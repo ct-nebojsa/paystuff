@@ -28,8 +28,12 @@
                     <input type="checkbox" v-model="isMsgVer2">
                 </p>
                 <p style="margin: 2px;">
-                    <strong style="display: inline-block; width: 150px;">Encryption password:</strong>
+                    <strong style="display: inline-block; width: 150px; font-size: 12px;">Encryption password:</strong>
                     <input type="text" class="simple-input" v-model="secret_test">
+                </p>
+                <p style="margin: 2px;">
+                    <strong style="display: inline-block; width: 150px;">HMAC password:</strong>
+                    <input type="text" placeholder="optional" class="simple-input" v-model="hmac_password">
                 </p>
                 <p style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Merchant ID:</strong>
@@ -162,12 +166,16 @@ export default {
             isThreeDsData: false,
             threeDsData: '{"challengeRequestInd":"04"}',
             credentialOnFile: '{"type":{"recurring":{"recurringFrequency":30,"recurringStartDate":"2025-09-14","recurringExpiryDate":"2025-09-14"}},"initialPayment":true}',
+            hmac_password: '',
         }
     },
     components: {
         Navbar
     },
     computed: {
+        hmac_data() {
+            return `*${this.merchantid}*${this.transid}*${this.amount}*${this.currency}` 
+        },
         plaintext() {
             const params = {
                 "MerchantID": this.merchantid,
@@ -202,6 +210,10 @@ export default {
 
             if (this.isThreeDsData) {
                 params.threeDsData = btoa(this.threeDsData);
+            }
+
+            if (this.hmac_password.length > 0) {
+                params.MAC = this.generateHMAC(this.hmac_data, this.hmac_password)
             }
 
             // Convert the object to a query string format
@@ -271,6 +283,9 @@ export default {
             } catch (error) {
                 console.error("Cannot access iframe contents due to cross-origin restrictions.", error);
             }
+        },
+        generateHMAC(hmac_data, secret) {
+            return CryptoJS.HmacSHA256(hmac_data, secret).toString(CryptoJS.enc.Hex);
         },
     },
     mounted() {

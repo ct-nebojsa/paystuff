@@ -2,6 +2,7 @@
     <ul class="navbar">
         <li>Payment request</li>
         <li>Decryption</li>
+        <li>Other actions</li>
     </ul>
 </template>
 
