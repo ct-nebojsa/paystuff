@@ -18,6 +18,7 @@
                         <option value="HPP">HPP</option>
                         <option value="payssl">payssl</option>
                         <option value="paytweak">paytweak</option>
+                        <option value="mandate">EasyCollect</option>
                         <option value="direct">S2S</option>
                         <option value="SimplePay">SimplePay</option>
                     </select>
@@ -98,12 +99,22 @@
                             v-model="threeDsData"></textarea>
                     </div>
                 </div>
+                <hr style="opacity: .2;">
+                <h3>Unencrypted parameters:</h3>
+                <p style="margin: 2px;">
+                    <strong style="display: inline-block; width: 150px;">Template:</strong>
+                    <input type="text" class="simple-input" v-model="template">
+                </p>
+                <p style="margin: 2px;">
+                    <strong style="display: inline-block; width: 150px;">Pay Types:</strong>
+                    <input type="text" class="simple-input" v-model="hpppaytypes">
+                </p>
                 <p v-if="paytype === 'paytweak'" style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Service (Paytweak):</strong>
                     <input type="text" class="simple-input" v-model="paytweak_service">
                 </p>
                 <p style="margin: 2px;">
-                    <button @click="encryptData(plaintext)" class="simple-button">Enrypt</button>
+                    <button @click="encryptData(plaintext)" class="simple-button">Encrypt</button>
                 </p>
                 <p style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Plain text:</strong>
@@ -122,7 +133,7 @@
         </div>
         <div style="margin: 0;">
             <div class="wrapper">
-                <h3>Some Payment calls</h3>
+                <h3>Some Payment calls (click on button below to open in a new tab)</h3>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
                     <strong style="display: inline-block; width: 150px;">{{ this.paytype }}:</strong>
                     <span class="redirect-url">{{ testurl_ohne_data }}</span>
@@ -143,7 +154,7 @@ import Navbar from '@/components/Navbar.vue'
 export default {
     data() {
         return {
-            merchantid: '',
+            merchantid: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_MERCHANTID : '',
             transid: '',
             amount: '1000',
             currency: 'EUR',
@@ -151,7 +162,7 @@ export default {
             urlsuccess: 'http://127.0.0.1:3005/success',
             urlfailure: 'http://127.0.0.1:3005/failure',
             urlnotify: 'http://127.0.0.1:3005/urlnotify',
-            secret_test: '',
+            secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
             encrypted_data: '',
             plain_text: '',
             len: 0,
@@ -167,6 +178,8 @@ export default {
             threeDsData: '{"challengeRequestInd":"04"}',
             credentialOnFile: '{"type":{"recurring":{"recurringFrequency":30,"recurringStartDate":"2025-09-14","recurringExpiryDate":"2025-09-14"}},"initialPayment":true}',
             hmac_password: '',
+            template: '',
+            hpppaytypes: '',
         }
     },
     components: {
@@ -174,7 +187,7 @@ export default {
     },
     computed: {
         hmac_data() {
-            return `*${this.merchantid}*${this.transid}*${this.amount}*${this.currency}` 
+            return `*${this.merchantid}*${this.transid}*${this.amount}*${this.currency}`
         },
         plaintext() {
             const params = {
@@ -194,6 +207,10 @@ export default {
 
             if (this.paytype === 'paytweak') {
                 params.Service = this.paytweak_service;
+            }
+
+            if (this.paytype === 'mandate') {
+                //
             }
 
             if (this.preauth_flag) {
@@ -234,6 +251,9 @@ export default {
             } else if (this.paytype === 'paytweak') {
                 this.isDataEncrypted = false
                 return 'paybylinkexternal'
+            } else if (this.paytype === 'mandate') {
+                this.isDataEncrypted = false
+                return 'mandate'
             } else if (this.paytype === 'direct') {
                 this.isDataEncrypted = false
                 return 'direct'
@@ -247,7 +267,15 @@ export default {
             return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=[EncryptedData]`
         },
         testurl() {
-            return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`
+            if (this.template.length > 0) {
+                return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}&Template=${this.template}`
+            } else if (this.hpppaytypes.length > 0) {
+                return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}&PayTypes=${this.hpppaytypes}`
+            }
+            else {
+                return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`
+            }
+
         }
     },
     methods: {
@@ -290,6 +318,7 @@ export default {
     },
     mounted() {
         this.generate_transid()
+        console.log(import.meta.env.MODE)
     }
 }
 </script>
@@ -300,6 +329,7 @@ export default {
     width: 1200px;
     margin: auto;
     gap: 20px;
+    margin-top: 10px;
 }
 
 .wrapper {
@@ -308,7 +338,6 @@ export default {
     width: 700px;
     padding: 30px;
     border-radius: 10px;
-    box-shadow: 0 0 1px 1px #d4d4d4;
     margin-top: 0;
     margin-bottom: 20px;
 }
@@ -349,14 +378,15 @@ textarea {
 
 .simple-button {
     border: none;
-    background-color: tomato;
+    background-color: #a5f729;
     border-radius: 5px;
-    padding: 5px 20px 5px 20px;
+    padding: 10px 25px 10px 25px;
     cursor: pointer;
+    font-size: 16px;
 }
 
 .narrow {
-    width: 200px;
+    width: 190px;
 }
 
 .redirect-url {

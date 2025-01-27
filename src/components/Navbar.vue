@@ -1,14 +1,26 @@
 <template>
+    <div class="navbar-wrapper">
     <ul class="navbar">
-        <li>Payment request</li>
-        <li>Decryption</li>
+        <li><router-link to="/">Payment request</router-link></li>
+        <li><router-link to="/decrypt">Decryption</router-link></li>
         <li>Other actions</li>
     </ul>
+</div>
 </template>
 
 <script></script>
 
 <style scoped>
+a {
+    text-decoration: none;
+    color: white;
+}
+.navbar-wrapper {
+    margin: auto;
+    width: 1200px;
+    text-align: center;
+}
+
 .navbar {
     display: flex;
     list-style: none;
@@ -23,9 +35,7 @@ li {
 }
 
 li:hover {
-    color: #1e5582;
-    background-color: white;
-    cursor: pointer;
+    text-decoration: underline;
 }
 
 
