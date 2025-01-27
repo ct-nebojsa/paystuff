@@ -3,7 +3,7 @@
     <Navbar />
     <div class="main-wrapper">
         <div class="wrapper narrower">
-            <h1>Paygate Playground</h1>
+            <h1 style="color: #1e5582; font-weight: 600;">Paygate Playground</h1>
             <div class="parameters">
                 <p style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Environment:</strong>
@@ -24,7 +24,8 @@
                         <option value="simplepay">SimplePay</option>
                     </select>
                 </p>
-                <hr style="opacity: .2;">
+                <hr style="opacity: .2; margin: 10px;">
+                <h3 style="color: #1e5582; font-weight: 600;">Encrypted parameters:</h3>
                 <p style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">MsgVer=2.0:</strong>
                     <input type="checkbox" v-model="isMsgVer2">
@@ -104,8 +105,8 @@
                     <strong style="display: inline-block; width: 150px;">Other parameters:</strong>
                     <input type="text" class="simple-input" v-model="otherparams" disabled>
                 </p>
-                <hr style="opacity: .2;">
-                <h3>Unencrypted parameters:</h3>
+                <hr style="opacity: .2; margin: 10px;">
+                <h3 style="color: #1e5582; font-weight: 600;">Unencrypted parameters:</h3>
                 <p style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Template:</strong>
                     <input type="text" class="simple-input" v-model="template">
@@ -138,14 +139,17 @@
         </div>
         <div style="margin: 0;">
             <div class="wrapper wider">
-                <h3>Some Payment calls (click on button below to open in a new tab)</h3>
+                <h3 style="color: #1e5582; font-weight: 600;">Payment call (click on the button below to open in a new tab)</h3>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
                     <strong style="display: inline-block; width: 150px;">{{ this.paytype }}:</strong>
+                    <div style="display: flex; align-items: center;">
                     <span class="redirect-url">{{ testurl_ohne_data }}</span>
-                    <a v-if="isDataEncrypted" :href=testurl target="_blank">Call {{ this.paytype }}</a>
+                    <a class="payment-url-button" v-if="isDataEncrypted" :href=testurl target="_blank">Call {{ this.paytype }}</a>
+                </div>
                 </div>
             </div>
             <div v-if="isDataEncrypted" class="wrapper wider">
+                <h3 style="color: #1e5582; font-weight: 600;">Embedded in iframe:</h3>
                 <iframe :src="testurl" width="850" height="650" ref="paymentIframe" @load="onIframeLoad"></iframe>
             </div>
         </div>
@@ -397,6 +401,7 @@ textarea {
     border-color: #d4d4d4;
     width: 300px;
     border-color: #d4d4d4;
+    outline: none;
 }
 
 .simple-button {
@@ -406,6 +411,8 @@ textarea {
     padding: 10px 25px 10px 25px;
     cursor: pointer;
     font-size: 16px;
+    color: #1e5582;
+    font-weight: 600;
 }
 
 .narrow {
@@ -413,11 +420,21 @@ textarea {
 }
 
 .redirect-url {
-    width: 800px;
+    width: 700px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     font-size: 12px;
+}
+
+.payment-url-button {
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e5582;
+    background-color: #a5f729;
+    padding: 5px 15px;
+    border-radius: 5px;
 }
 
 .generate-button {
