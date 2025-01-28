@@ -68,6 +68,10 @@
                     <input type="text" class="simple-input" v-model="urlnotify">
                 </p>
                 <p style="margin: 2px;">
+                    <strong style="display: inline-block; width: 150px;">Email:</strong>
+                    <input type="text" class="simple-input" v-model="email">
+                </p>
+                <p style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Preauth:</strong>
                     <input type="checkbox" v-model="preauth_flag" disabled> <!-- disabled for now -->
                 </p>
@@ -94,6 +98,15 @@
                 </div>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
                     <div>
+                        <strong style="display: inline-block; width: 150px;">billToCustomer:</strong>
+                        <input type="checkbox" v-model="isBillToCustomer">
+                    </div>
+                    <div><textarea class="custom-height" v-if="isBillToCustomer" name="billToCustomer"
+                            id="billToCustomer" v-model="billToCustomer"></textarea>
+                    </div>
+                </div>
+                <div style="margin: 2px; display: flex; flex-direction: column;">
+                    <div>
                         <strong style="display: inline-block; width: 150px;">threeDsData:</strong>
                         <input type="checkbox" v-model="isThreeDsData">
                     </div>
@@ -114,6 +127,18 @@
                 <p style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Pay Types:</strong>
                     <input type="text" class="simple-input" v-model="hpppaytypes">
+                </p>
+                <p style="margin: 2px;">
+                    <strong style="display: inline-block; width: 150px;">CustomField1:</strong>
+                    <input type="text" class="simple-input" v-model="customfield1">
+                </p>
+                <p style="margin: 2px;">
+                    <strong style="display: inline-block; width: 150px;">CustomField2:</strong>
+                    <input type="text" class="simple-input" v-model="customfield2">
+                </p>
+                <p style="margin: 2px;">
+                    <strong style="display: inline-block; width: 150px;">CustomField4:</strong>
+                    <input type="text" class="simple-input" v-model="customfield4">
                 </p>
                 <p v-if="paytype === 'paytweak'" style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Service (Paytweak):</strong>
@@ -139,13 +164,15 @@
         </div>
         <div style="margin: 0;">
             <div class="wrapper wider">
-                <h3 style="color: #1e5582; font-weight: 600;">Payment call (click on the button below to open in a new tab)</h3>
+                <h3 style="color: #1e5582; font-weight: 600;">Payment call (click on the button below to open in a new
+                    tab)</h3>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
                     <strong style="display: inline-block; width: 150px;">{{ this.paytype }}:</strong>
                     <div style="display: flex; align-items: center;">
-                    <span class="redirect-url">{{ testurl_ohne_data }}</span>
-                    <a class="payment-url-button" v-if="isDataEncrypted" :href=testurl target="_blank">Call {{ this.paytype }}</a>
-                </div>
+                        <span class="redirect-url">{{ testurl_ohne_data }}</span>
+                        <a class="payment-url-button" v-if="isDataEncrypted" :href=testurl target="_blank">Call {{
+                            this.paytype }}</a>
+                    </div>
                 </div>
             </div>
             <div v-if="isDataEncrypted" class="wrapper wider">
@@ -154,7 +181,7 @@
             </div>
         </div>
     </div>
-<LoginModal />
+    <LoginModal />
 </template>
 
 <script>
@@ -174,6 +201,7 @@ export default {
             urlsuccess: 'http://127.0.0.1:3005/success',
             urlfailure: 'http://127.0.0.1:3005/failure',
             urlnotify: 'http://127.0.0.1:3005/urlnotify',
+            email: import.meta.env.VITE_ENVIRONMENT === 'development' ? 'nebojsa.pesic@computop.com' : '',
             secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
             encrypted_data: '',
             plain_text: '',
@@ -192,6 +220,11 @@ export default {
             hmac_password: '',
             template: '',
             hpppaytypes: '',
+            isBillToCustomer: false,
+            billToCustomer: '{"consumer":{"salutation":"Mr","firstName":"John","lastName":"Doe"},"phone":{"countryCode":"49","subscriberNumber":"12345678910"},"mobilePhone":{"countryCode":"49","subscriberNumber":"12345678910"}}',
+            customfield1: '',
+            customfield2: '',
+            customfield4: ''
         }
     },
     components: {
@@ -212,6 +245,7 @@ export default {
                 "URLSuccess": this.urlsuccess,
                 "URLFailure": this.urlfailure,
                 "URLNotify": this.urlnotify,
+                "email": this.email,
                 "OrderDesc": this.orderdesc,
             };
 
@@ -241,6 +275,10 @@ export default {
 
             if (this.isThreeDsData) {
                 params.threeDsData = btoa(this.threeDsData);
+            }
+
+            if (this.isBillToCustomer) {
+                params.billToCustomer = btoa(this.billToCustomer);
             }
 
             if (this.hmac_password.length > 0) {
@@ -284,59 +322,67 @@ export default {
             return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=[EncryptedData]`
         },
         testurl() {
+            let base_url = `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`
             if (this.template.length > 0) {
-                return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}&Template=${this.template}`
-            } else if (this.hpppaytypes.length > 0) {
-                return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}&PayTypes=${this.hpppaytypes}`
+                base_url = base_url + `&Template=${this.template}`
             }
-            else {
-                return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`
-            }
+            if (this.hpppaytypes.length > 0) {
+                base_url = base_url + `&PayTypes=${this.hpppaytypes}`
 
+            }
+            if (this.customfield1.length > 0) {
+                base_url = base_url + `&CustomField1=${this.customfield1}`
+
+            }
+            if (this.customfield2.length > 0) {
+                base_url = base_url + `&CustomField2=${this.customfield2}`
+
+            }
+            return base_url
+    }
+},
+methods: {
+    generate_transid() {
+        let transid = '';
+        for (let i = 0; i < 10; i++) {
+            transid += Math.floor(Math.random() * 10); // Generates a random digit (0-9)
+        }
+        this.transid = transid
+        this.isDataEncrypted = false
+    },
+    encryptData(data) {
+        this.encrypted_data = CryptoJS.Blowfish.encrypt(data, CryptoJS.enc.Utf8.parse(this.secret_test), {
+            mode: CryptoJS.mode.ECB,
+            padding: CryptoJS.pad.Pkcs7
+        }).ciphertext.toString(CryptoJS.enc.Hex);
+        this.isDataEncrypted = true
+    },
+        async callaspx() {
+        await axios.get(`https://test.computop-paygate.com/paybylinkexternal.aspx?MerchantId=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`)
+            .then(response => {
+                console.log('Response:', response.data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    },
+    onIframeLoad() {
+        const iframe = this.$refs.paymentIframe;
+        try {
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            console.log(iframeDoc.body); // Access the <body> of the iframe
+        } catch (error) {
+            console.error("Cannot access iframe contents due to cross-origin restrictions.", error);
         }
     },
-    methods: {
-        generate_transid() {
-            let transid = '';
-            for (let i = 0; i < 10; i++) {
-                transid += Math.floor(Math.random() * 10); // Generates a random digit (0-9)
-            }
-            this.transid = transid
-            this.isDataEncrypted = false
-        },
-        encryptData(data) {
-            this.encrypted_data = CryptoJS.Blowfish.encrypt(data, CryptoJS.enc.Utf8.parse(this.secret_test), {
-                mode: CryptoJS.mode.ECB,
-                padding: CryptoJS.pad.Pkcs7
-            }).ciphertext.toString(CryptoJS.enc.Hex);
-            this.isDataEncrypted = true
-        },
-        async callaspx() {
-            await axios.get(`https://test.computop-paygate.com/paybylinkexternal.aspx?MerchantId=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`)
-                .then(response => {
-                    console.log('Response:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        },
-        onIframeLoad() {
-            const iframe = this.$refs.paymentIframe;
-            try {
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                console.log(iframeDoc.body); // Access the <body> of the iframe
-            } catch (error) {
-                console.error("Cannot access iframe contents due to cross-origin restrictions.", error);
-            }
-        },
-        generateHMAC(hmac_data, secret) {
-            return CryptoJS.HmacSHA256(hmac_data, secret).toString(CryptoJS.enc.Hex);
-        },
+    generateHMAC(hmac_data, secret) {
+        return CryptoJS.HmacSHA256(hmac_data, secret).toString(CryptoJS.enc.Hex);
     },
-    mounted() {
-        this.generate_transid()
-        console.log(import.meta.env.MODE)
-    }
+},
+mounted() {
+    this.generate_transid()
+    console.log(import.meta.env.MODE)
+}
 }
 </script>
 

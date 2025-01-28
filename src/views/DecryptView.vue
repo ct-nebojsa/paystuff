@@ -8,7 +8,7 @@
             <div class="data-wrapper">
                 <p style="width: 150px; text-align: right; margin-right: 10px;">Data</p>
                 <textarea class="custom-width" v-model="encryptedData"></textarea>
-                <p style="margin-left: 10px;">Encrypted LEN + Data</p>
+                <p style="margin-left: 10px;">Encrypted Data only</p>
             </div>
             <div style="display: flex; margin-top: 10px;">
                 <p style="width: 150px; text-align: right; margin-right: 10px;">Encryption password:</p>

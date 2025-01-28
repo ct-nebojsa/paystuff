@@ -1,7 +1,7 @@
 <template>
     <div class="navbar-wrapper">
     <ul class="navbar">
-        <li><router-link to="/">Payment request</router-link></li>
+        <li><router-link to="/">Encryption</router-link></li>
         <li><router-link to="/decrypt">Decryption</router-link></li>
         <li>Other actions</li>
     </ul>
