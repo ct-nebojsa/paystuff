@@ -163,7 +163,10 @@
                     <button @click="encryptData(plaintext)" class="simple-button">Encrypt</button>
                 </div>
                 </div>
-                <p style="margin: 2px;">
+            </div>
+        </div>
+        <div class="wrapper narrower">
+            <p style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Plain text:</strong>
                     <textarea name="" id="">{{ plaintext }}</textarea>
                 </p>
@@ -175,8 +178,6 @@
                     <strong style="display: inline-block; width: 150px;">Encrypted data:</strong>
                     <textarea v-if="encrypted_data" name="" id="">{{ encrypted_data }}</textarea>
                 </p>
-                <!-- <button @click="callaspx">CALLLL</button> -->
-            </div>
         </div>
         <div style="margin: 0;">
             <div class="wrapper wider">
@@ -193,7 +194,7 @@
             </div>
             <div v-if="isDataEncrypted" class="wrapper wider">
                 <h3 style="color: #1e5582; font-weight: 600;">Embedded in iframe:</h3>
-                <iframe :src="testurl" width="850" height="650" ref="paymentIframe" @load="onIframeLoad"></iframe>
+                <iframe :src="testurl" width="750" height="650" ref="paymentIframe" @load="onIframeLoad"></iframe>
             </div>
         </div>
     </div>
@@ -412,7 +413,7 @@ export default {
 <style scoped>
 .main-wrapper {
     display: flex;
-    width: 1500px;
+    width: 2000px;
     margin: auto;
     gap: 20px;
     margin-top: 10px;
@@ -435,7 +436,7 @@ export default {
 }
 
 .wider {
-    width: 850px;
+    width: 750px;
 }
 
 select {

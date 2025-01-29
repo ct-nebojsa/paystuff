@@ -25,7 +25,7 @@ export default {
 <style scoped>
 .header-wrapper {
     margin: auto;
-    width: 1500px;
+    width: 2000px;
     background-color: #1e5582;
     color: white;
     text-align: right;

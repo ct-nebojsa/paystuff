@@ -63,7 +63,7 @@ export default {
 
 <style scoped>
 .decrypt-wrapper {
-    width: 1500px;
+    width: 2100px;
     display: flex;
     margin: auto;
     flex-direction: column;
