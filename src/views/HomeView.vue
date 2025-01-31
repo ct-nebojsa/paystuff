@@ -65,7 +65,7 @@
                     <strong style="display: inline-block; width: 150px;">Customer ID:</strong>
                     <input type="text" class="simple-input" v-model="customerid">
                 </p>
-                <p style="margin: 2px;">
+                <p style="margin: 2px; display: flex;">
                     <strong style="display: inline-block; width: 150px;">Amount:</strong>
                     <input type="text" class="simple-input" v-model="amount" placeholder="mandatory">
                 </p>
@@ -157,10 +157,16 @@
                             v-model="threeDsData"></textarea>
                     </div>
                 </div>
-                <p style="margin: 2px;">
-                    <strong style="display: inline-block; width: 150px;">Other parameters:</strong>
+                <div style="margin: 2px;">
+                    <strong style="display: inline-block; width: 150px; font-size: 13px;">Other parameters <strong
+                            title="Use this field to manually add payment specific parameters. Example key1=value1&key2=value2. It will automatically be parsed and included in the request."
+                            class="qm-tooltip">?</strong></strong>
                     <input type="text" class="simple-input" v-model="otherparams" placeholder="">
-                </p>
+                    <div style="display: flex; margin-top: 4px; justify-content: center;">
+                        <button class="show-all-button" @click="isParametersModal = true">Show all parameters</button>
+                        <button class="show-all-button" @click="this.otherparams = ''">Clear field</button>
+                    </div>
+                </div>
                 <hr style="opacity: .2; margin: 10px;">
                 <h3 style="color: #1e5582; font-weight: 600;">Unencrypted parameters:</h3>
                 <p style="margin: 2px;">
@@ -234,6 +240,8 @@
         </div>
     </div>
     <LoginModal />
+    <ParametersModal v-show="isParametersModal" @close="isParametersModal = false"
+        @setparameter="handleReceivedParameter" />
 </template>
 
 <script>
@@ -242,6 +250,7 @@ import axios from 'axios'
 import Navbar from '@/components/Navbar.vue'
 import LoginModal from "@/components/LoginModal.vue";
 import Header from "@/components/Header.vue";
+import ParametersModal from "@/components/ParametersModal.vue";
 export default {
     data() {
         return {
@@ -286,12 +295,15 @@ export default {
             otherparams: '',
             paybylinkexpiration: '2099-12-31 23:59:59',
             articlelist: '{"order_lines":[{"name":"Advanced Care","quantity":1,"quantity_unit":"STK","reference":"1452906","tax_rate":1900,"total_amount":500,"type":"physical","unit_price":500}]}',
+            isParametersModal: false,
+            receivedParameter: null,
         }
     },
     components: {
         Header,
         Navbar,
-        LoginModal
+        LoginModal,
+        ParametersModal
     },
     computed: {
         hmac_data() {
@@ -522,6 +534,14 @@ export default {
         generateHMAC(hmac_data, secret) {
             return CryptoJS.HmacSHA256(hmac_data, secret).toString(CryptoJS.enc.Hex);
         },
+        handleReceivedParameter(value) {
+            if (this.otherparams.length === 0) {
+                this.otherparams += value + '='
+            } else {
+                this.otherparams += '&' + value + '='
+            }
+
+        }
     },
     mounted() {
         this.generate_transid()
@@ -533,6 +553,21 @@ export default {
                 this.currency = 'HUF'
             }
         },
+        customerid() {
+            if (this.customerid.length > 0 && this.paytype === 'floapay') {
+                this.inputClass = 'simple-input'
+            } else if (this.customerid.length === 0 && this.paytype === 'floapay') {
+                this.inputClass = 'simple-input-mandatory'
+            }
+        },
+        otherparams(newValue) {
+            if (newValue.endsWith('&')) {
+                this.otherparams = newValue.slice(0, -1);
+            }
+            if (newValue.startsWith('&')) {
+                this.otherparams = newValue.slice(0);
+            }
+        }
     }
 }
 </script>
@@ -597,8 +632,17 @@ textarea {
     border: 1px solid;
     border-color: #d4d4d4;
     width: 300px;
-    border-color: #d4d4d4;
     outline: none;
+}
+
+.simple-input-mandatory {
+    padding: 4px;
+    border-radius: 5px;
+    border: 1px solid;
+    border-color: #d4d4d4;
+    width: 300px;
+    outline: none;
+    background-color: #ff857c;
 }
 
 .simple-button {
@@ -660,6 +704,17 @@ textarea {
     font-size: 12px;
     cursor: pointer;
     padding: 0 5px 0 5px;
+}
+
+.show-all-button {
+    border: none;
+    border-radius: 5px;
+    background-color: #1e5582;
+    color: white;
+    margin-left: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 7px 2px 7px;
 }
 
 iframe {
