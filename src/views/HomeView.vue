@@ -231,8 +231,8 @@
                         <a class="payment-url-button" v-if="isDataEncrypted" :href=testurl target="_blank">Call {{
                             this.paytype }}</a>
                     </div>
-                    <div style="align-items: center; display: flex;">
-                        <canvas ref="qrcodeCanvas" v-if="isDataEncrypted"></canvas>
+                    <div style="align-items: center; display: flex;" v-if="isDataEncrypted">
+                        <canvas ref="qrcodeCanvas"></canvas>
                         <button class="simpler-button" @click="generateQR()" v-if="!this.isQRCodeGenerated">Generate QR code</button>
                     </div>
                 </div>
