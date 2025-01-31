@@ -19,7 +19,7 @@
                     <select name="paytype" id="paytype" v-model="paytype" style="width: 250px;">
                         <option value="mandateform">EasyCollect (mandateform.aspx)</option>
                         <option value="floapay">Floapay (floapay.aspx)</option>
-                        <option value="HPP">HPP (paymentpage.aspx)</option>
+                        <option value="paymentpage">HPP (paymentpage.aspx)</option>
                         <option value="instanea">Instanea (instanea.aspx)</option>
                         <option value="klarnapayments">KlarnaPM (klarnapayments.aspx)</option>
                         <option value="payssl">payssl (payssl.aspx)</option>
@@ -159,7 +159,7 @@
                 </div>
                 <div style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px; font-size: 13px;">Other parameters <strong
-                            title="Use this field to manually add payment specific parameters. Example key1=value1&key2=value2. It will automatically be parsed and included in the request."
+                            title="Use this field to manually add payment specific parameters. Example: key1=value1&key2=value2. It will automatically be parsed and included in the request. Or click on Show all parameters button to add parameters on a click."
                             class="qm-tooltip">?</strong></strong>
                     <input type="text" class="simple-input" v-model="otherparams" placeholder="">
                     <div style="display: flex; margin-top: 4px; justify-content: center;">
@@ -209,7 +209,7 @@
         <div class="wrapper narrower">
             <p style="margin: 2px;">
                 <strong style="display: inline-block; width: 150px;">Plain text:</strong>
-                <textarea name="" id="">{{ plaintext }}</textarea>
+                <textarea readonly name="" id="">{{ plaintext }}</textarea>
             </p>
             <p style="margin: 2px;">
                 <strong style="display: inline-block; width: 150px;">Len:</strong>
@@ -231,6 +231,10 @@
                         <a class="payment-url-button" v-if="isDataEncrypted" :href=testurl target="_blank">Call {{
                             this.paytype }}</a>
                     </div>
+                    <div style="align-items: center; display: flex;">
+                        <canvas ref="qrcodeCanvas" v-if="isDataEncrypted"></canvas>
+                        <button class="simpler-button" @click="generateQR()" v-if="!this.isQRCodeGenerated">Generate QR code</button>
+                    </div>
                 </div>
             </div>
             <div v-if="isDataEncrypted" class="wrapper wider">
@@ -251,6 +255,7 @@ import Navbar from '@/components/Navbar.vue'
 import LoginModal from "@/components/LoginModal.vue";
 import Header from "@/components/Header.vue";
 import ParametersModal from "@/components/ParametersModal.vue";
+import QRCode from "qrcode";
 export default {
     data() {
         return {
@@ -269,7 +274,7 @@ export default {
             encrypted_data: '',
             plain_text: '',
             len: 0,
-            paytype: 'HPP',
+            paytype: 'paymentpage',
             paytweak_service: 'link',
             preauth_flag: false,
             isCard: false,
@@ -297,6 +302,7 @@ export default {
             articlelist: '{"order_lines":[{"name":"Advanced Care","quantity":1,"quantity_unit":"STK","reference":"1452906","tax_rate":1900,"total_amount":500,"type":"physical","unit_price":500}]}',
             isParametersModal: false,
             receivedParameter: null,
+            isQRCodeGenerated: false,
         }
     },
     components: {
@@ -410,7 +416,7 @@ export default {
             return this.otherparams ? this.otherparams.split('&') : [];
         },
         frontend() {
-            if (this.paytype === 'HPP') {
+            if (this.paytype === 'paymentpage') {
                 this.isMsgVer2 = true
                 this.isDataEncrypted = false
                 this.encrypted_data = ''
@@ -512,6 +518,7 @@ export default {
                 padding: CryptoJS.pad.Pkcs7
             }).ciphertext.toString(CryptoJS.enc.Hex);
             this.isDataEncrypted = true
+            this.isQRCodeGenerated = false
         },
         async callaspx() {
             await axios.get(`https://test.computop-paygate.com/paybylinkexternal.aspx?MerchantId=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`)
@@ -521,6 +528,12 @@ export default {
                 .catch(error => {
                     console.error('Error:', error);
                 });
+        },
+        generateQR() {
+            QRCode.toCanvas(this.$refs.qrcodeCanvas, `https://test.computop-paygate.com/${this.paytype}.aspx?MerchantId=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`, {
+                width: 200
+            });
+            this.isQRCodeGenerated = true
         },
         onIframeLoad() {
             const iframe = this.$refs.paymentIframe;
@@ -652,6 +665,18 @@ textarea {
     padding: 10px 45px 10px 45px;
     cursor: pointer;
     font-size: 16px;
+    color: #1e5582;
+    font-weight: 600;
+    outline: none;
+}
+
+.simpler-button {
+    border: none;
+    background-color: #a5f729;
+    border-radius: 5px;
+    padding: 5px 15px 5px 15px;
+    cursor: pointer;
+    font-size: 12px;
     color: #1e5582;
     font-weight: 600;
     outline: none;
