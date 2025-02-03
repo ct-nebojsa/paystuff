@@ -3,7 +3,7 @@
     <Navbar />
     <div class="main-wrapper">
         <div class="wrapper narrower">
-            <h2 style="color: #1e5582; font-weight: 600;">Paygate Playground</h2>
+            <h2 style="color: #1e5582; font-weight: 600;">Paygate Encryption Test Tool</h2>
             <h3 style="color: tomato;">Data is not stored on any server.</h3>
             <div class="parameters">
                 <p style="margin: 2px;">
@@ -675,6 +675,7 @@ textarea {
     background-color: #a5f729;
     border-radius: 5px;
     padding: 10px 45px 10px 45px;
+    margin-top: 10px;
     cursor: pointer;
     font-size: 16px;
     color: #1e5582;
