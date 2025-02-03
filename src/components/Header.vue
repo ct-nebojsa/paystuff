@@ -1,8 +1,15 @@
 <template>
-    <div v-if="auth.isAuthenticated" class="header-wrapper">
-        User:
-        {{ this.auth.getUsername }}
-        <button class="logout-button" @click="logout">Logout</button>
+    <div style="width: 100%; background-color: #141932; display: flex;">
+        <div style="width: 2000px; margin: auto; display: flex; padding: 10px 0;">
+            <div>
+                <img src="@/assets/images/logo/Logo.svg" width="60%" alt="">
+            </div>
+            <div v-if="auth.isAuthenticated" class="header-wrapper">
+                User:
+                {{ this.auth.getUsername }}
+                <button class="logout-button" @click="logout">Logout</button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -16,7 +23,7 @@ export default {
     },
     methods: {
         logout() {
-            this.auth.isAuthenticated = false 
+            this.auth.isAuthenticated = false
         }
     }
 }
@@ -26,7 +33,7 @@ export default {
 .header-wrapper {
     margin: auto;
     width: 2000px;
-    background-color: #1e5582;
+    background-color: #141932;
     color: white;
     text-align: right;
     padding: 4px 0 4px 0;

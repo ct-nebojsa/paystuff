@@ -17,6 +17,7 @@ a {
 }
 .navbar-wrapper {
     margin: auto;
+    margin-top: 10px;
     width: 2000px;
     text-align: center;
 }

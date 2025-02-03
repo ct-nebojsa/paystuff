@@ -5,10 +5,14 @@
         <div class="other-wrapper">
             <div>
                 <h1>Capture</h1>
+                <p>n/a</p>
             </div>
+            <hr style="opacity: .3;">
             <div>
                 <h1>Increment</h1>
+                <p>n/a</p>
             </div>
+            <hr style="opacity: .3;">
             <div>
                 <h1>Inquiry</h1>
                 <div>

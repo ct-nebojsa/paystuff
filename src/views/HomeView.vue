@@ -3,15 +3,15 @@
     <Navbar />
     <div class="main-wrapper">
         <div class="wrapper narrower">
-            <h1 style="color: #1e5582; font-weight: 600;">Paygate Playground</h1>
+            <h2 style="color: #1e5582; font-weight: 600;">Paygate Playground</h2>
             <h3 style="color: tomato;">Data is not stored on any server.</h3>
             <div class="parameters">
                 <p style="margin: 2px;">
                     <strong style="display: inline-block; width: 150px;">Environment:</strong>
-                    <select name="environment" id="environment" disabled style="width: 250px;">
-                        <option value="dev">DEV disabled for now.</option>
+                    <select name="environment" id="environment" style="width: 250px;" v-model="environment">
+                        <option value="dev">DEV</option>
                         <option value="test">TEST</option>
-                        <option value="prod">PROD</option>
+                        <option value="prod">PRODUCTION</option>
                     </select>
                 </p>
                 <p style="margin: 2px;">
@@ -82,11 +82,11 @@
                     <input type="text" class="simple-input" v-model="urlfailure">
                 </p>
                 <p style="margin: 2px;">
-                    <strong style="display: inline-block; width: 150px;">URLBack:</strong>
+                    <strong style="display: inline-block; width: 150px;">URLNotify:</strong>
                     <input type="text" class="simple-input" v-model="urlnotify">
                 </p>
                 <p style="margin: 2px;">
-                    <strong style="display: inline-block; width: 150px;">URLNotify:</strong>
+                    <strong style="display: inline-block; width: 150px;">URLBack:</strong>
                     <input type="text" class="simple-input" v-model="urlback">
                 </p>
                 <p v-if="paytype === 'paytweak'" style="margin: 2px;">
@@ -222,7 +222,7 @@
         </div>
         <div style="margin: 0;">
             <div class="wrapper wider">
-                <h3 style="color: #1e5582; font-weight: 600;">Payment call (click on the button below to open in a new
+                <h3 style="color: #1e5582; font-weight: 600;">Payment request (click on the button below to open in a new
                     tab)</h3>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
                     <strong style="display: inline-block; width: 150px;">{{ this.paytype }}:</strong>
@@ -260,6 +260,7 @@ import QRCode from "qrcode";
 export default {
     data() {
         return {
+            environment: 'test',
             merchantid: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_MERCHANTID : '',
             transid: '',
             refnr: '',
@@ -304,7 +305,6 @@ export default {
             isParametersModal: false,
             receivedParameter: null,
             isQRCodeGenerated: false,
-            baseUrl: ''
         }
     },
     components: {
@@ -316,6 +316,15 @@ export default {
     computed: {
         hmac_data() {
             return `*${this.merchantid}*${this.transid}*${this.amount}*${this.currency}`
+        },
+        baseurl() {
+            if (this.environment === 'dev') {
+                return 'dev.computop.de/paygate'
+            } else if (this.environment === 'test') {
+                return 'test.computop-paygate.com'
+            } else {
+                return 'computop-paygate.com'
+            }
         },
         plaintext() {
             const params = {
@@ -476,10 +485,10 @@ export default {
             }
         },
         testurl_ohne_data() {
-            return `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=[EncryptedData]`
+            return `https://${this.baseurl}/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=[EncryptedData]`
         },
         testurl() {
-            let base_url = `https://test.computop-paygate.com/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`
+            let base_url = `https://${this.baseurl}/${this.frontend}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`
             if (this.template.length > 0) {
                 base_url = base_url + `&Template=${this.template}`
             }
@@ -523,7 +532,7 @@ export default {
             this.isQRCodeGenerated = false
         },
         async callaspx() {
-            await axios.get(`https://test.computop-paygate.com/paybylinkexternal.aspx?MerchantId=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`)
+            await axios.get(`https://${this.baseurl}/paybylinkexternal.aspx?MerchantId=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`)
                 .then(response => {
                     console.log('Response:', response.data);
                 })
@@ -532,7 +541,7 @@ export default {
                 });
         },
         generateQR() {
-            QRCode.toCanvas(this.$refs.qrcodeCanvas, `https://test.computop-paygate.com/${this.paytype}.aspx?MerchantId=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`, {
+            QRCode.toCanvas(this.$refs.qrcodeCanvas, `https://${this.baseurl}/${this.paytype}.aspx?MerchantId=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`, {
                 width: 200
             });
             this.isQRCodeGenerated = true
@@ -601,14 +610,15 @@ export default {
     background-color: white;
     margin: auto;
     width: 700px;
-    padding: 30px;
+    padding: 20px;
+    padding-top: 10px;
     border-radius: 10px;
     margin-top: 0;
     margin-bottom: 20px;
 }
 
 .narrower {
-    width: 500px;
+    width: 520px;
     margin-left: 0;
 }
 
@@ -709,7 +719,7 @@ textarea {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .payment-url-button {
