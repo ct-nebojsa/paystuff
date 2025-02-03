@@ -30,7 +30,7 @@
                     </select>
                 </p>
                 <div style="margin: 2px; align-items: center; display: flex; margin-top: 5px;">
-                    <strong style="display: inline-block; width: 150px; align-items: center; font-size: 12px">Other payment method <strong title="Use this if payment method not listed in above dropdown" class="qm-tooltip">?</strong></strong>
+                    <strong style="display: inline-block; width: 150px; align-items: center; font-size: 11px">Other payment method <strong title="Use this if payment method not listed in above dropdown" class="qm-tooltip">?</strong></strong>
                     <input type="checkbox" v-model="isOtherPaymentMethod" style="margin-right: 10px;">
                     <div v-if="isOtherPaymentMethod">
                         <input class="simple-input" style="width: 275px;" type="text" v-model="otherpaymentmethod" placeholder="example (example.aspx)">
