@@ -45,15 +45,15 @@
                 <p style="margin: 2px; align-items: center;">
                     <strong class="strong-label">Encryption
                         password <strong title="Received from Computop" class="qm-tooltip">?</strong></strong>
-                    <input type="text" class="simple-input" v-model="secret_test" placeholder="mandatory">
+                    <input type="text" class="simple-input" v-model="secret_test" placeholder="(mandatory)">
                 </p>
                 <p style="margin: 2px;">
                     <strong class="strong-label">HMAC password:</strong>
-                    <input type="text" placeholder="optional" class="simple-input" v-model="hmac_password">
+                    <input type="text" placeholder="(optional)" class="simple-input" v-model="hmac_password">
                 </p>
                 <p style="margin: 2px;">
                     <strong class="strong-label">Merchant ID:</strong>
-                    <input type="text" class="simple-input" v-model="merchantid" placeholder="mandatory">
+                    <input type="text" class="simple-input" v-model="merchantid" placeholder="(mandatory)">
                 </p>
                 <p style="margin: 2px; display: flex; align-items: center;">
                     <strong class="strong-label">Transaction ID:</strong>
@@ -74,11 +74,11 @@
                 </p>
                 <p style="margin: 2px; display: flex; align-items: center;">
                     <strong class="strong-label">Amount:</strong>
-                    <input type="text" class="simple-input" v-model="amount" placeholder="mandatory">
+                    <input type="text" class="simple-input" v-model="amount" placeholder="(mandatory)">
                 </p>
                 <p style="margin: 0; align-items: center;">
                     <strong class="strong-label">Currency:</strong>
-                    <input type="text" class="simple-input" v-model="currency" placeholder="mandatory">
+                    <input type="text" class="simple-input" v-model="currency" placeholder="(mandatory)">
                 </p>
                 <p style="margin: 2px; align-items: center;">
                     <strong class="strong-label">URLSuccess:</strong>
