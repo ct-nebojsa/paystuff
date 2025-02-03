@@ -31,11 +31,11 @@
                 </p>
                 <hr style="opacity: .2; margin: 10px;">
                 <h3 style="color: #1e5582; font-weight: 600;">Encrypted parameters:</h3>
-                <p style="margin: 2px;">
-                    <strong style="display: inline-block; width: 150px;">MsgVer=2.0:</strong>
+                <p style="margin: 2px; align-items: center; display: flex;">
+                    <strong style="display: inline-block; width: 150px; align-items: center;">MsgVer=2.0 <strong title="This parameter is required to indicate that your implementation supports 3-D Secure processing" class="qm-tooltip">?</strong></strong>
                     <input type="checkbox" v-model="isMsgVer2">
                 </p>
-                <p style="margin: 2px;">
+                <p style="margin: 2px; align-items: center;">
                     <strong style="display: inline-block; width: 150px; font-size: 12px; user-select: none;">Encryption
                         password <strong title="Received from Computop" class="qm-tooltip">?</strong></strong>
                     <input type="text" class="simple-input" v-model="secret_test" placeholder="mandatory">
@@ -775,8 +775,10 @@ iframe {
     border-radius: 50px;
     min-width: 15px;
     min-height: 15px;
+    max-height: 15px;
     text-align: center;
     cursor: pointer;
+    font-size: 12px;
 }
 
 .order-desc-buttons {
