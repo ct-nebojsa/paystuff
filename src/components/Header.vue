@@ -2,7 +2,7 @@
     <div style="width: 100%; background-color: #141932; display: flex;">
         <div style="width: 2000px; margin: auto; display: flex; padding: 10px 0;">
             <div>
-                <img src="@/assets/images/logo/Logo.svg" width="60%" alt="">
+                <a href="https://computop.com/de/" target="_blank"><img src="@/assets/images/logo/Logo.svg" width="60%" alt=""></a>
             </div>
             <div v-if="auth.isAuthenticated" class="header-wrapper">
                 User:
