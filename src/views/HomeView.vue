@@ -16,7 +16,8 @@
                 </p>
                 <p v-if="!isOtherPaymentMethod" style="margin: 2px;">
                     <strong class="strong-label">Pay type:</strong>
-                    <select name="paytype" id="paytype" v-model="paytype" style="width: 310px;"  @click="isOtherPaymentMethod = false">
+                    <select name="paytype" id="paytype" v-model="paytype" style="width: 310px;"
+                        @click="isOtherPaymentMethod = false">
                         <option value="mandateform">EasyCollect (mandateform.aspx)</option>
                         <option value="floapay">Floapay (floapay.aspx)</option>
                         <option value="paymentpage">HPP (paymentpage.aspx)</option>
@@ -30,16 +31,21 @@
                     </select>
                 </p>
                 <div style="margin: 2px; align-items: center; display: flex; margin-top: 5px;">
-                    <strong class="strong-label">Other payment method <strong title="Use this if payment method not listed in above dropdown" class="qm-tooltip">?</strong></strong>
+                    <strong class="strong-label">Other payment method <strong
+                            title="Use this if payment method not listed in above dropdown"
+                            class="qm-tooltip">?</strong></strong>
                     <input type="checkbox" v-model="isOtherPaymentMethod" style="margin-right: 10px;">
                     <div v-if="isOtherPaymentMethod">
-                        <input class="simple-input" style="width: 275px;" type="text" v-model="otherpaymentmethod" placeholder="example (example.aspx)">
+                        <input class="simple-input" style="width: 275px;" type="text" v-model="otherpaymentmethod"
+                            placeholder="example (example.aspx)">
                     </div>
                 </div>
                 <hr style="opacity: .2; margin: 10px;">
                 <h3 style="color: #1e5582; font-weight: 600;">Encrypted parameters</h3>
                 <p style="margin: 2px; align-items: center; display: flex;">
-                    <strong class="strong-label">MsgVer=2.0 <strong title="This parameter is required to indicate that your implementation supports 3-D Secure processing" class="qm-tooltip">?</strong></strong>
+                    <strong class="strong-label">MsgVer=2.0 <strong
+                            title="This parameter is required to indicate that your implementation supports 3-D Secure processing"
+                            class="qm-tooltip">?</strong></strong>
                     <input type="checkbox" v-model="isMsgVer2">
                 </p>
                 <p style="margin: 2px; align-items: center;">
@@ -97,8 +103,8 @@
                     <input type="text" class="simple-input" v-model="urlback">
                 </p>
                 <p v-if="paytype === 'paytweak'" style="margin: 2px;">
-                    <strong class="strong-label">Service (Paytweak) <strong
-                            title="Values: link|email|sms" class="qm-tooltip">?</strong></strong>
+                    <strong class="strong-label">Service (Paytweak) <strong title="Values: link|email|sms"
+                            class="qm-tooltip">?</strong></strong>
                     <input type="text" class="simple-input" v-model="paytweak_service">
                 </p>
                 <p v-if="paytype === 'paybylink'" style="margin: 2px;">
@@ -143,7 +149,7 @@
                     </div>
                     <div v-if="isCredentialOnFile" class="cof-buttons">
                         <button class="cof-button">MIT</button>
-                        <button class="cof-button">CIT</button>
+                        <button class="cof-button" @click="setCit">CIT</button>
                     </div>
                 </div>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
@@ -168,13 +174,14 @@
                     <strong class="strong-label">Other parameters <strong
                             title="Use this field to manually add payment specific parameters. Example: key1=value1&key2=value2. It will automatically be parsed and included in the request. Or click on Show all parameters button to add parameters on a click."
                             class="qm-tooltip">?</strong></strong>
-                            <input type="checkbox" v-model="isOtherParameters">
+                    <input type="checkbox" v-model="isOtherParameters">
                     <div v-if="isOtherParameters">
-                    <textarea class="only-height" type="text" v-model="otherparams" placeholder=""></textarea>
-                    <div style="display: flex; margin-top: 4px; justify-content: center;">
-                        <button class="show-all-button" @click="isParametersModal = true">Show all parameters</button>
-                        <button class="show-all-button" @click="this.otherparams = ''">Clear field</button>
-                    </div>
+                        <textarea class="only-height" type="text" v-model="otherparams" placeholder=""></textarea>
+                        <div style="display: flex; margin-top: 4px; justify-content: center;">
+                            <button class="show-all-button" @click="isParametersModal = true">Show all
+                                parameters</button>
+                            <button class="show-all-button" @click="this.otherparams = ''">Clear field</button>
+                        </div>
                     </div>
                 </div>
                 <hr style="opacity: .2; margin: 10px;">
@@ -232,7 +239,8 @@
         </div>
         <div style="margin: 0;">
             <div class="wrapper wider">
-                <h3 style="color: #1e5582; font-weight: 600;">Payment request (click on the button below to open in a new
+                <h3 style="color: #1e5582; font-weight: 600;">Payment request (click on the button below to open in a
+                    new
                     tab)</h3>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
                     <strong class="strong-label">{{ this.paytype }}:</strong>
@@ -243,8 +251,10 @@
                     </div>
                     <div style="align-items: center; display: flex;" v-if="isDataEncrypted">
                         <canvas ref="qrcodeCanvas"></canvas>
-                        <p v-if="!this.isQRCodeGenerated" style="margin-right: 10px; font-size: 14px; color: #1e5582">Or generate QR code with payment URL:</p>
-                        <button class="simpler-button" @click="generateQR()" v-if="!this.isQRCodeGenerated">Generate QR code</button>
+                        <p v-if="!this.isQRCodeGenerated" style="margin-right: 10px; font-size: 14px; color: #1e5582">Or
+                            generate QR code with payment URL:</p>
+                        <button class="simpler-button" @click="generateQR()" v-if="!this.isQRCodeGenerated">Generate QR
+                            code</button>
                     </div>
                 </div>
             </div>
@@ -261,15 +271,16 @@
 
 <script>
 import CryptoJS from "crypto-js";
-import axios from 'axios'
 import Navbar from '@/components/Navbar.vue'
 import LoginModal from "@/components/LoginModal.vue";
 import Header from "@/components/Header.vue";
 import ParametersModal from "@/components/ParametersModal.vue";
+import useAuthStore from '@/stores/auth.js'
 import QRCode from "qrcode";
 export default {
     data() {
         return {
+            auth: useAuthStore(),
             environment: 'test',
             merchantid: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_MERCHANTID : '',
             transid: '',
@@ -536,6 +547,10 @@ export default {
         }
     },
     methods: {
+        setCit() {
+            this.credentialOnFile = ''
+            this.credentialOnFile = '{"type":{"unscheduled":"CIT"},"initialPayment":true}'
+        },
         generate_transid() {
             let transid = '';
             for (let i = 0; i < 10; i++) {
@@ -577,11 +592,10 @@ export default {
                 this.otherparams += '&' + value + '='
             }
 
-        }
+        },
     },
     mounted() {
         this.generate_transid()
-        console.log(import.meta.env.MODE)
     },
     watch: {
         paytype() {
@@ -603,8 +617,15 @@ export default {
             if (newValue.startsWith('&')) {
                 this.otherparams = newValue.slice(0);
             }
-        }
-    }
+        },
+        merchantid() {
+            this.auth.merchantid = this.merchantid
+
+        },
+        secret_test() {
+            this.auth.bf_password = this.secret_test
+        },
+    },
 }
 </script>
 
@@ -811,6 +832,7 @@ iframe {
     cursor: pointer;
     font-size: 12px;
 }
+
 canvas {
     height: 0;
     width: 0;
@@ -824,7 +846,7 @@ canvas {
 }
 
 .strong-label {
-    display: inline-block; 
+    display: inline-block;
     width: 200px;
     user-select: none;
 }

@@ -28,9 +28,11 @@
 import Header from '@/components/Header.vue';
 import Navbar from '@/components/Navbar.vue'
 import CryptoJS from "crypto-js";
+import useAuthStore from '@/stores/auth.js'
 export default {
     data() {
         return {
+            auth: useAuthStore(),
             encryptedData: '',
             decryptedData: '',
             decryptedDataArray: [],
@@ -57,7 +59,10 @@ export default {
             this.isDecrypted = true
         }
 
-    }
+    },
+    // mounted() {
+    //     this.secret_test = this.auth.getBfpassword
+    // }
 }
 </script>
 

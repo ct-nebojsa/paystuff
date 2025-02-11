@@ -11,6 +11,9 @@
             </div>
         </div>
     </div>
+    <!-- <div class="debug">
+    {{ auth.getMerchantid }}<span>/</span>{{ auth.getBfpassword }}
+</div> -->
 </template>
 
 <script>
@@ -37,6 +40,7 @@ export default {
     color: white;
     text-align: right;
     padding: 4px 0 4px 0;
+    position: relative;
 }
 
 .logout-button {
@@ -49,5 +53,11 @@ export default {
 .logout-button:hover {
     text-decoration: underline;
     cursor: pointer;
+}
+
+.debug {
+    position: absolute;
+    color: white;
+    top: 0;
 }
 </style>

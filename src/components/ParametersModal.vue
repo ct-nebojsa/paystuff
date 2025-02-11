@@ -19,27 +19,24 @@ export default {
         return {
             parameters: [
                "AccessToken", "Account", "AccountId", "AccOwner", "AccType", "AccVerify",
-                "AddrCity", "AddrCity2", "AddrCountryCode", "AddrCountrycode2", "AddrDistrict", "AddrDistrict2",
+                "AddrCity",
                 "AddressAddition", "AddressAddition2", "AddrStreet", "AddrStreet2",
-                "AddrStreet3", "AddrStreetNr", "AddrStreetNr2", "AddrZIP", "AddrZIP2", "AgtCode", "AID", "AllowCredInq",
+                "AddrStreet3", "AddrStreetNr", "AddrStreetNr2", "AddrZIP",
                  "ArticleList", "ArticleList1", "ArticleList10", "ArticleList2", "ArticleList3", "ArticleList4",
                 "ArticleList5", "ArticleList6", "ArticleList7", "ArticleList8", "ArticleList9", "ArticleNr",
-                "BankAccount", "BankCode", "BaseAmount", "BaseCurrency", "bdAddressAddition", "bdCity",
+                "bdAddressAddition", "bdCity",
                 "bdCompanyOrPerson", "bdCountryCode", "bdCustomerId", "bdDateOfBirth", "bdDeviceToken", "bdDistrict",
                 "bdEmail", "bdFax", "bdFirstName", "bdLastName", "bdMaidenName", "bdMiddleName", "bdMobileNr", "bdPhone",
                 "bdPOBox", "bdSalutation", "bdState", "bdStreet", "bdStreet2", "bdStreetNr", "bdSuffix", "bdTaxNumber",
-                "bdTitle", "bdWorkPhone", "bdZIP", "Brand", "Capture", "Card", "CardData", "CardExpireMonth", "CardExpireYear", "CardNumber", "CarrierName", "CAVV", "CcBrand", "CCCVC", "CCExpiry", "CCNr", "CCNrEnc", "ccStartDate",
-                "Channel", "ChargeAmount", "CHDesc", "CountryCode", "CreditCardHolder", "CreditCardIssueNr", "CreditDelay", "CreditorID",
-                "Custom", "CustomerHistory", "CustomerID", "CustomerRefNr", "CustomerScore", "CustomParameter", "Cycle", "DateOfBirth",
-                "DtOfSgntr", "DueDate", "eci", "ECI3D", "EDDMethod", "Email",
-                "Enddate", "EntryMode", "ETIID", "Event", "EventToken", "Expiration", "ExpirationDate", "ExpirationTime",
+                "bdTitle", "bdZIP", "Brand", "Capture", "Card",
+                "CardNumber", "CcBrand", "CCCVC", "CCExpiry", "CCNr", "CCNrEnc", "ccStartDate",
+                "Channel", "ChargeAmount", "CHDesc", "CountryCode", "CustomerID", "delayedshipment",
+                "DtOfSgntr", "DueDate", "Email", "Enddate", "EntryMode", "ETIID", "Event", "EventToken", "Expiration", "ExpirationDate", "ExpirationTime",
                 "Expiry", "FirstName", "Gender", "Homepage", "IBAN", "industrySpecificTxType",
                 "InvoiceNr", "InvoiceText", "IPAddr",
-                "IpZone", "IssuerID", "ItemTotal", "KlarnaAction", "Language", "LastName",
-                "LocalAmount", "LocalCurrency", "MAC", 
+                "Language", "LastName", "LocalAmount", "LocalCurrency", "MAC", 
                 "MandateID", "MobileNet", "MobileNr", "Month", "Name", "PayID",
-                "PayPalMethod", "PayTerm", "PayType",
-                "Phone", "PhoneAreaCode", "schemeReferenceID"
+                "PayType", "Phone", "PhoneAreaCode", "schemeReferenceID"
             ]
         }
     },
