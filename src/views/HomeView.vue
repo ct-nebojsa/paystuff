@@ -1,5 +1,10 @@
 <template>
     <Header />
+    <div class="info-div-wrapper">
+        <div class="info-div">
+            REST API testing tool: <span style="margin-left: 5px;"><a href="https://paygaterest.vercel.app" target="_blank">link</a></span>
+        </div>
+    </div>
     <Navbar />
     <div class="main-wrapper">
         <div class="wrapper narrower">
@@ -648,6 +653,22 @@ export default {
     border-radius: 10px;
     margin-top: 0;
     margin-bottom: 20px;
+}
+
+.info-div-wrapper {
+    width: 100%;
+    background-color: #a5f729;
+    display: flex;
+    margin: auto;
+    text-align: center;
+}
+
+.info-div {
+    width: 2000px;
+    display: flex;
+    margin: auto;
+    justify-content: center;
+    text-align: center;
 }
 
 .narrower {

@@ -8,7 +8,7 @@
             <div class="data-wrapper">
                 <p style="width: 150px; text-align: right; margin-right: 10px;">Data</p>
                 <textarea class="custom-width" v-model="encryptedData"></textarea>
-                <p style="margin-left: 10px;">Encrypted Data only</p>
+                <p style="margin-left: 10px;">Encrypted Data only <span class="info-span" title="Textbox should contain only encrypted data (without Data=) and not Len+Data">?</span></p>
             </div>
             <div style="display: flex; margin-top: 10px;">
                 <p style="width: 150px; text-align: right; margin-right: 10px;">Encryption password:</p>
@@ -120,5 +120,17 @@ textarea {
     font-size: 16px;
     color: #1e5582;
     font-weight: 600;
+}
+
+.info-span {
+    background-color: #1e5582;
+    border-radius: 20px;
+    color: white;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    cursor: help;
 }
 </style>
