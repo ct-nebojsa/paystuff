@@ -27,6 +27,7 @@ export default {
     methods: {
         logout() {
             this.auth.isAuthenticated = false
+            this.auth.bf_password = null
         }
     }
 }

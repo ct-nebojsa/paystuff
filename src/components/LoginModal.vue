@@ -1,4 +1,5 @@
 <template>
+    
     <div v-if="!this.auth.isAuthenticated" class="modal-overlay">
         <div class="modal-content">
             <h2 style="margin-bottom: 10px; user-select: none;">Login</h2>
@@ -15,6 +16,7 @@
                 <button v-if="this.username.length > 0 && this.password.length > 0" class="simple-button" @click="login">Login</button>
                 <button v-else class="simple-button-disabled">Login</button>
                 <span style="color: red; font-weight: 500; display: inline-block; margin-top: 10px;">{{ errorMessage }}</span>
+                {{ auth }}
             </div>
             </div>
         </div>
@@ -34,7 +36,7 @@ export default {
     },
     methods: {
         login() {
-            if (this.username === this.auth.getUsername && this.password === this.auth.getPassword) {
+            if (this.username === this.auth.username && this.password === this.auth.password) {
                 this.auth.isAuthenticated = true 
             } else [
                 this.errorMessage = 'Check your credentials'

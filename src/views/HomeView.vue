@@ -56,7 +56,7 @@
                 <p style="margin: 2px; align-items: center;">
                     <strong class="strong-label">Encryption
                         password <strong title="Received from Computop" class="qm-tooltip">?</strong></strong>
-                    <input type="text" class="simple-input" v-model="secret_test" placeholder="(mandatory)">
+                    <input type="text" class="simple-input" v-model="this.auth.bf_password" placeholder="(mandatory)">
                 </p>
                 <p style="margin: 2px;">
                     <strong class="strong-label">HMAC password:</strong>
@@ -64,7 +64,7 @@
                 </p>
                 <p style="margin: 2px;">
                     <strong class="strong-label">Merchant ID:</strong>
-                    <input type="text" class="simple-input" v-model="merchantid" placeholder="(mandatory)">
+                    <input type="text" class="simple-input" v-model="this.auth.merchantid" placeholder="(mandatory)">
                 </p>
                 <p style="margin: 2px; display: flex; align-items: center;">
                     <strong class="strong-label">Transaction ID:</strong>
@@ -221,7 +221,7 @@
                 </p>
                 <div style="margin: 2px;">
                     <div class="only-text-align">
-                        <button v-if="this.merchantid.length !== 0 && this.secret_test.length !== 0"
+                        <button v-if="this.auth.merchantid && this.auth.bf_password"
                             @click="encryptData(plaintext)" class="simple-button">Encrypt</button>
                         <button v-else class="simple-button-disabled">Encrypt</button>
                     </div>
@@ -287,7 +287,7 @@ export default {
         return {
             auth: useAuthStore(),
             environment: 'test',
-            merchantid: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_MERCHANTID : '',
+            // merchantid: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_MERCHANTID : '',
             transid: '',
             refnr: '',
             amount: '1000',
@@ -298,7 +298,7 @@ export default {
             urlnotify: 'http://127.0.0.1:3005/urlnotify',
             urlback: 'http://127.0.0.1:3005/back',
             email: import.meta.env.VITE_ENVIRONMENT === 'development' ? 'nebojsa.pesic@computop.com' : '',
-            secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
+            // secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
             encrypted_data: '',
             plain_text: '',
             len: 0,
@@ -344,7 +344,7 @@ export default {
     },
     computed: {
         hmac_data() {
-            return `*${this.merchantid}*${this.transid}*${this.amount}*${this.currency}`
+            return `*${this.auth.merchantid}*${this.transid}*${this.amount}*${this.currency}`
         },
         baseurl() {
             if (this.environment === 'dev') {
@@ -365,7 +365,7 @@ export default {
         },
         plaintext() {
             const params = {
-                "MerchantID": this.merchantid,
+                "MerchantID": this.auth.merchantid,
                 "TransID": this.transid,
                 "Amount": this.amount,
                 "Currency": this.currency,
@@ -522,10 +522,10 @@ export default {
             }
         },
         testurl_ohne_data() {
-            return `https://${this.baseurl}/${this.replaceFrontEnd}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=[EncryptedData]`
+            return `https://${this.baseurl}/${this.replaceFrontEnd}.aspx?MerchantID=${this.auth.merchantid}&Len=${this.len}&Data=[EncryptedData]`
         },
         testurl() {
-            let base_url = `https://${this.baseurl}/${this.replaceFrontEnd}.aspx?MerchantID=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`
+            let base_url = `https://${this.baseurl}/${this.replaceFrontEnd}.aspx?MerchantID=${this.auth.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`
             if (this.template.length > 0) {
                 base_url = base_url + `&Template=${this.template}`
             }
@@ -565,7 +565,7 @@ export default {
             this.isDataEncrypted = false
         },
         encryptData(data) {
-            this.encrypted_data = CryptoJS.Blowfish.encrypt(data, CryptoJS.enc.Utf8.parse(this.secret_test), {
+            this.encrypted_data = CryptoJS.Blowfish.encrypt(data, CryptoJS.enc.Utf8.parse(this.auth.bf_password), {
                 mode: CryptoJS.mode.ECB,
                 padding: CryptoJS.pad.Pkcs7
             }).ciphertext.toString(CryptoJS.enc.Hex);
@@ -573,7 +573,7 @@ export default {
             this.isQRCodeGenerated = false
         },
         generateQR() {
-            QRCode.toCanvas(this.$refs.qrcodeCanvas, `https://${this.baseurl}/${this.paytype}.aspx?MerchantId=${this.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`, {
+            QRCode.toCanvas(this.$refs.qrcodeCanvas, `https://${this.baseurl}/${this.paytype}.aspx?MerchantId=${this.auth.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`, {
                 width: 200
             });
             this.isQRCodeGenerated = true
@@ -601,6 +601,7 @@ export default {
     },
     mounted() {
         this.generate_transid()
+        // this.auth.$reset();
     },
     watch: {
         paytype() {
@@ -622,13 +623,6 @@ export default {
             if (newValue.startsWith('&')) {
                 this.otherparams = newValue.slice(0);
             }
-        },
-        merchantid() {
-            this.auth.merchantid = this.merchantid
-
-        },
-        secret_test() {
-            this.auth.bf_password = this.secret_test
         },
     },
 }

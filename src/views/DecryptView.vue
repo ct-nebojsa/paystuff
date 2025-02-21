@@ -12,7 +12,7 @@
             </div>
             <div style="display: flex; margin-top: 10px;">
                 <p style="width: 150px; text-align: right; margin-right: 10px;">Encryption password:</p>
-                <input class="simple-input" type="text" v-model="secret_test">
+                <input class="simple-input" type="text" v-model="this.auth.bf_password">
             </div>
             <div style="margin-top: 10px; text-align: center;">
                 <button class="simple-button" @click="decryptData(encryptedData)">Decrypt</button>
@@ -37,7 +37,7 @@ export default {
             decryptedData: '',
             decryptedDataArray: [],
             isDecrypted: false,
-            secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
+            // secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
         }
     },
     components: {
