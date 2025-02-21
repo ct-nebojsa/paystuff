@@ -48,7 +48,7 @@ export default {
         decryptData(encryptedData) {
             const decrypted = CryptoJS.Blowfish.decrypt(
                 { ciphertext: CryptoJS.enc.Hex.parse(encryptedData) },
-                CryptoJS.enc.Utf8.parse(this.secret_test),
+                CryptoJS.enc.Utf8.parse(this.auth.bf_password),
                 {
                     mode: CryptoJS.mode.ECB,
                     padding: CryptoJS.pad.Pkcs7
