@@ -34,6 +34,7 @@
                         <option value="paytweak">paytweak (paybylinkexternal.aspx)</option>
                         <option value="direct">S2S (direct.aspx)</option>
                         <option value="simplepay">SimplePay (simplepay.aspx)</option>
+                        <option value="twintpp">TWINT via PPRO (twintpp.aspx)</option>
                     </select>
                 </p>
                 <div style="margin: 2px; align-items: center; display: flex; margin-top: 5px;">
@@ -406,6 +407,12 @@ export default {
                 });
             }
 
+            if (this.paytype === 'twintpp') {
+                Object.assign(params, {
+                    AccOwner: 'Nebojsa Pesic'
+                });
+            }
+
             if (this.paytype === 'klarnapayments') {
                 Object.assign(params, {
                     ArticleList: btoa(this.articlelist),
@@ -522,6 +529,12 @@ export default {
                 this.isDataEncrypted = false
                 this.encrypted_data = ''
                 return 'installment'
+            }
+            else if (this.paytype === 'twintpp') {
+                this.isMsgVer2 = false
+                this.isDataEncrypted = false
+                this.encrypted_data = ''
+                return 'twintpp'
             }
             else {
                 this.isDataEncrypted = false
