@@ -2,7 +2,8 @@
     <Header />
     <div class="info-div-wrapper">
         <div class="info-div">
-            REST API testing tool: <span style="margin-left: 5px;"><a href="https://paygaterest.vercel.app" target="_blank">link</a></span>
+            REST API testing tool: <span style="margin-left: 5px;"><a href="https://paygaterest.vercel.app"
+                    target="_blank">link</a></span>
         </div>
     </div>
     <Navbar />
@@ -38,6 +39,8 @@
                         <option value="direct">S2S (direct.aspx)</option>
                         <option value="simplepay">SimplePay (simplepay.aspx)</option>
                         <option value="twintpp">TWINT via PPRO (twintpp.aspx)</option>
+                        <option value="---" disabled>----------------</option>
+                        <option value="credit">Refund (credit.aspx)</option>
                     </select>
                 </p>
                 <div style="margin: 2px; align-items: center; display: flex; margin-top: 5px;">
@@ -226,8 +229,8 @@
                 </p>
                 <div style="margin: 2px;">
                     <div class="only-text-align">
-                        <button v-if="this.auth.merchantid && this.auth.bf_password"
-                            @click="encryptData(plaintext)" class="simple-button">Encrypt</button>
+                        <button v-if="this.auth.merchantid && this.auth.bf_password" @click="encryptData(plaintext)"
+                            class="simple-button">Encrypt</button>
                         <button v-else class="simple-button-disabled">Encrypt</button>
                     </div>
                 </div>
@@ -538,6 +541,18 @@ export default {
                 this.isDataEncrypted = false
                 this.encrypted_data = ''
                 return 'twintpp'
+            }
+            else if (this.paytype === 'credit') {
+                this.isMsgVer2 = false
+                this.isDataEncrypted = false
+                this.encrypted_data = ''
+                this.urlsuccess = ''
+                this.urlfailure = ''
+                this.urlback = ''
+                this.urlnotify = ''
+                this.isOtherParameters = true
+                return 'credit'
+
             }
             else {
                 this.isDataEncrypted = false

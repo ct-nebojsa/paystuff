@@ -14,6 +14,11 @@
             </div>
             <hr style="opacity: .3;">
             <div>
+                <h1>Credit</h1>
+                <p>n/a</p>
+            </div>
+            <hr style="opacity: .3;">
+            <div>
                 <h1>Inquiry</h1>
                 <div>
                     <div class="mini-wrapper">
