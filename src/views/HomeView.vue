@@ -163,6 +163,7 @@
                     <div v-if="isCredentialOnFile" class="cof-buttons">
                         <button class="cof-button">MIT</button>
                         <button class="cof-button" @click="setCit">CIT</button>
+                        <button class="cof-button" @click="setInstallments">Installments</button>
                     </div>
                 </div>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
@@ -593,6 +594,10 @@ export default {
         setCit() {
             this.credentialOnFile = ''
             this.credentialOnFile = '{"type":{"unscheduled":"CIT"},"initialPayment":true}'
+        },
+        setInstallments() {
+            this.credentialOnFile = ''
+            this.credentialOnFile = '{"type":{"installments":{"total":3,"curIdx":1,"purchaseAmount":10000}},"initialPayment":true}'
         },
         generate_transid() {
             let transid = '';
