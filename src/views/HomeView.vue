@@ -130,8 +130,15 @@
                         placeholder="YYYY-MM-DD HH:MM:SS">
                 </p>
                 <p style="margin: 2px;">
+                    <div>
                     <strong class="strong-label">Email:</strong>
                     <input type="text" class="simple-input" v-model="email">
+                    </div>
+                        <div class="order-desc-buttons only-margin">
+                        <button class="order-desc-button" @click="this.email = '@computop.com'"
+                            title="Use this for simulating successful payment">@computop.com</button>
+                        <button class="order-desc-button" @click="this.email = '@gmail.com'">@gmail.com</button>
+                    </div>
                 </p>
                 <p style="margin: 2px;">
                     <strong class="strong-label">Preauth:</strong>
@@ -912,6 +919,10 @@ iframe {
     border-radius: 3px;
     cursor: pointer;
     font-size: 12px;
+}
+
+.only-margin {
+    margin-left: 60px;
 }
 
 canvas {
