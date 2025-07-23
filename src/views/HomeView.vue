@@ -8,8 +8,8 @@
     </div>
     <Navbar />
     <!-- <div class="home-view-debug">
-        {{ this.hmac_data }}
-    </div> -->
+{{ this.hmac_data }}
+</div> -->
     <div class="main-wrapper">
         <div class="wrapper narrower">
             <h2 style="color: #1e5582; font-weight: 600;">Paygate Encryption Test Tool</h2>
@@ -115,6 +115,10 @@
                     <strong class="strong-label">URLBack:</strong>
                     <input type="text" class="simple-input" v-model="urlback">
                 </p>
+                <p style="margin: 2px;">
+                    <strong class="strong-label">ArticleList:</strong>
+                    <input type="text" class="simple-input" v-model="articlelist">
+                </p>
                 <p v-if="paytype === 'paytweak'" style="margin: 2px;">
                     <strong class="strong-label">Service (Paytweak) <strong title="Values: link|email|sms"
                             class="qm-tooltip">?</strong></strong>
@@ -130,15 +134,15 @@
                         placeholder="YYYY-MM-DD HH:MM:SS">
                 </p>
                 <p style="margin: 2px;">
-                    <div>
+                <div>
                     <strong class="strong-label">Email:</strong>
                     <input type="text" class="simple-input" v-model="email">
-                    </div>
-                        <div class="order-desc-buttons only-margin">
-                        <button class="order-desc-button" @click="this.email = '@computop.com'"
-                            title="Use this for simulating successful payment">@computop.com</button>
-                        <button class="order-desc-button" @click="this.email = '@gmail.com'">@gmail.com</button>
-                    </div>
+                </div>
+                <div class="order-desc-buttons only-margin">
+                    <button class="order-desc-button" @click="this.email = '@computop.com'"
+                        title="Use this for simulating successful payment">@computop.com</button>
+                    <button class="order-desc-button" @click="this.email = '@gmail.com'">@gmail.com</button>
+                </div>
                 </p>
                 <p style="margin: 2px;">
                     <strong class="strong-label">Preauth:</strong>
@@ -317,10 +321,10 @@ export default {
             amount: '1000',
             currency: 'EUR',
             orderdesc: 'test:payment',
-            urlsuccess: 'http://127.0.0.1:3005/success',
-            urlfailure: 'http://127.0.0.1:3005/failure',
-            urlnotify: 'http://127.0.0.1:3005/urlnotify',
-            urlback: 'http://127.0.0.1:3005/back',
+            urlsuccess: 'http://localhost/urls/success.php',
+            urlfailure: 'http://localhost/urls/failure.php',
+            urlnotify: 'http://localhost/urls/notify.php',
+            urlback: 'http://localhost/urls/back.php',
             email: import.meta.env.VITE_ENVIRONMENT === 'development' ? 'nebojsa.pesic@computop.com' : '',
             // secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
             encrypted_data: '',
