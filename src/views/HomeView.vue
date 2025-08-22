@@ -734,6 +734,20 @@ export default {
                 this.otherparams = '';
             }
         },
+        environment(newVal) {
+            if (newVal) {
+                this.generate_transid()
+                this.isDataEncrypted = false
+                this.encrypted_data = ''
+            }
+
+        },
+        'auth.merchantid'(oldVal, newVal) {
+            if (oldVal != newVal) {
+                this.isDataEncrypted = false
+                this.encrypted_data = ''
+            }
+        }
     },
 }
 </script>
