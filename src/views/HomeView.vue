@@ -119,6 +119,10 @@
                     <strong class="strong-label">ArticleList:</strong>
                     <input type="text" class="simple-input" v-model="articlelist">
                 </p>
+                <p style="margin: 2px;">
+                    <strong class="strong-label">OrderItem:</strong>
+                    <input type="text" class="simple-input" v-model="orderitem">
+                </p>
                 <p v-if="paytype === 'paytweak'" style="margin: 2px;">
                     <strong class="strong-label">Service (Paytweak) <strong title="Values: link|email|sms"
                             class="qm-tooltip">?</strong></strong>
@@ -376,6 +380,7 @@ export default {
             otherparams: '',
             paybylinkexpiration: '2099-12-31 23:59:59',
             articlelist: '{"order_lines":[{"name":"Advanced Care","quantity":1,"quantity_unit":"STK","reference":"1452906","tax_rate":1900,"total_amount":500,"type":"physical","unit_price":500}]}',
+            orderitem: '{"items":[{"name":"Advanced Care","quantity":1,"quantity_unit":"STK","reference":"1452906","tax_rate":1900,"total_amount":500,"type":"physical","unit_price":500}]}',
             isParametersModal: false,
             receivedParameter: null,
             isQRCodeGenerated: false,
@@ -425,7 +430,8 @@ export default {
                 "URLNotify": this.urlnotify,
                 "URLBack": this.urlback,
                 "email": this.email,
-                "OrderDesc": this.orderdesc
+                "OrderDesc": this.orderdesc,
+                "OrderItem": btoa(this.orderitem),
             };
 
             if (this.isMsgVer2) {
