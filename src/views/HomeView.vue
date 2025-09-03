@@ -196,6 +196,18 @@
                 </div>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
                     <div>
+                        <strong class="strong-label">billingAddress:</strong>
+                        <input type="checkbox" v-model="isBillToCustomer">
+                    </div>
+                    <div><textarea style="height: 150px;" v-if="isBillToCustomer" name="billToCustomer"
+                            id="billToCustomer" v-model="billingAddress" :rows="rows(billToCustomer)"></textarea>
+                    </div>
+                </div>
+
+
+                
+                <div style="margin: 2px; display: flex; flex-direction: column;">
+                    <div>
                         <strong class="strong-label">threeDsData:</strong>
                         <input type="checkbox" v-model="isThreeDsData">
                     </div>
@@ -391,6 +403,8 @@ export default {
             isBrowserInfo: false,
             isThreeDsPolicy: false,
             threeDsPolicy: '{"skipThreeDS":"thisTransaction","threeDSExemption":{"exemptionReason":"transactionRiskAnalysis"},"challengePreference":"noPreference"}',
+            billingAddress: '{"city":"Cacakongma","country":{"countryA3":"SRB","countryA2":"SR"},"postalCode":"80331","addressLine1":{"street":"test street","streetNumber":"10"}}',
+            isBillingAddress: false,
         }
     },
     components: {
@@ -499,6 +513,10 @@ export default {
             if (this.isCard) {
                 params.card = btoa(this.card);
             }
+            
+            if (this.isBillingAddress) {
+                params.billingAddress = btoa(this.billingAddress);
+            }
 
             if (this.isCredentialOnFile) {
                 params.credentialOnFile = btoa(this.credentialOnFile);
@@ -511,8 +529,6 @@ export default {
             if (this.isThreeDsPolicy) {
                 params.threeDsPolicy = btoa(this.threeDsPolicy);
             }
-
-            
 
             if (this.isBrowserInfo) {
                 params.browserInfo = btoa(this.browserInfo);
