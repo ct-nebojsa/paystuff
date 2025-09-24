@@ -231,6 +231,15 @@
                             v-model="browserInfo"></textarea>
                     </div>
                 </div>
+                <div style="margin: 2px; display: flex; flex-direction: column;">
+                    <div>
+                        <strong class="strong-label">tokenData:</strong>
+                        <input type="checkbox" v-model="isTokenData">
+                    </div>
+                    <div><textarea class="custom-height" v-if="isTokenData" name="tokenData" id="tokenData"
+                            v-model="tokenData"></textarea>
+                    </div>
+                </div>
                 <div style="margin: 2px;">
                     <strong class="strong-label">Other parameters <strong
                             title="Use this field to manually add payment specific parameters. Example: key1=value1&key2=value2. It will automatically be parsed and included in the request. Or click on Show all parameters button to add parameters on a click."
@@ -400,9 +409,11 @@ export default {
             browserInfo: '{"timeZoneOffset":"120","acceptHeaders":"text","ipAddress":"93.176.166.240","javaEnabled":false,"javaScriptEnabled":true,"language":"US","colorDepth":32,"screenWidth":1060,"screenHeight":1050,"userAgent":"Mozilla/5.0"}',
             isBrowserInfo: false,
             isThreeDsPolicy: false,
+            isTokenData: false,
             threeDsPolicy: '{"skipThreeDS":"thisTransaction","threeDSExemption":{"exemptionReason":"transactionRiskAnalysis"},"challengePreference":"noPreference"}',
             billingAddress: '{"city":"Cacakongma","country":{"countryA3":"SRB","countryA2":"SR"},"postalCode":"80331","addressLine1":{"street":"test street","streetNumber":"10"}}',
             isBillingAddress: false,
+            tokenData: '{"ECI":"07","TokenCryptogram":"AgAAAAAAAIR8CQrXcIhbQAAAAAA=","TokenRequestorID":"40000000082"}',
         }
     },
     components: {
@@ -530,6 +541,10 @@ export default {
 
             if (this.isBrowserInfo) {
                 params.browserInfo = btoa(this.browserInfo);
+            }
+
+             if (this.isTokenData) {
+                params.tokenData = btoa(this.tokenData);
             }
 
             if (this.isBillToCustomer) {
