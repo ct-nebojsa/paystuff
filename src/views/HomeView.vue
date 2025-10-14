@@ -146,7 +146,8 @@
                     <div class="order-desc-buttons only-margin">
                         <button class="order-desc-button" @click="this.email = this.email + '@computop.com'"
                             title="Use this for simulating successful payment">@computop.com</button>
-                        <button class="order-desc-button" @click="this.email = this.email + '@gmail.com'">@gmail.com</button>
+                        <button class="order-desc-button"
+                            @click="this.email = this.email + '@gmail.com'">@gmail.com</button>
                     </div>
                 </div>
                 <p style="margin: 2px;">
@@ -220,6 +221,11 @@
                     </div>
                     <div><textarea class="custom-height" v-if="isThreeDsPolicy" name="threeDsData" id="threeDsData"
                             v-model="threeDsPolicy"></textarea>
+                        <div v-if="isThreeDsPolicy">
+                            <button class="cof-button" @click="setSkipThreeDs">Skip 3DS</button>
+                            <button class="cof-button" @click="mandateChallenge">Mandate challenge</button>
+                            <button class="cof-button" @click="setInstallments">TRA</button>
+                        </div>
                     </div>
                 </div>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
@@ -308,7 +314,8 @@
             </p>
             <p style="margin: 2px;">
                 <strong class="strong-label">Encrypted data:</strong>
-                <textarea v-if="encrypted_data" name="" id="" :rows="rows(encrypted_data)">{{ encrypted_data }}</textarea>
+                <textarea v-if="encrypted_data" name="" id=""
+                    :rows="rows(encrypted_data)">{{ encrypted_data }}</textarea>
             </p>
         </div>
         <div style="margin: 0;">
@@ -522,7 +529,7 @@ export default {
             if (this.isCard) {
                 params.card = btoa(this.card);
             }
-            
+
             if (this.isBillingAddress) {
                 params.billingAddress = btoa(this.billingAddress);
             }
@@ -543,7 +550,7 @@ export default {
                 params.browserInfo = btoa(this.browserInfo);
             }
 
-             if (this.isTokenData) {
+            if (this.isTokenData) {
                 params.tokenData = btoa(this.tokenData);
             }
 
@@ -658,7 +665,7 @@ export default {
                 this.urlback = ''
                 this.urlnotify = ''
                 this.isOtherParameters = true
-                this.otherparams='PayID='
+                this.otherparams = 'PayID='
                 return 'increment'
 
             }
@@ -711,6 +718,18 @@ export default {
             this.credentialOnFile = ''
             this.credentialOnFile = '{"type":{"installments":{"total":3,"curIdx":1,"purchaseAmount":10000}},"initialPayment":true}'
         },
+        setSkipThreeDs() {
+            this.threeDsPolicy = ''
+            this.threeDsPolicy = '{"skipThreeDS":"thisTransaction"}'
+        },
+        mandateChallenge() {
+            this.threeDsPolicy = ''
+            this.threeDsPolicy = '{"challengePreference": "mandateChallenge"}'
+        },
+        tra() {
+            this.threeDsPolicy = ''
+            this.threeDsPolicy = '"threeDSExemption": {"exemptionReason": "transactionRiskAnalysis", "merchantFraudRate": 4}'
+        },
         generate_transid() {
             let transid = '';
             for (let i = 0; i < 10; i++) {
@@ -762,7 +781,7 @@ export default {
             }
         },
         rows(e) {
-            return Math.ceil(e.length / 69 ) + 1
+            return Math.ceil(e.length / 69) + 1
         },
     },
     mounted() {
