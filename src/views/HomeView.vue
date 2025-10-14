@@ -224,7 +224,7 @@
                         <div v-if="isThreeDsPolicy">
                             <button class="cof-button" @click="setSkipThreeDs">Skip 3DS</button>
                             <button class="cof-button" @click="mandateChallenge">Mandate challenge</button>
-                            <button class="cof-button" @click="setInstallments">TRA</button>
+                            <button class="cof-button" @click="tra">TRA</button>
                         </div>
                     </div>
                 </div>
