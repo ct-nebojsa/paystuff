@@ -343,6 +343,10 @@
                 <h3 style="color: #1e5582; font-weight: 600;">Embedded in iframe:</h3>
                 <iframe :src="testurl" width="750" height="650" ref="paymentIframe" @load="onIframeLoad"></iframe>
             </div>
+            <div class="wrapper wider">
+                <p>Quick requests</p>
+                <button class="simple-button" @click="quickhpp">HPP</button>
+            </div>
         </div>
     </div>
     <LoginModal />
@@ -463,6 +467,7 @@ export default {
                 "email": this.email,
                 "OrderDesc": this.orderdesc,
                 "OrderItem": btoa(this.orderitem),
+                "ArticleList": btoa(this.articlelist),
             };
 
             if (this.isMsgVer2) {
@@ -783,6 +788,20 @@ export default {
         rows(e) {
             return Math.ceil(e.length / 69) + 1
         },
+        quickhpp() {
+            const params = {
+                "MerchantID": "npesic_test",
+                "TransID": this.generate_transid(),
+                "Amount": "1000",
+                "Currency": "EUR",
+                "URLSuccess": this.urlsuccess,
+                "URLFailure": this.urlfailure,
+                "URLNotify": this.urlnotify,
+                "URLBack": this.urlback,
+                "email": this.email,
+                "OrderDesc": "quick order desc"
+            };
+        }
     },
     mounted() {
         this.generate_transid()
