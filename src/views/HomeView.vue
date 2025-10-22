@@ -194,6 +194,8 @@
                         <button class="cof-button" @click="setMitM">MIT (RTF=M)</button>
                         <button class="cof-button" @click="setInstallments">Installments (RTF=I)</button>
                         <button class="cof-button" @click="setInstallmentsR">Installments (RTF=R)</button>
+                        <button class="cof-button" @click="setRecurring">Recurring (RTF=I)</button>
+                        <button class="cof-button" @click="setRecurringR">Recurring (RTF=R)</button>
                     </div>
                 </div>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
@@ -219,8 +221,12 @@
                         <strong class="strong-label">threeDsData:</strong>
                         <input type="checkbox" v-model="isThreeDsData">
                     </div>
-                    <div><textarea class="custom-height" v-if="isThreeDsData" name="threeDsData" id="threeDsData"
+                    <div v-if="isThreeDsData"><textarea class="custom-height" name="threeDsData" id="threeDsData"
                             v-model="threeDsData"></textarea>
+                        <div>
+                            <button class="cof-button" @click="seEci07()">ECI=07/04</button>
+                            <button class="cof-button" @click="seEci05()">ECI=05/02</button>
+                        </div>
                     </div>
                 </div>
                 <div style="margin: 2px; display: flex; flex-direction: column;">
@@ -734,6 +740,14 @@ export default {
         }
     },
     methods: {
+        seEci07() {
+            this.threeDsData = ''
+            this.threeDsData = '{"acsProtocolVersion":"2.2.0","eci":"07"}'
+        },
+        seEci05() {
+            this.threeDsData = ''
+            this.threeDsData = '{"acsProtocolVersion":"2.2.0","authenticationValue":"kAMACEJBakKSOSzNLnxNiZeBQnf+","eci":"02","threeDSServerTransID":"a3dd2b66-6c06-423b-acd4-1cc19697a08f","dsTransID":"9e0e91c0-24e3-423c-a136-97023269d580","intermediateStatus":"Y","finalStatus":"Y"}'
+        },
         setCit() {
             this.credentialOnFile = ''
             this.credentialOnFile = '{"type":{"unscheduled":"CIT"},"initialPayment":true}'
@@ -757,6 +771,14 @@ export default {
         setInstallmentsR() {
             this.credentialOnFile = ''
             this.credentialOnFile = '{"type":{"installments":{"total":3,"curIdx":1,"purchaseAmount":10000}},"initialPayment":false}'
+        },
+        setRecurring() {
+            this.credentialOnFile = ''
+            this.credentialOnFile = '{"type":{"recurring":{"recurringFrequency":30,"recurringStartDate":"2026-09-14","recurringExpiryDate":"2027-09-14"}},"initialPayment":true}'
+        },
+        setRecurringR() {
+            this.credentialOnFile = ''
+            this.credentialOnFile = '{"type":{"recurring":{"recurringFrequency":30,"recurringStartDate":"2026-09-14","recurringExpiryDate":"2027-09-14"}},"initialPayment":false}'
         },
         setSkipThreeDs() {
             this.threeDsPolicy = ''
