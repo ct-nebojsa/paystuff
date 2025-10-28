@@ -643,6 +643,8 @@ export default {
                 this.isMsgVer2 = true
                 this.isDataEncrypted = false
                 this.encrypted_data = ''
+                this.isOtherParameters = true
+                this.otherparams = 'Language=en&externalLanguage=US&bdEmail=nebojsa.pesic@computop.com'
                 return 'paybylink'
             } else if (this.paytype === 'simplepay') {
                 this.isMsgVer2 = false
