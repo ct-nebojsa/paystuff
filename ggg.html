@@ -1,0 +1,44 @@
+<div id="buttons">
+  <google-pay-button environment="TEST" button-type="short" button-color="black"></google-pay-button>
+</div>
+<script type="module">
+  import './node_modules/@google-pay/button-element/dist/index.js';
+
+  const button = document.querySelector('google-pay-button');
+  button.paymentRequest = {
+    apiVersion: 2,
+    apiVersionMinor: 0,
+    allowedPaymentMethods: [
+      {
+        type: 'CARD',
+        parameters: {
+          allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
+          allowedCardNetworks: ['MASTERCARD', 'VISA'],
+          billingAddressRequired: true,
+        },
+        tokenizationSpecification: {
+          type: 'PAYMENT_GATEWAY',
+          parameters: {
+            gateway: 'computop',
+            gatewayMerchantId: 'npesic_test',
+          },
+        },
+      },
+    ],
+    merchantInfo: {
+      merchantId: 'npesic_test',
+      merchantName: 'Demo Merchant',
+    },
+    transactionInfo: {
+      totalPriceStatus: 'FINAL',
+      totalPriceLabel: 'Total',
+      totalPrice: '10.00',
+      currencyCode: 'EUR',
+      countryCode: 'FR',
+    },
+  };
+
+  button.addEventListener('loadpaymentdata', event => {
+    console.log('load payment data', event.detail);
+  });
+</script>
