@@ -497,6 +497,10 @@ export default {
             if (this.paytype === 'paytweak') {
                 params.Service = this.paytweak_service;
                 params.reminderEmail = btoa(this.paytweak_reminder_email)
+                delete params.URLSuccess;
+                delete params.URLFailure;
+                delete params.URLBack;
+                delete params.URLNotify;
             }
 
             if (this.paytype === 'mandate') {
