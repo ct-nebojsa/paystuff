@@ -28,7 +28,7 @@ export default {
                 "AddrCity",
                 "AddressAddition", "AddressAddition2", "AddrStreet", "AddrStreet2",
                 "AddrStreet3", "AddrStreetNr", "AddrStreetNr2", "AddrZIP",
-                "ArticleList", "ArticleList1", "bdAddressAddition", "bdCity",
+                "ArticleList", "ArticleList1", "Attachment", "AttachmentName", "bdAddressAddition", "bdCity",
                 "bdCompanyOrPerson", "bdCountryCode", "bdCustomerId", "bdDateOfBirth", "bdDeviceToken", "bdDistrict",
                 "bdEmail", "bdFirstName", "bdLastName", "bdMobileNr", "bdPhone",
                 "bdPOBox", "bdSalutation", "bdState", "bdStreet", "bdStreet2", "bdStreetNr", "bdSuffix", "bdTitle", "bdZIP", "Brand", "browserInfo", "Capture", "Card",
