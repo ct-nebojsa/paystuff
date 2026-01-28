@@ -1,5 +1,6 @@
 <template>
-    <div style="width: 100%; background-color: #141932; display: flex; align-items: center; justify-content: flex-start;">
+    <div
+        style="width: 100%; background-color: #141932; display: flex; align-items: center; justify-content: flex-start;">
         <div style="margin: 0; padding: 10px 0;">
             <div style="margin: 0;">
                 <a href="/" target="_blank"><img src="@/assets/images/logo/Logo.svg" width="60%" alt=""></a>
@@ -10,11 +11,21 @@
                 <li><router-link to="/">Encryption</router-link></li>
                 <li><router-link to="/decrypt">Decryption</router-link></li>
                 <li><router-link to="/other">Other actions</router-link></li>
-                <li><router-link to="/cb2a">CB2A</router-link></li>
+                <li @click="routeTo('cb2a')">CB2A</li>
             </ul>
         </div>
     </div>
 </template>
+
+<script>
+export default {
+    methods: {
+        routeTo(name) {
+            this.$router.push({ name: name })
+        }
+    }
+}
+</script>
 
 <style scoped>
 .header-wrapper {

@@ -14,7 +14,7 @@ const router = createRouter({
     },
     {path: '/decrypt', name: 'decrypt', component: DecryptView},
     {path: '/other', name: 'other', component: OtherView},
-    {path: '/cb2a', name: 'cb2a', component: Cb2aView}
+    {path: '/cb2a-builder', name: 'cb2a', component: Cb2aView}
   ],
 })
 
