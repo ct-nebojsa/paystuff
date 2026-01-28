@@ -1,6 +1,4 @@
 <template>
-    <Header />
-    <Navbar />
     <div class="other-main-wrapper">
         <div class="other-wrapper">
             <div>

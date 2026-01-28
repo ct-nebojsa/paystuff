@@ -1,6 +1,4 @@
 <template>
-    <Header />
-    <Navbar />
     <div class="decrypt-wrapper">
         <div class="decrypt">
             <h2 style="color: #1e5582; font-weight: 700;">Test Paygate Decryption</h2>

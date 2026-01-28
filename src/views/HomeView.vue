@@ -1,5 +1,4 @@
 <template>
-    <Header />
     <div class="main-wrapper" @mousedown="handleParentClick">
         <div style="display: flex; margin: auto; gap: 20px; width: 100%;">
         <div class="wrapper">
