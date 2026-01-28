@@ -10,6 +10,7 @@
                 <li><router-link to="/">Encryption</router-link></li>
                 <li><router-link to="/decrypt">Decryption</router-link></li>
                 <li><router-link to="/other">Other actions</router-link></li>
+                <li><router-link to="/cb2a">CB2A</router-link></li>
             </ul>
         </div>
     </div>
