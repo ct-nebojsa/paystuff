@@ -309,6 +309,26 @@
                         <strong class="strong-label">CustomField4:</strong>
                         <input type="text" class="simple-input" v-model="customfield4">
                     </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">CustomField5:</strong>
+                        <input type="text" class="simple-input" v-model="customfield5">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">CustomField6:</strong>
+                        <input type="text" class="simple-input" v-model="customfield6">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">CustomField7:</strong>
+                        <input type="text" class="simple-input" v-model="customfield7">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">CustomField8:</strong>
+                        <input type="text" class="simple-input" v-model="customfield8">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">Attachment:</strong>
+                        <input type="text" class="simple-input" v-model="attachment">
+                    </p>
                 </div>
                 <div style="margin: 2px;">
                     <div class="only-text-align">
@@ -414,6 +434,10 @@ export default {
             customfield2: '',
             customfield3: '',
             customfield4: '',
+            customfield5: '',
+            customfield6: '',
+            customfield7: '',
+            customfield8: '',
             channel: '',
             customerid: '',
             language: '',
