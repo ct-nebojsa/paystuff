@@ -787,6 +787,17 @@ export default {
                 base_url = base_url + `&CustomField3=${this.customfield3}`
 
             }
+             if (this.customfield4.length > 0) {
+                base_url = base_url + `&CustomField4=${this.customfield4}`
+
+            }
+             if (this.customfield5.length > 0) {
+                base_url = base_url + `&CustomField5=${this.customfield5}`
+
+            }
+            if (this.attachment.length > 0) {
+                base_url = base_url + `&attachment=${this.attachment}`
+            }
             return base_url
         },
         buttonLabel() {
@@ -1001,7 +1012,6 @@ select {
 }
 
 textarea {
-    resize: none;
     border-radius: 10px;
     outline: none;
     padding: 5px;
