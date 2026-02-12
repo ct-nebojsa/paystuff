@@ -325,10 +325,6 @@
                         <strong class="strong-label">CustomField8:</strong>
                         <input type="text" class="simple-input" v-model="customfield8">
                     </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Attachment:</strong>
-                        <input type="text" class="simple-input" v-model="attachment">
-                    </p>
                 </div>
                 <div style="margin: 2px;">
                     <div class="only-text-align">
@@ -794,9 +790,6 @@ export default {
              if (this.customfield5.length > 0) {
                 base_url = base_url + `&CustomField5=${this.customfield5}`
 
-            }
-            if (this.attachment.length > 0) {
-                base_url = base_url + `&attachment=${this.attachment}`
             }
             return base_url
         },
