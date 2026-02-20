@@ -1,377 +1,387 @@
 <template>
     <div class="main-wrapper" @mousedown="handleParentClick">
         <div style="display: flex; margin: auto; gap: 20px; width: 100%;">
-        <div class="wrapper">
-            <h3 style="color: #1e5582; font-weight: 600;">Paygate Encryption Test Tool</h3>
-            <h4 style="color: tomato;">Data is not stored on any server.</h4>
-            <div class="parameters">
-                <div class="simple-wrapper">
-                    <strong class="strong-label">Environment:</strong>
-                    <select name="environment" id="environment" style="width: 310px;" v-model="environment">
-                        <option value="dev">DEV</option>
-                        <option value="test">TEST</option>
-                        <option value="prod">PRODUCTION</option>
-                    </select>
-                </div>
-                <p v-if="!isOtherPaymentMethod" class="simple-wrapper">
-                    <strong class="strong-label">Pay type:</strong>
-                    <select name="paytype" id="paytype" v-model="paytype" style="width: 310px;"
-                        @click="isOtherPaymentMethod = false">
-                        <option value="mandateform">EasyCollect (mandateform.aspx)</option>
-                        <option value="floapay">Floapay (floapay.aspx)</option>
-                        <option value="paymentpage">HPP (paymentpage.aspx)</option>
-                        <option value="installment">CB2A Installments (installment.aspx)</option>
-                        <option value="instanea">Instanea (instanea.aspx)</option>
-                        <option value="klarnapayments">KlarnaPM (klarnapayments.aspx)</option>
-                        <option value="payssl">payssl (payssl.aspx)</option>
-                        <option value="paybylink">paybylink (paybylink.aspx)</option>
-                        <option value="paytweak">paytweak (paybylinkexternal.aspx)</option>
-                        <option value="direct">S2S (direct.aspx)</option>
-                        <option value="simplepay">SimplePay (simplepay.aspx)</option>
-                        <option value="twintpp">TWINT via PPRO (twintpp.aspx)</option>
-                        <option value="---" disabled>----------------</option>
-                        <option value="credit">Refund (credit.aspx)</option>
-                        <option value="increment">Increment (increment.aspx)</option>
-                    </select>
-                </p>
-                <div class="simple-wrapper">
-                    <strong class="strong-label">Other pay type <strong
-                            title="Use this if payment method not listed in above dropdown"
-                            class="qm-tooltip">?</strong></strong>
-                    <input type="checkbox" v-model="isOtherPaymentMethod">
-                    <div v-if="isOtherPaymentMethod" class="other-wrapper">
-                        <input class="simple-input" style="width: 275px;" type="text" v-model="otherpaymentmethod"
-                            placeholder="example (example.aspx)">
-                        <div style="display: flex; margin-top: 3px;">
-                            <button class="cof-button" @click="otherpaymentmethod = 'reverse'">reverse.aspx</button>
-                            <button class="cof-button" @click="otherpaymentmethod = 'credit'">credit.aspx</button>
+            <div class="wrapper">
+                <h3 style="color: #1e5582; font-weight: 600;">Paygate Encryption Test Tool</h3>
+                <h4 style="color: tomato;">Data is not stored on any server.</h4>
+                <div class="parameters">
+                    <div class="simple-wrapper">
+                        <strong class="strong-label">Environment:</strong>
+                        <select name="environment" id="environment" style="width: 310px;" v-model="environment">
+                            <option value="dev">DEV</option>
+                            <option value="test">TEST</option>
+                            <option value="prod">PRODUCTION</option>
+                        </select>
+                    </div>
+                    <p v-if="!isOtherPaymentMethod" class="simple-wrapper">
+                        <strong class="strong-label">Pay type:</strong>
+                        <select name="paytype" id="paytype" v-model="paytype" style="width: 310px;"
+                            @click="isOtherPaymentMethod = false">
+                            <option value="mandateform">EasyCollect (mandateform.aspx)</option>
+                            <option value="floapay">Floapay (floapay.aspx)</option>
+                            <option value="paymentpage">HPP (paymentpage.aspx)</option>
+                            <option value="installment">CB2A Installments (installment.aspx)</option>
+                            <option value="instanea">Instanea (instanea.aspx)</option>
+                            <option value="klarnapayments">KlarnaPM (klarnapayments.aspx)</option>
+                            <option value="payssl">payssl (payssl.aspx)</option>
+                            <option value="paybylink">paybylink (paybylink.aspx)</option>
+                            <option value="paytweak">paytweak (paybylinkexternal.aspx)</option>
+                            <option value="direct">S2S (direct.aspx)</option>
+                            <option value="simplepay">SimplePay (simplepay.aspx)</option>
+                            <option value="twintpp">TWINT via PPRO (twintpp.aspx)</option>
+                            <option value="---" disabled>----------------</option>
+                            <option value="credit">Refund (credit.aspx)</option>
+                            <option value="increment">Increment (increment.aspx)</option>
+                        </select>
+                    </p>
+                    <div class="simple-wrapper">
+                        <strong class="strong-label">Other pay type <strong
+                                title="Use this if payment method not listed in above dropdown"
+                                class="qm-tooltip">?</strong></strong>
+                        <input type="checkbox" v-model="isOtherPaymentMethod">
+                        <div v-if="isOtherPaymentMethod" class="other-wrapper">
+                            <input class="simple-input" style="width: 275px;" type="text" v-model="otherpaymentmethod"
+                                placeholder="example (example.aspx)">
+                            <div style="display: flex; margin-top: 3px;">
+                                <button class="cof-button" @click="otherpaymentmethod = 'reverse'">reverse.aspx</button>
+                                <button class="cof-button" @click="otherpaymentmethod = 'credit'">credit.aspx</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <hr style="opacity: .2; margin: 10px;">
-                <h4 style="color: #1e5582; font-weight: 600; margin-bottom: 4px;">Encrypted parameters</h4>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">MsgVer=2.0 <strong
-                            title="This parameter is required to indicate that your implementation supports 3-D Secure processing"
-                            class="qm-tooltip">?</strong></strong>
-                    <input type="checkbox" v-model="isMsgVer2">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">Encryption
-                        password <strong title="Received from Computop" class="qm-tooltip">?</strong></strong>
-                    <input type="text" class="simple-input" v-model="this.auth.bf_password" placeholder="(mandatory)">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">HMAC password:</strong>
-                    <input type="text" placeholder="(optional)" class="simple-input" v-model="hmac_password">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">Merchant ID:</strong>
-                    <input type="text" class="simple-input" v-model="this.auth.merchantid" placeholder="(mandatory)">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">Transaction ID:</strong>
-                    <input type="text" class="simple-input narrow" v-model="transid">
-                    <button @click="generate_transid" class="generate-button custom-padding">Generate TransID</button>
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">RefNr:</strong>
-                    <input type="text" class="simple-input" v-model="refnr">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">Channel:</strong>
-                    <input type="text" class="simple-input" v-model="channel">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">Customer ID:</strong>
-                    <input type="text" class="simple-input" v-model="customerid">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">Amount:</strong>
-                    <input type="text" class="simple-input" v-model="amount" placeholder="(mandatory)">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">Currency:</strong>
-                    <input type="text" class="simple-input" v-model="currency" placeholder="(mandatory)">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">URLSuccess:</strong>
-                    <input type="text" class="simple-input" v-model="urlsuccess">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">URLFailure:</strong>
-                    <input type="text" class="simple-input" v-model="urlfailure">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">URLNotify:</strong>
-                    <input type="text" class="simple-input" v-model="urlnotify">
-                </p>
-                <p class="simple-wrapper">
-                    <strong class="strong-label">URLBack:</strong>
-                    <input type="text" class="simple-input" v-model="urlback">
-                </p>
-                <div style="margin: 2px; display: flex;">
-                    <strong class="strong-label">ArticleList:</strong>
+                    <hr style="opacity: .2; margin: 10px;">
+                    <h4 style="color: #1e5582; font-weight: 600; margin-bottom: 4px;">Encrypted parameters</h4>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">MsgVer=2.0 <strong
+                                title="This parameter is required to indicate that your implementation supports 3-D Secure processing"
+                                class="qm-tooltip">?</strong></strong>
+                        <input type="checkbox" v-model="isMsgVer2">
+                    </p>
                     <div class="simple-wrapper">
-                        <input type="text" class="simple-input" v-model="articlelist">
-                        <input type="checkbox" v-model="isArticleList" @click="isArticleList = !isArticleList">
+                        <strong class="strong-label">Encryption
+                            password <strong title="Received from Computop" class="qm-tooltip">?</strong></strong>
+                        <div>
+                            <input type="text" class="simple-input" v-model="this.auth.bf_password"
+                                placeholder="(mandatory)">
+                            <button class="order-desc-button" @click="this.auth.bf_password = 'AaAaAaAaAaAaAaAa'">AaAaAaAaAaAaAaAa</button>
+                        </div>
                     </div>
-                </div>
-                <div style="margin: 2px;  display: flex;">
-                    <strong class="strong-label">OrderItem:</strong>
-                    <div style="display: flex; gap: 5px;">
-                        <input type="text" class="simple-input" v-model="orderitem">
-                        <input type="checkbox" v-model="isOrderItem" @click="isOrderItem = !isOrderItem">
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">HMAC password:</strong>
+                        <input type="text" placeholder="(optional)" class="simple-input" v-model="hmac_password">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">Merchant ID:</strong>
+                        <input type="text" class="simple-input" v-model="this.auth.merchantid"
+                            placeholder="(mandatory)">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">Transaction ID:</strong>
+                        <input type="text" class="simple-input narrow" v-model="transid">
+                        <button @click="generate_transid" class="generate-button custom-padding">Generate
+                            TransID</button>
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">RefNr:</strong>
+                        <input type="text" class="simple-input" v-model="refnr">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">Channel:</strong>
+                        <input type="text" class="simple-input" v-model="channel">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">Customer ID:</strong>
+                        <input type="text" class="simple-input" v-model="customerid">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">Amount:</strong>
+                        <input type="text" class="simple-input" v-model="amount" placeholder="(mandatory)">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">Currency:</strong>
+                        <input type="text" class="simple-input" v-model="currency" placeholder="(mandatory)">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">URLSuccess:</strong>
+                        <input type="text" class="simple-input" v-model="urlsuccess">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">URLFailure:</strong>
+                        <input type="text" class="simple-input" v-model="urlfailure">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">URLNotify:</strong>
+                        <input type="text" class="simple-input" v-model="urlnotify">
+                    </p>
+                    <p class="simple-wrapper">
+                        <strong class="strong-label">URLBack:</strong>
+                        <input type="text" class="simple-input" v-model="urlback">
+                    </p>
+                    <div style="margin: 2px; display: flex;">
+                        <strong class="strong-label">ArticleList:</strong>
+                        <div class="simple-wrapper">
+                            <input type="text" class="simple-input" v-model="articlelist">
+                            <input type="checkbox" v-model="isArticleList" @click="isArticleList = !isArticleList">
+                        </div>
                     </div>
-                </div>
-                <p v-if="paytype === 'paytweak'" style="margin: 2px;">
-                    <strong class="strong-label">Service (Paytweak) <strong title="Values: link|email|sms"
-                            class="qm-tooltip">?</strong></strong>
-                    <input type="text" class="simple-input" v-model="paytweak_service">
-                </p>
-                <p v-if="paytype === 'paytweak'" style="margin: 2px;">
-                    <strong class="strong-label">Reminder email</strong>
-                    <input type="text" class="simple-input" v-model="paytweak_reminder_email">
-                </p>
-                <p v-if="paytype === 'paybylink'" style="margin: 2px;">
-                    <strong class="strong-label">PBL expiration date:</strong>
-                    <input type="text" class="simple-input" v-model="paybylinkexpiration"
-                        placeholder="YYYY-MM-DD HH:MM:SS">
-                </p>
-                <div style="margin: 2px;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">Email:</strong>
-                        <input type="text" class="simple-input" v-model="email">
+                    <div style="margin: 2px;  display: flex;">
+                        <strong class="strong-label">OrderItem:</strong>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="text" class="simple-input" v-model="orderitem">
+                            <input type="checkbox" v-model="isOrderItem" @click="isOrderItem = !isOrderItem">
+                        </div>
                     </div>
-                    <div class="order-desc-buttons only-margin">
-                        <button class="order-desc-button" @click="this.email = this.email + '@computop.com'"
-                            title="Use this for simulating successful payment">@computop.com</button>
-                        <button class="order-desc-button"
-                            @click="this.email = this.email + '@gmail.com'">@gmail.com</button>
+                    <p v-if="paytype === 'paytweak'" style="margin: 2px;">
+                        <strong class="strong-label">Service (Paytweak) <strong title="Values: link|email|sms"
+                                class="qm-tooltip">?</strong></strong>
+                        <input type="text" class="simple-input" v-model="paytweak_service">
+                    </p>
+                    <p v-if="paytype === 'paytweak'" style="margin: 2px;">
+                        <strong class="strong-label">Reminder email</strong>
+                        <input type="text" class="simple-input" v-model="paytweak_reminder_email">
+                    </p>
+                    <p v-if="paytype === 'paybylink'" style="margin: 2px;">
+                        <strong class="strong-label">PBL expiration date:</strong>
+                        <input type="text" class="simple-input" v-model="paybylinkexpiration"
+                            placeholder="YYYY-MM-DD HH:MM:SS">
+                    </p>
+                    <div style="margin: 2px;">
+                        <div class="simple-wrapper">
+                            <strong class="strong-label">Email:</strong>
+                            <input type="text" class="simple-input" v-model="email">
+                        </div>
+                        <div class="order-desc-buttons only-margin">
+                            <button class="order-desc-button" @click="this.email = this.email + '@computop.com'"
+                                title="Use this for simulating successful payment">@computop.com</button>
+                            <button class="order-desc-button"
+                                @click="this.email = this.email + '@gmail.com'">@gmail.com</button>
+                        </div>
                     </div>
-                </div>
-                <!-- <p style="margin: 2px;">
+                    <!-- <p style="margin: 2px;">
                     <strong class="strong-label">Preauth:</strong>
                     <input type="checkbox" v-model="preauth_flag" disabled>
                 </p> -->
-                <div style="margin: 2px;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">OrderDesc:</strong>
-                        <input type="text" class="simple-input" v-model="orderdesc">
-                    </div>
-                    <div class="order-desc-buttons">
-                        <button class="order-desc-button" @click="this.orderdesc = 'test:0000'"
-                            title="Use this for simulating successful payment">test:0000</button>
-                        <button class="order-desc-button" @click="this.orderdesc = 'test:0305'">test:0305</button>
-                    </div>
-                </div>
-                <div style="margin: 2px; display: flex; flex-direction: column;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">Card:</strong>
-                        <input type="checkbox" v-model="isCard">
-                    </div>
-                    <div><textarea class="custom-height" v-if="isCard" :rows="rows(card)" name="card" id="card"
-                            v-model="card"></textarea></div>
-                </div>
-                <div style="margin: 2px; display: flex; flex-direction: column;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">credentialOnFile:</strong>
-                        <input type="checkbox" v-model="isCredentialOnFile">
-                    </div>
-                    <div><textarea class="custom-height" v-if="isCredentialOnFile" name="cof" id="cof"
-                            v-model="credentialOnFile" :rows="rows(credentialOnFile)"></textarea>
-                    </div>
-                    <div v-if="isCredentialOnFile" class="cof-buttons">
-                        <button class="cof-button" @click="setCit">CIT</button>
-                        <button class="cof-button" @click="setCitC">CIT (RTF=C)</button>
-                        <button class="cof-button" @click="setMitE">MIT (RTF=E)</button>
-                        <button class="cof-button" @click="setMitM">MIT (RTF=M)</button>
-                        <button class="cof-button" @click="setInstallments">Installments (RTF=I)</button>
-                        <button class="cof-button" @click="setInstallmentsR">Installments (RTF=R)</button>
-                        <button class="cof-button" @click="setRecurring">Recurring (RTF=I)</button>
-                        <button class="cof-button" @click="setRecurringR">Recurring (RTF=R)</button>
-                    </div>
-                </div>
-                <div style="margin: 2px; display: flex; flex-direction: column;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">billToCustomer:</strong>
-                        <input type="checkbox" v-model="isBillToCustomer">
-                    </div>
-                    <div><textarea style="height: 150px;" v-if="isBillToCustomer" name="billToCustomer"
-                            id="billToCustomer" v-model="billToCustomer" :rows="rows(billToCustomer)"></textarea>
-                    </div>
-                </div>
-                <div style="margin: 2px; display: flex; flex-direction: column;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">billingAddress:</strong>
-                        <input type="checkbox" v-model="isBillingAddress">
-                    </div>
-                    <div><textarea style="height: 150px;" v-if="isBillingAddress" name="billToCustomer"
-                            id="billToCustomer" v-model="billingAddress" :rows="rows(billingAddress)"></textarea>
-                    </div>
-                </div>
-                <div style="margin: 2px; display: flex; flex-direction: column;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">threeDsData:</strong>
-                        <input type="checkbox" v-model="isThreeDsData">
-                    </div>
-                    <div v-if="isThreeDsData"><textarea class="custom-height" name="threeDsData" id="threeDsData"
-                            v-model="threeDsData"></textarea>
+                    <div style="margin: 2px;">
                         <div class="simple-wrapper">
-                            <button class="cof-button" @click="seEci07()">ECI=07/04</button>
-                            <button class="cof-button" @click="seEci05()">ECI=05/02</button>
+                            <strong class="strong-label">OrderDesc:</strong>
+                            <input type="text" class="simple-input" v-model="orderdesc">
+                        </div>
+                        <div class="order-desc-buttons">
+                            <button class="order-desc-button" @click="this.orderdesc = 'test:0000'"
+                                title="Use this for simulating successful payment">test:0000</button>
+                            <button class="order-desc-button" @click="this.orderdesc = 'test:0305'">test:0305</button>
                         </div>
                     </div>
-                </div>
-                <div style="margin: 2px; display: flex; flex-direction: column;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">threeDsPolicy:</strong>
-                        <input type="checkbox" v-model="isThreeDsPolicy">
+                    <div style="margin: 2px; display: flex; flex-direction: column;">
+                        <div class="simple-wrapper">
+                            <strong class="strong-label">Card:</strong>
+                            <input type="checkbox" v-model="isCard">
+                        </div>
+                        <div><textarea class="custom-height" v-if="isCard" :rows="rows(card)" name="card" id="card"
+                                v-model="card"></textarea></div>
                     </div>
-                    <div><textarea class="custom-height" v-if="isThreeDsPolicy" name="threeDsData" id="threeDsData"
-                            v-model="threeDsPolicy"></textarea>
-                        <div v-if="isThreeDsPolicy">
-                            <button class="cof-button" @click="setSkipThreeDs">Skip 3DS</button>
-                            <button class="cof-button" @click="mandateChallenge">Mandate challenge</button>
-                            <button class="cof-button" @click="tra">TRA</button>
-                            <button class="cof-button" @click="lowvalue">Low Value</button>
+                    <div style="margin: 2px; display: flex; flex-direction: column;">
+                        <div class="simple-wrapper">
+                            <strong class="strong-label">credentialOnFile:</strong>
+                            <input type="checkbox" v-model="isCredentialOnFile">
+                        </div>
+                        <div><textarea class="custom-height" v-if="isCredentialOnFile" name="cof" id="cof"
+                                v-model="credentialOnFile" :rows="rows(credentialOnFile)"></textarea>
+                        </div>
+                        <div v-if="isCredentialOnFile" class="cof-buttons">
+                            <button class="cof-button" @click="setCit">CIT</button>
+                            <button class="cof-button" @click="setCitC">CIT (RTF=C)</button>
+                            <button class="cof-button" @click="setMitE">MIT (RTF=E)</button>
+                            <button class="cof-button" @click="setMitM">MIT (RTF=M)</button>
+                            <button class="cof-button" @click="setInstallments">Installments (RTF=I)</button>
+                            <button class="cof-button" @click="setInstallmentsR">Installments (RTF=R)</button>
+                            <button class="cof-button" @click="setRecurring">Recurring (RTF=I)</button>
+                            <button class="cof-button" @click="setRecurringR">Recurring (RTF=R)</button>
                         </div>
                     </div>
-                </div>
-                <div style="margin: 2px; display: flex; flex-direction: column;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">browserInfo:</strong>
-                        <input type="checkbox" v-model="isBrowserInfo">
-                    </div>
-                    <div><textarea class="custom-height" v-if="isBrowserInfo" name="browserIno" id="browserInfo"
-                            v-model="browserInfo"></textarea>
-                    </div>
-                </div>
-                <div style="margin: 2px; display: flex; flex-direction: column;">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">tokenData:</strong>
-                        <input type="checkbox" v-model="isTokenData">
-                    </div>
-                    <div><textarea class="custom-height" v-if="isTokenData" name="tokenData" id="tokenData"
-                            v-model="tokenData"></textarea>
-                    </div>
-                </div>
-                <div style="margin: 2px;">
-                    <strong class="strong-label">Other parameters <strong
-                            title="Use this field to manually add payment specific parameters. Example: key1=value1&key2=value2. It will automatically be parsed and included in the request. Or click on Show all parameters button to add parameters on a click."
-                            class="qm-tooltip">?</strong></strong>
-                    <input type="checkbox" v-model="isOtherParameters">
-                    <div v-if="isOtherParameters">
-                        <textarea class="only-height" type="text" v-model="otherparams" :rows="this.otherparams.length / 75" placeholder=""></textarea>
-                        <div style="display: flex; margin-top: 4px; justify-content: center;">
-                            <button class="show-all-button" @click="isParametersModal = true">Show all
-                                parameters</button>
-                            <button class="show-all-button" @click="this.otherparams = ''">Clear field</button>
+                    <div style="margin: 2px; display: flex; flex-direction: column;">
+                        <div class="simple-wrapper">
+                            <strong class="strong-label">billToCustomer:</strong>
+                            <input type="checkbox" v-model="isBillToCustomer">
+                        </div>
+                        <div><textarea style="height: 150px;" v-if="isBillToCustomer" name="billToCustomer"
+                                id="billToCustomer" v-model="billToCustomer" :rows="rows(billToCustomer)"></textarea>
                         </div>
                     </div>
-                </div>
-                <hr style="opacity: .2; margin: 10px;">
-                <div style="display: flex; align-items: baseline; gap:7px; margin-bottom: 5px;">
-                    <h3 style="color: #1e5582; font-weight: 600;">Unencrypted parameters</h3>
-                    <button style="border: none; background: none; cursor: pointer; padding: 0; margin: 0; font-weight: 600; color: blue;"
-                        @click="showUnencryptedParamsDiv = !showUnencryptedParamsDiv">{{ buttonLabel }}</button>
-                </div>
-                <div v-if="showUnencryptedParamsDiv" style="display: contents;">
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Template:</strong>
-                        <input type="text" class="simple-input" v-model="template">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">CCTemplate:</strong>
-                        <input type="text" class="simple-input" v-model="cctemplate">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Pay Types:</strong>
-                        <input type="text" class="simple-input" v-model="hpppaytypes">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Language:</strong>
-                        <input type="text" class="simple-input" v-model="language">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">CustomField1:</strong>
-                        <input type="text" class="simple-input" v-model="customfield1">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">CustomField2:</strong>
-                        <input type="text" class="simple-input" v-model="customfield2">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">CustomField3:</strong>
-                        <input type="text" class="simple-input" v-model="customfield3">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">CustomField4:</strong>
-                        <input type="text" class="simple-input" v-model="customfield4">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">CustomField5:</strong>
-                        <input type="text" class="simple-input" v-model="customfield5">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">CustomField6:</strong>
-                        <input type="text" class="simple-input" v-model="customfield6">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">CustomField7:</strong>
-                        <input type="text" class="simple-input" v-model="customfield7">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">CustomField8:</strong>
-                        <input type="text" class="simple-input" v-model="customfield8">
-                    </p>
-                </div>
-                <div style="margin: 2px;">
-                    <div class="only-text-align">
-                        <button v-if="this.auth.merchantid && this.auth.bf_password" @click="encryptData(plaintext)"
-                            class="simple-button">Encrypt</button>
-                        <button v-else class="simple-button-disabled">Encrypt</button>
+                    <div style="margin: 2px; display: flex; flex-direction: column;">
+                        <div class="simple-wrapper">
+                            <strong class="strong-label">billingAddress:</strong>
+                            <input type="checkbox" v-model="isBillingAddress">
+                        </div>
+                        <div><textarea style="height: 150px;" v-if="isBillingAddress" name="billToCustomer"
+                                id="billToCustomer" v-model="billingAddress" :rows="rows(billingAddress)"></textarea>
+                        </div>
+                    </div>
+                    <div style="margin: 2px; display: flex; flex-direction: column;">
+                        <div class="simple-wrapper">
+                            <strong class="strong-label">threeDsData:</strong>
+                            <input type="checkbox" v-model="isThreeDsData">
+                        </div>
+                        <div v-if="isThreeDsData"><textarea class="custom-height" name="threeDsData" id="threeDsData"
+                                v-model="threeDsData"></textarea>
+                            <div class="simple-wrapper">
+                                <button class="cof-button" @click="seEci07()">ECI=07/04</button>
+                                <button class="cof-button" @click="seEci05()">ECI=05/02</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin: 2px; display: flex; flex-direction: column;">
+                        <div class="simple-wrapper">
+                            <strong class="strong-label">threeDsPolicy:</strong>
+                            <input type="checkbox" v-model="isThreeDsPolicy">
+                        </div>
+                        <div><textarea class="custom-height" v-if="isThreeDsPolicy" name="threeDsData" id="threeDsData"
+                                v-model="threeDsPolicy"></textarea>
+                            <div v-if="isThreeDsPolicy">
+                                <button class="cof-button" @click="setSkipThreeDs">Skip 3DS</button>
+                                <button class="cof-button" @click="mandateChallenge">Mandate challenge</button>
+                                <button class="cof-button" @click="tra">TRA</button>
+                                <button class="cof-button" @click="lowvalue">Low Value</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin: 2px; display: flex; flex-direction: column;">
+                        <div class="simple-wrapper">
+                            <strong class="strong-label">browserInfo:</strong>
+                            <input type="checkbox" v-model="isBrowserInfo">
+                        </div>
+                        <div><textarea class="custom-height" v-if="isBrowserInfo" name="browserIno" id="browserInfo"
+                                v-model="browserInfo"></textarea>
+                        </div>
+                    </div>
+                    <div style="margin: 2px; display: flex; flex-direction: column;">
+                        <div class="simple-wrapper">
+                            <strong class="strong-label">tokenData:</strong>
+                            <input type="checkbox" v-model="isTokenData">
+                        </div>
+                        <div><textarea class="custom-height" v-if="isTokenData" name="tokenData" id="tokenData"
+                                v-model="tokenData"></textarea>
+                        </div>
+                    </div>
+                    <div style="margin: 2px;">
+                        <strong class="strong-label">Other parameters <strong
+                                title="Use this field to manually add payment specific parameters. Example: key1=value1&key2=value2. It will automatically be parsed and included in the request. Or click on Show all parameters button to add parameters on a click."
+                                class="qm-tooltip">?</strong></strong>
+                        <input type="checkbox" v-model="isOtherParameters">
+                        <div v-if="isOtherParameters">
+                            <textarea class="only-height" type="text" v-model="otherparams"
+                                :rows="this.otherparams.length / 75" placeholder=""></textarea>
+                            <div style="display: flex; margin-top: 4px; justify-content: center;">
+                                <button class="show-all-button" @click="isParametersModal = true">Show all
+                                    parameters</button>
+                                <button class="show-all-button" @click="this.otherparams = ''">Clear field</button>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="opacity: .2; margin: 10px;">
+                    <div style="display: flex; align-items: baseline; gap:7px; margin-bottom: 5px;">
+                        <h3 style="color: #1e5582; font-weight: 600;">Unencrypted parameters</h3>
+                        <button
+                            style="border: none; background: none; cursor: pointer; padding: 0; margin: 0; font-weight: 600; color: blue;"
+                            @click="showUnencryptedParamsDiv = !showUnencryptedParamsDiv">{{ buttonLabel }}</button>
+                    </div>
+                    <div v-if="showUnencryptedParamsDiv" style="display: contents;">
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">Template:</strong>
+                            <input type="text" class="simple-input" v-model="template">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">CCTemplate:</strong>
+                            <input type="text" class="simple-input" v-model="cctemplate">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">Pay Types:</strong>
+                            <input type="text" class="simple-input" v-model="hpppaytypes">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">Language:</strong>
+                            <input type="text" class="simple-input" v-model="language">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">CustomField1:</strong>
+                            <input type="text" class="simple-input" v-model="customfield1">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">CustomField2:</strong>
+                            <input type="text" class="simple-input" v-model="customfield2">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">CustomField3:</strong>
+                            <input type="text" class="simple-input" v-model="customfield3">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">CustomField4:</strong>
+                            <input type="text" class="simple-input" v-model="customfield4">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">CustomField5:</strong>
+                            <input type="text" class="simple-input" v-model="customfield5">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">CustomField6:</strong>
+                            <input type="text" class="simple-input" v-model="customfield6">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">CustomField7:</strong>
+                            <input type="text" class="simple-input" v-model="customfield7">
+                        </p>
+                        <p class="simple-wrapper">
+                            <strong class="strong-label">CustomField8:</strong>
+                            <input type="text" class="simple-input" v-model="customfield8">
+                        </p>
+                    </div>
+                    <div style="margin: 2px;">
+                        <div class="only-text-align">
+                            <button v-if="this.auth.merchantid && this.auth.bf_password" @click="encryptData(plaintext)"
+                                class="simple-button">Encrypt</button>
+                            <button v-else class="simple-button-disabled">Encrypt</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="wrapper">
-            <p style="margin: 2px;">
-                <strong class="strong-label">Plain text:</strong>
-                <textarea readonly name="" id="" :rows="rows(plaintext)">{{ plaintext }}</textarea>
-            </p>
-            <p style="margin: 2px;">
-                <strong class="strong-label">Len:</strong>
-                <span>{{ len }}</span>
-            </p>
-            <p style="margin: 2px;">
-                <strong class="strong-label">Encrypted data:</strong>
-                <textarea v-if="encrypted_data" name="" id=""
-                    :rows="rows(encrypted_data)">{{ encrypted_data }}</textarea>
-            </p>
-            <div style="margin: 0;">
-                <h3 style="color: #1e5582; font-weight: 600;">Payment request (click to open in a new tab)</h3>
-                <div style="margin: 2px; display: flex; flex-direction: column; gap: 5px;">
-                    <strong>{{ this.paytype }}:</strong>
-                    <div style="display: flex; align-items: center;">
-                        <p class="redirect-url">{{ testurl_ohne_data }}</p>
-                        <a class="payment-url-button" v-if="isDataEncrypted" :href=testurl target="_blank"><span>Call</span> {{
-                            this.paytype }}</a>
+            <div class="wrapper">
+                <p style="margin: 2px;">
+                    <strong class="strong-label">Plain text:</strong>
+                    <textarea readonly name="" id="" :rows="rows(plaintext)">{{ plaintext }}</textarea>
+                </p>
+                <p style="margin: 2px;">
+                    <strong class="strong-label">Len:</strong>
+                    <span>{{ len }}</span>
+                </p>
+                <p style="margin: 2px;">
+                    <strong class="strong-label">Encrypted data:</strong>
+                    <textarea v-if="encrypted_data" name="" id=""
+                        :rows="rows(encrypted_data)">{{ encrypted_data }}</textarea>
+                </p>
+                <div style="margin: 0;">
+                    <h3 style="color: #1e5582; font-weight: 600;">Payment request (click to open in a new tab)</h3>
+                    <div style="margin: 2px; display: flex; flex-direction: column; gap: 5px;">
+                        <strong>{{ this.paytype }}:</strong>
+                        <div style="display: flex; align-items: center;">
+                            <p class="redirect-url">{{ testurl_ohne_data }}</p>
+                            <a class="payment-url-button" v-if="isDataEncrypted" :href=testurl
+                                target="_blank"><span>Call</span> {{
+                                    this.paytype }}</a>
+                        </div>
+                        <div class="simple-wrapper" v-if="isDataEncrypted">
+                            <canvas ref="qrcodeCanvas"></canvas>
+                            <p v-if="!this.isQRCodeGenerated" style="display: flex; font-size: 12px; color: #1e5582">Or
+                                generate QR code with payment URL:</p>
+                            <button class="simpler-button" @click="generateQR()" v-if="!this.isQRCodeGenerated">Generate
+                                QR
+                                code</button>
+                        </div>
                     </div>
-                    <div class="simple-wrapper" v-if="isDataEncrypted">
-                        <canvas ref="qrcodeCanvas"></canvas>
-                        <p v-if="!this.isQRCodeGenerated" style="display: flex; font-size: 12px; color: #1e5582">Or
-                            generate QR code with payment URL:</p>
-                        <button class="simpler-button" @click="generateQR()" v-if="!this.isQRCodeGenerated">Generate QR
-                            code</button>
-                    </div>
-                </div>
-            <!-- <div v-if="isDataEncrypted" class="wrapper wider">
+                    <!-- <div v-if="isDataEncrypted" class="wrapper wider">
                 <h3 style="color: #1e5582; font-weight: 600;">Embedded in iframe:</h3>
                 <iframe :src="testurl" width="750" height="650" ref="paymentIframe" @load="onIframeLoad"></iframe>
             </div> -->
-        </div>
-        </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- <LoginModal /> -->
@@ -783,11 +793,11 @@ export default {
                 base_url = base_url + `&CustomField3=${this.customfield3}`
 
             }
-             if (this.customfield4.length > 0) {
+            if (this.customfield4.length > 0) {
                 base_url = base_url + `&CustomField4=${this.customfield4}`
 
             }
-             if (this.customfield5.length > 0) {
+            if (this.customfield5.length > 0) {
                 base_url = base_url + `&CustomField5=${this.customfield5}`
 
             }
