@@ -74,81 +74,55 @@
                         <input type="text" class="simple-input" v-model="this.auth.merchantid"
                             placeholder="(mandatory)">
                     </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Transaction ID:</strong>
-                        <input type="text" class="simple-input narrow" v-model="transid">
+                    <ParamInputRow label="Transaction ID" v-model="transid" v-model:includeValue="includeTransID"
+                        input-class="simple-input narrow">
                         <button @click="generate_transid" class="generate-button custom-padding">Generate
                             TransID</button>
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">RefNr:</strong>
-                        <input type="text" class="simple-input" v-model="refnr">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Channel:</strong>
-                        <input type="text" class="simple-input" v-model="channel">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Customer ID:</strong>
-                        <input type="text" class="simple-input" v-model="customerid">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Amount:</strong>
-                        <input type="text" class="simple-input" v-model="amount" placeholder="(mandatory)">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Currency:</strong>
-                        <input type="text" class="simple-input" v-model="currency" placeholder="(mandatory)">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">URLSuccess:</strong>
-                        <input type="text" class="simple-input" v-model="urlsuccess">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">URLFailure:</strong>
-                        <input type="text" class="simple-input" v-model="urlfailure">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">URLNotify:</strong>
-                        <input type="text" class="simple-input" v-model="urlnotify">
-                    </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">URLBack:</strong>
-                        <input type="text" class="simple-input" v-model="urlback">
-                    </p>
+                    </ParamInputRow>
+                    <ParamInputRow label="RefNr" v-model="refnr" v-model:includeValue="includeRefNr" />
+                    <ParamInputRow label="Channel" v-model="channel" v-model:includeValue="includeChannel" />
+                    <ParamInputRow label="Customer ID" v-model="customerid" v-model:includeValue="includeCustomerID" />
+                    <ParamInputRow label="Amount" v-model="amount" v-model:includeValue="includeAmount"
+                        placeholder="(mandatory)" />
+                    <ParamInputRow label="Currency" v-model="currency" v-model:includeValue="includeCurrency"
+                        placeholder="(mandatory)" />
+                    <ParamInputRow label="URLSuccess" v-model="urlsuccess" v-model:includeValue="includeURLSuccess" />
+                    <ParamInputRow label="URLFailure" v-model="urlfailure" v-model:includeValue="includeURLFailure" />
+                    <ParamInputRow label="URLNotify" v-model="urlnotify" v-model:includeValue="includeURLNotify" />
+                    <ParamInputRow label="URLBack" v-model="urlback" v-model:includeValue="includeURLBack" />
                     <div style="margin: 2px; display: flex;">
                         <strong class="strong-label">ArticleList:</strong>
                         <div class="simple-wrapper">
                             <input type="text" class="simple-input" v-model="articlelist">
-                            <input type="checkbox" v-model="isArticleList" @click="isArticleList = !isArticleList">
+                            <input type="checkbox" v-model="isArticleList">
                         </div>
                     </div>
                     <div style="margin: 2px;  display: flex;">
                         <strong class="strong-label">OrderItem:</strong>
                         <div style="display: flex; gap: 5px;">
                             <input type="text" class="simple-input" v-model="orderitem">
-                            <input type="checkbox" v-model="isOrderItem" @click="isOrderItem = !isOrderItem">
+                            <input type="checkbox" v-model="isOrderItem">
                         </div>
                     </div>
                     <p v-if="paytype === 'paytweak'" style="margin: 2px;">
                         <strong class="strong-label">Service (Paytweak) <strong title="Values: link|email|sms"
                                 class="qm-tooltip">?</strong></strong>
                         <input type="text" class="simple-input" v-model="paytweak_service">
+                        <input type="checkbox" v-model="includePaytweakService">
                     </p>
                     <p v-if="paytype === 'paytweak'" style="margin: 2px;">
                         <strong class="strong-label">Reminder email</strong>
                         <input type="text" class="simple-input" v-model="paytweak_reminder_email">
+                        <input type="checkbox" v-model="includePaytweakReminderEmail">
                     </p>
                     <p v-if="paytype === 'paybylink'" style="margin: 2px;">
                         <strong class="strong-label">PBL expiration date:</strong>
                         <input type="text" class="simple-input" v-model="paybylinkexpiration"
                             placeholder="YYYY-MM-DD HH:MM:SS">
+                        <input type="checkbox" v-model="includeExpirationDate">
                     </p>
                     <div style="margin: 2px;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">Email:</strong>
-                            <input type="text" class="simple-input" v-model="email">
-                        </div>
+                        <ParamInputRow label="Email" v-model="email" v-model:includeValue="includeEmail" />
                         <div class="order-desc-buttons only-margin">
                             <button class="order-desc-button" @click="this.email = this.email + '@computop.com'"
                                 title="Use this for simulating successful payment">@computop.com</button>
@@ -161,10 +135,7 @@
                     <input type="checkbox" v-model="preauth_flag" disabled>
                 </p> -->
                     <div style="margin: 2px;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">OrderDesc:</strong>
-                            <input type="text" class="simple-input" v-model="orderdesc">
-                        </div>
+                        <ParamInputRow label="OrderDesc" v-model="orderdesc" v-model:includeValue="includeOrderDesc" />
                         <div class="order-desc-buttons">
                             <button class="order-desc-button" @click="this.orderdesc = 'test:0000'"
                                 title="Use this for simulating successful payment">test:0000</button>
@@ -336,9 +307,9 @@
                     </div>
                     <div style="margin: 2px;">
                         <div class="only-text-align">
-                            <button v-if="this.auth.merchantid && this.auth.bf_password" @click="encryptData(plaintext)"
-                                class="simple-button">Encrypt</button>
-                            <button v-else class="simple-button-disabled">Encrypt</button>
+                            <button @click="encryptData(plaintext)" class="simple-button"
+                                :class="{ 'simple-button-disabled': !canEncrypt }" :disabled="!canEncrypt">Encrypt</button>
+                            <p v-if="!canEncrypt" class="validation-error">{{ encryptDisabledReason }}</p>
                         </div>
                     </div>
                 </div>
@@ -395,6 +366,7 @@ import Navbar from '@/components/Navbar.vue'
 // import LoginModal from "@/components/LoginModal.vue";
 import Header from "@/components/Header.vue";
 import ParametersModal from "@/components/ParametersModal.vue";
+import ParamInputRow from "@/components/ParamInputRow.vue";
 import useAuthStore from '@/stores/auth.js'
 import QRCode from "qrcode";
 export default {
@@ -415,8 +387,6 @@ export default {
             email: import.meta.env.VITE_ENVIRONMENT === 'development' ? 'nebojsa.pesic@computop.com' : '',
             // secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
             encrypted_data: '',
-            plain_text: '',
-            len: 0,
             paytype: 'paymentpage',
             paytweak_service: 'link',
             paytweak_reminder_email: '{"ResendAfterDays":"1","MaxAttempts":"1"}',
@@ -467,6 +437,21 @@ export default {
             tokenData: '{"eci":"07","tokenCryptogram":"AgAAAAAAAIR8CQrXcIhbQAAAAAA=","tokenRequestorID":"40000000082","tokenRequestor":"schemetokenization"}',
             isArticleList: false,
             isOrderItem: false,
+            includeTransID: true,
+            includeRefNr: false,
+            includeChannel: false,
+            includeCustomerID: false,
+            includeAmount: true,
+            includeCurrency: true,
+            includeURLSuccess: true,
+            includeURLFailure: true,
+            includeURLNotify: true,
+            includeURLBack: true,
+            includeEmail: true,
+            includeOrderDesc: true,
+            includePaytweakService: true,
+            includePaytweakReminderEmail: true,
+            includeExpirationDate: true,
             showUnencryptedParamsDiv: false,
         }
     },
@@ -474,7 +459,8 @@ export default {
         Header,
         Navbar,
         // LoginModal,
-        ParametersModal
+        ParametersModal,
+        ParamInputRow
     },
     computed: {
         hmac_data() {
@@ -498,162 +484,44 @@ export default {
             }
         },
         plaintext() {
-            const params = {
-                "MerchantID": this.auth.merchantid,
-                "TransID": this.transid,
-                "Amount": this.amount,
-                "Currency": this.currency,
-                "URLSuccess": this.urlsuccess,
-                "URLFailure": this.urlfailure,
-                "URLNotify": this.urlnotify,
-                "URLBack": this.urlback,
-                "email": this.email,
-                "OrderDesc": this.orderdesc,
-            };
-
-            if (this.isOrderItem) {
-                params.OrderItem = btoa(this.orderitem);
-            }
-
-            if (this.isArticleList) {
-                params.ArticleList = btoa(this.articlelist);
-            }
-
-            if (this.isMsgVer2) {
-                params.MsgVer = "2.0";
-            }
-
-            if (this.paytype === 'paytweak') {
-                params.Service = this.paytweak_service;
-                params.reminderEmail = btoa(this.paytweak_reminder_email)
-                delete params.URLSuccess;
-                delete params.URLFailure;
-                delete params.URLBack;
-                delete params.URLNotify;
-            }
-
-            if (this.paytype === 'mandate') {
-                //
-            }
-
-            if (this.paytype === 'direct') {
-                delete params.URLSuccess;
-                delete params.URLFailure;
-                delete params.URLBack;
-            }
-
-            if (this.paytype === 'paybylink') {
-                params.ExpirationDate = this.paybylinkexpiration;
-            }
-
-            if (this.paytype === 'floapay') {
-                Object.assign(params, {
-                    Homepage: 'https://localhost:3005/homepage',
-                    CustomerID: this.customerid,
-                    LastName: 'User',
-                    FirstName: 'Test',
-                    AddrCountryCode: '276',
-                    Date: '2025/01/01',
-                    NumberArticles: '2',
-                });
-            }
-
-            if (this.paytype === 'twintpp') {
-                Object.assign(params, {
-                    AccOwner: 'Nebojsa Pesic'
-                });
-            }
-
-            if (this.paytype === 'klarnapayments') {
-                Object.assign(params, {
-                    ArticleList: btoa(this.articlelist),
-                    TaxAmount: '100',
-                    URLConfirm: 'https://localhost:3005/confirm',
-                    bdCountryCode: 'DE',
-                    Account: '1',
-                });
-            }
-
-            if (this.otherpaymentmethod === 'reverse') {
-                delete params.URLSuccess;
-                delete params.URLFailure;
-                delete params.URLBack;
-                delete params.URLNotify;
-                delete params.ArticleList;
-                delete params.OrderDesc;
-                delete params.MsgVer;
-                delete params.email;
-            }
-
-            if (this.preauth_flag) {
-                params.TxType = 'preauth';
-            }
-
-            if (this.channel.length > 0) {
-                params.Channel = this.channel;
-            }
-
-            if (this.customerid.length > 0) {
-                params.CustomerID = this.customerid;
-            }
-
-            if (this.refnr.length > 0) {
-                params.RefNr = this.refnr;
-            }
-
-            if (this.isCard) {
-                params.card = btoa(this.card);
-            }
-
-            if (this.isBillingAddress) {
-                params.billingAddress = btoa(this.billingAddress);
-            }
-
-            if (this.isCredentialOnFile) {
-                params.credentialOnFile = btoa(this.credentialOnFile);
-            }
-
-            if (this.isThreeDsData) {
-                params.threeDsData = btoa(this.threeDsData);
-            }
-
-            if (this.isThreeDsPolicy) {
-                params.threeDsPolicy = btoa(this.threeDsPolicy);
-            }
-
-            if (this.isBrowserInfo) {
-                params.browserInfo = btoa(this.browserInfo);
-            }
-
-            if (this.isTokenData) {
-                params.tokenData = btoa(this.tokenData);
-            }
-
-            if (this.isBillToCustomer) {
-                params.billToCustomer = btoa(this.billToCustomer);
-            }
-
-            if (this.hmac_password.length > 0) {
-                params.MAC = this.generateHMAC(this.hmac_data, this.hmac_password)
-            }
-
-            this.otherparamsarray.forEach(element => {
-                const idx = element.indexOf("=");
-
-                if (idx !== -1) {
-                    const key = element.substring(0, idx);
-                    const value = element.substring(idx + 1); // includes trailing '=' if present
-                    params[key] = value;
-                }
-            });
-
-            // Convert the object to a query string format
-            this.plain_text = Object.entries(params)
+            const params = this.buildParams();
+            return Object.entries(params)
                 .map(([key, value]) => `${key}=${value}`)
-                .join("&") + "&";  // Adds the trailing '&'
+                .join("&");
+        },
+        len() {
+            return this.plaintext.length;
+        },
+        validationErrors() {
+            const errors = [];
 
-            this.len = this.plain_text.slice(0, -1).length;
-            return this.plain_text.slice(0, -1);
+            if (!this.auth.merchantid) {
+                errors.push('Merchant ID is required.');
+            }
+
+            if (!this.auth.bf_password) {
+                errors.push('Encryption password is required.');
+            }
+
+            if (this.includeTransID && !this.transid) {
+                errors.push('Transaction ID is required when included.');
+            }
+
+            if (this.includeAmount && !this.amount) {
+                errors.push('Amount is required when included.');
+            }
+
+            if (this.includeCurrency && !this.currency) {
+                errors.push('Currency is required when included.');
+            }
+
+            return errors;
+        },
+        canEncrypt() {
+            return this.validationErrors.length === 0;
+        },
+        encryptDisabledReason() {
+            return this.validationErrors[0] || '';
         },
         otherparamsarray() {
             return this.otherparams ? this.otherparams.split('&') : [];
@@ -808,6 +676,184 @@ export default {
         }
     },
     methods: {
+        buildParams() {
+            const params = {
+                MerchantID: this.auth.merchantid,
+            };
+
+            if (this.includeTransID) {
+                params.TransID = this.transid;
+            }
+
+            if (this.includeAmount) {
+                params.Amount = this.amount;
+            }
+
+            if (this.includeCurrency) {
+                params.Currency = this.currency;
+            }
+
+            if (this.includeURLSuccess) {
+                params.URLSuccess = this.urlsuccess;
+            }
+
+            if (this.includeURLFailure) {
+                params.URLFailure = this.urlfailure;
+            }
+
+            if (this.includeURLNotify) {
+                params.URLNotify = this.urlnotify;
+            }
+
+            if (this.includeURLBack) {
+                params.URLBack = this.urlback;
+            }
+
+            if (this.includeEmail) {
+                params.email = this.email;
+            }
+
+            if (this.includeOrderDesc) {
+                params.OrderDesc = this.orderdesc;
+            }
+
+            if (this.isOrderItem) {
+                params.OrderItem = btoa(this.orderitem);
+            }
+
+            if (this.isArticleList) {
+                params.ArticleList = btoa(this.articlelist);
+            }
+
+            if (this.isMsgVer2) {
+                params.MsgVer = "2.0";
+            }
+
+            if (this.paytype === 'paytweak') {
+                if (this.includePaytweakService) {
+                    params.Service = this.paytweak_service;
+                }
+                if (this.includePaytweakReminderEmail) {
+                    params.reminderEmail = btoa(this.paytweak_reminder_email);
+                }
+                delete params.URLSuccess;
+                delete params.URLFailure;
+                delete params.URLBack;
+                delete params.URLNotify;
+            }
+
+            if (this.paytype === 'direct') {
+                delete params.URLSuccess;
+                delete params.URLFailure;
+                delete params.URLBack;
+            }
+
+            if (this.paytype === 'paybylink' && this.includeExpirationDate) {
+                params.ExpirationDate = this.paybylinkexpiration;
+            }
+
+            if (this.paytype === 'floapay') {
+                Object.assign(params, {
+                    Homepage: 'https://localhost:3005/homepage',
+                    CustomerID: this.customerid,
+                    LastName: 'User',
+                    FirstName: 'Test',
+                    AddrCountryCode: '276',
+                    Date: '2025/01/01',
+                    NumberArticles: '2',
+                });
+            }
+
+            if (this.paytype === 'twintpp') {
+                Object.assign(params, {
+                    AccOwner: 'Nebojsa Pesic'
+                });
+            }
+
+            if (this.paytype === 'klarnapayments') {
+                Object.assign(params, {
+                    ArticleList: btoa(this.articlelist),
+                    TaxAmount: '100',
+                    URLConfirm: 'https://localhost:3005/confirm',
+                    bdCountryCode: 'DE',
+                    Account: '1',
+                });
+            }
+
+            if (this.otherpaymentmethod === 'reverse') {
+                delete params.URLSuccess;
+                delete params.URLFailure;
+                delete params.URLBack;
+                delete params.URLNotify;
+                delete params.ArticleList;
+                delete params.OrderDesc;
+                delete params.MsgVer;
+                delete params.email;
+            }
+
+            if (this.preauth_flag) {
+                params.TxType = 'preauth';
+            }
+
+            if (this.includeChannel && this.channel.length > 0) {
+                params.Channel = this.channel;
+            }
+
+            if (this.includeCustomerID && this.customerid.length > 0) {
+                params.CustomerID = this.customerid;
+            }
+
+            if (this.includeRefNr && this.refnr.length > 0) {
+                params.RefNr = this.refnr;
+            }
+
+            if (this.isCard) {
+                params.card = btoa(this.card);
+            }
+
+            if (this.isBillingAddress) {
+                params.billingAddress = btoa(this.billingAddress);
+            }
+
+            if (this.isCredentialOnFile) {
+                params.credentialOnFile = btoa(this.credentialOnFile);
+            }
+
+            if (this.isThreeDsData) {
+                params.threeDsData = btoa(this.threeDsData);
+            }
+
+            if (this.isThreeDsPolicy) {
+                params.threeDsPolicy = btoa(this.threeDsPolicy);
+            }
+
+            if (this.isBrowserInfo) {
+                params.browserInfo = btoa(this.browserInfo);
+            }
+
+            if (this.isTokenData) {
+                params.tokenData = btoa(this.tokenData);
+            }
+
+            if (this.isBillToCustomer) {
+                params.billToCustomer = btoa(this.billToCustomer);
+            }
+
+            if (this.hmac_password.length > 0) {
+                params.MAC = this.generateHMAC(this.hmac_data, this.hmac_password);
+            }
+
+            this.otherparamsarray.forEach(element => {
+                const idx = element.indexOf('=');
+                if (idx !== -1) {
+                    const key = element.substring(0, idx);
+                    const value = element.substring(idx + 1);
+                    params[key] = value;
+                }
+            });
+
+            return params;
+        },
         seEci07() {
             this.threeDsData = ''
             this.threeDsData = '{"acsProtocolVersion":"2.2.0","eci":"07"}'
@@ -1085,6 +1131,12 @@ textarea {
 .only-text-align {
     text-align: center;
     margin-top: 10px;
+}
+
+.validation-error {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #d12f2f;
 }
 
 .narrow {
