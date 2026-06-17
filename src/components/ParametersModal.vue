@@ -48,16 +48,21 @@ export default {
 
 <style scoped>
 .parameters-wrapper {
-    position: absolute;
+    position: fixed;
     background-color: white;
     padding: 10px;
     width: 800px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
     top: 10%;
-    left: 30%;
+    left: 50%;
+    transform: translateX(-50%);
     border: solid;
     border-width: 1px;
     border-color: #1e5582;
     border-radius: 10px;
+    z-index: 1000;
 }
 
 .simple-button {
@@ -67,7 +72,7 @@ export default {
     margin-right: 5px;
     padding: 3px 6px;
     margin-top: 2px;
-    font-size: 12px;
+    font-size: 11px;
     color: #1e5582;
 }
 

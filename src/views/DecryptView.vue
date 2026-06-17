@@ -1,23 +1,23 @@
 <template>
     <div class="decrypt-wrapper">
-        <div class="decrypt">
-            <h2 style="color: #1e5582; font-weight: 700;">Test Paygate Decryption</h2>
-            <p style="margin: 10px 0 10px 0; color: #1e5582;">Data is not stored on any server.</p>
-            <div class="data-wrapper">
-                <p style="width: 150px; text-align: right; margin-right: 10px;">Data</p>
-                <textarea class="custom-width" v-model="encryptedData"></textarea>
-                <p style="margin-left: 10px;">Encrypted Data only <span class="info-span" title="Textbox should contain only encrypted data (without Data=) and not Len+Data">?</span></p>
+        <div class="card decrypt">
+            <h2 class="page-title">Test Paygate Decryption</h2>
+            <p class="warning-text">Data is not stored on any server.</p>
+            <div class="subsection data-wrapper">
+                <p class="field-label w-37.5!">Data</p>
+                <textarea class="field-textarea custom-width" v-model="encryptedData"></textarea>
+                <p>Encrypted Data only <span class="info-span" title="Textbox should contain only encrypted data (without Data=) and not Len+Data">?</span></p>
             </div>
-            <div style="display: flex; margin-top: 10px;">
-                <p style="width: 150px; text-align: right; margin-right: 10px;">Encryption password:</p>
-                <input class="simple-input" type="text" v-model="this.auth.bf_password">
+            <div class="field-row mt-2.5">
+                <p class="field-label w-37.5!">Encryption password:</p>
+                <input class="field-input" type="text" v-model="this.auth.bf_password">
             </div>
-            <div style="margin-top: 10px; text-align: center;">
-                <button class="simple-button" @click="decryptData(encryptedData)">Decrypt</button>
+            <div class="mt-2.5 text-center">
+                <button class="btn-primary" @click="decryptData(encryptedData)">Decrypt</button>
             </div>
         </div>
-        <div v-if="isDecrypted" class="decrypt">
-        <p v-for="parameter in this.decryptedDataArray" :key="parameter.id">{{ parameter }}</p>
+        <div v-if="isDecrypted" class="card decrypt">
+            <p v-for="parameter in this.decryptedDataArray" :key="parameter.id">{{ parameter }}</p>
         </div>
     </div>
 </template>
@@ -66,58 +66,34 @@ export default {
 
 <style scoped>
 .decrypt-wrapper {
-    width: 2100px;
+    width: 100%;
+    max-width: 900px;
     display: flex;
     margin: auto;
+    margin-top: 20px;
     flex-direction: column;
+    gap: 20px;
+    padding: 0 16px;
 }
 
 .decrypt {
     margin: auto;
-    width: 850px;
-    border-radius: 10px;
-    background-color: white;
-    padding: 20px;
-    margin-top: 10px;
 }
 
 .data-wrapper {
     display: flex;
+    align-items: flex-start;
+    gap: 10px;
 }
 
 textarea {
-    padding: 5px;
-    outline: none;
-    border-radius: 5px;
-    border-width: 1px;
-    border-color: #c7c7c7;
     resize: none;
     height: 250px;
-}
-
-.simple-input {
-    padding: 4px;
-    border-radius: 5px;
-    border: 1px solid;
-    border-color: #d4d4d4;
-    width: 300px;
-    border-color: #d4d4d4;
-    outline: none;
+    font-size: 11px;
 }
 
 .custom-width {
-    width: 500px;
-}
-
-.simple-button {
-    border: none;
-    background-color: #a5f729;
-    border-radius: 5px;
-    padding: 10px 25px 10px 25px;
-    cursor: pointer;
-    font-size: 16px;
-    color: #1e5582;
-    font-weight: 600;
+    width: 100%;
 }
 
 .info-span {

@@ -356,14 +356,16 @@ export default {
 <style scoped>
 .cb2a-builder {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 20px auto;
   padding: 18px;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 .header h1 {
   margin: 0 0 6px 0;
-  font-size: 22px;
+  font-size: 19px;
+  color: #1e5582;
+  font-weight: 600;
 }
 
 .muted {
@@ -371,7 +373,7 @@ export default {
 }
 
 .small {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .panel {
@@ -380,6 +382,13 @@ export default {
   border-radius: 12px;
   padding: 14px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.panel h2 {
+  color: #1e5582;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
 }
 
 .label {
@@ -405,7 +414,7 @@ export default {
 }
 
 .chip {
-  font-size: 12px;
+  font-size: 11px;
   padding: 3px 8px;
   border-radius: 999px;
   background: #f3f4f6;
@@ -436,7 +445,7 @@ export default {
   border-top: 1px solid #f1f5f9;
   padding: 8px 6px;
   vertical-align: top;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .table th {
@@ -453,7 +462,7 @@ export default {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   border: 1px solid #e5e7eb;
   background: #f9fafb;
 }
@@ -482,9 +491,15 @@ export default {
 .btn {
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid #d1d5db;
-  background: #fff;
+  border: none;
+  background: #1e5582;
+  color: #fff;
+  font-weight: 600;
   cursor: pointer;
+}
+
+.btn:hover {
+  background: #163f63;
 }
 
 .pre {
@@ -493,7 +508,7 @@ export default {
   padding: 12px;
   border-radius: 12px;
   overflow: auto;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.35;
 }
 

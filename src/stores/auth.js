@@ -8,7 +8,9 @@ const useAuthStore = defineStore('auth', {
         password: 'kogDwjYjVUTX8Gp8HHqv',
         merchantid: null,
         bf_password: null,
-        hmac_password: null
+        hmac_password: null,
+        partner: 'computop',
+        environment: 'test'
     }),
 
     actions: {

@@ -1,13 +1,100 @@
-CSS
-* {
+@import "tailwindcss";
+
+@theme {
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.875rem;
+  --text-xl: 1.125rem;
+}
+
+@layer base {
+  * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
 
-body {
+  body {
     background-color: #1e5582;
     font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+  }
 }
 
-@import "tailwindcss";
+@layer components {
+  /* Typography */
+  .page-title {
+    @apply text-[#1e5582] font-semibold text-xl;
+  }
+
+  .section-title {
+    @apply text-[#1e5582] font-semibold text-base mb-2;
+  }
+
+  .warning-text {
+    @apply text-[tomato] text-sm mb-3;
+  }
+
+  .muted-text {
+    @apply text-[#1e5582] text-sm;
+  }
+
+  /* Layout */
+  .card {
+    @apply bg-white rounded-xl p-6 w-full;
+  }
+
+  .subsection {
+    @apply bg-[#f7f9fb] border border-[#e7edf2] rounded-lg p-4 mb-4;
+  }
+
+  .divider {
+    @apply opacity-20 my-4;
+  }
+
+  /* Form fields */
+  .field-row {
+    @apply flex items-center gap-2 mb-1;
+  }
+
+  .field-label {
+    @apply w-40 text-right select-none text-sm shrink-0;
+  }
+
+  .field-input {
+    @apply px-2 py-1 rounded-md border border-[#d4d4d4] outline-none w-full max-w-75 bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed;
+  }
+
+  .field-input-mandatory {
+    @apply px-2 py-1 rounded-md border border-[#d4d4d4] outline-none w-full max-w-75 bg-[#ff857c];
+  }
+
+  .field-select {
+    @apply px-2 py-1 rounded-md border border-[#d4d4d4] bg-white outline-none w-full max-w-77.5;
+  }
+
+  .field-textarea {
+    @apply rounded-lg outline-none p-2 border border-[#d4d4d4] w-full text-xs bg-white;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply border-none bg-[#a5f729] rounded-md text-[#1e5582] font-semibold text-base px-11 py-2.5 cursor-pointer outline-none;
+  }
+
+  .btn-primary:disabled {
+    @apply bg-gray-200 text-white cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply border-none rounded-md bg-[#1e5582] text-white text-xs px-1.5 py-0.5 cursor-pointer;
+  }
+
+  .btn-chip {
+    @apply border-none rounded bg-[#a5f729] text-xs px-1.5 py-0.5 mr-1.5 mt-0.5 cursor-pointer;
+  }
+
+  .btn-ghost {
+    @apply border-none bg-transparent cursor-pointer p-0 m-0 font-semibold text-blue-700;
+  }
+}

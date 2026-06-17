@@ -11,7 +11,7 @@
                 <li><router-link to="/">Encryption</router-link></li>
                 <li><router-link to="/decrypt">Decryption</router-link></li>
                 <li><router-link to="/other">Other actions</router-link></li>
-                <li @click="routeTo('cb2a')">CB2A</li>
+                <li><router-link to="/cb2a-builder">CB2A</router-link></li>
             </ul>
         </div>
     </div>
@@ -19,11 +19,6 @@
 
 <script>
 export default {
-    methods: {
-        routeTo(name) {
-            this.$router.push({ name: name })
-        }
-    }
 }
 </script>
 
@@ -61,6 +56,10 @@ a {
     color: white;
     width: 150px;
     display: flex;
+    justify-content: center;
+    padding: 4px 0;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
 }
 
 .navbar-wrapper {
@@ -73,6 +72,7 @@ a {
     display: flex;
     list-style: none;
     margin: auto;
+    gap: 4px;
 }
 
 li {
@@ -82,7 +82,13 @@ li {
     text-align: center;
 }
 
-li:hover {
-    text-decoration: underline;
+a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+a.router-link-active {
+    background-color: #a5f729;
+    color: #1e5582;
+    font-weight: 600;
 }
 </style>

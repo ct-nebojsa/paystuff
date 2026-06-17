@@ -1,11 +1,12 @@
 <template>
-  <p class="simple-wrapper">
-    <strong class="strong-label">{{ label }}:</strong>
+  <p class="field-row">
+    <strong class="field-label">{{ label }}:</strong>
     <input
       :type="type"
       :class="inputClass"
       :placeholder="placeholder"
       :value="modelValue"
+      :disabled="!includeValue"
       @input="$emit('update:modelValue', $event.target.value)"
     >
     <input type="checkbox" :checked="includeValue" @change="$emit('update:includeValue', $event.target.checked)">
@@ -35,7 +36,7 @@ export default {
     },
     inputClass: {
       type: String,
-      default: 'simple-input',
+      default: 'field-input',
     },
     type: {
       type: String,
@@ -47,29 +48,6 @@ export default {
 </script>
 
 <style scoped>
-.simple-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 5px;
-}
-
-.strong-label {
-  width: 160px;
-  text-align: right;
-  user-select: none;
-  font-size: 14px;
-}
-
-.simple-input {
-  padding: 3px;
-  border-radius: 5px;
-  border: 1px solid;
-  border-color: #d4d4d4;
-  width: 300px;
-  outline: none;
-}
-
 .narrow {
   width: 190px;
 }

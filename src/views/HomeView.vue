@@ -1,21 +1,27 @@
 <template>
-    <div class="main-wrapper" @mousedown="handleParentClick">
-        <div style="display: flex; margin: auto; gap: 20px; width: 100%;">
-            <div class="wrapper">
-                <h3 style="color: #1e5582; font-weight: 600;">Paygate Encryption Test Tool</h3>
-                <h4 style="color: tomato;">Data is not stored on any server.</h4>
-                <div class="parameters">
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">Environment:</strong>
-                        <select name="environment" id="environment" style="width: 310px;" v-model="environment">
+    <div class="main-wrapper">
+        <div class="card mx-auto">
+            <h3 class="page-title">Paygate Encryption Test Tool</h3>
+            <h4 class="warning-text">Data is not stored on any server.</h4>
+            <div class="parameters" @keydown.enter="handleEnterKey">
+                <AccordionSection title="General" v-model="accordionGeneral">
+                    <div class="field-row">
+                        <strong class="field-label">Partner:</strong>
+                        <select name="partner" id="partner" class="field-select" v-model="auth.partner">
+                            <option v-for="p in partners" :key="p.value" :value="p.value">{{ p.label }}</option>
+                        </select>
+                    </div>
+                    <div class="field-row">
+                        <strong class="field-label">Environment:</strong>
+                        <select name="environment" id="environment" class="field-select" v-model="auth.environment">
                             <option value="dev">DEV</option>
                             <option value="test">TEST</option>
                             <option value="prod">PRODUCTION</option>
                         </select>
                     </div>
-                    <p v-if="!isOtherPaymentMethod" class="simple-wrapper">
-                        <strong class="strong-label">Pay type:</strong>
-                        <select name="paytype" id="paytype" v-model="paytype" style="width: 310px;"
+                    <p v-if="!isOtherPaymentMethod" class="field-row">
+                        <strong class="field-label">Pay type:</strong>
+                        <select name="paytype" id="paytype" v-model="paytype" class="field-select"
                             @click="isOtherPaymentMethod = false">
                             <option value="mandateform">EasyCollect (mandateform.aspx)</option>
                             <option value="floapay">Floapay (floapay.aspx)</option>
@@ -34,49 +40,55 @@
                             <option value="increment">Increment (increment.aspx)</option>
                         </select>
                     </p>
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">Other pay type <strong
+                    <div class="field-row">
+                        <strong class="field-label">Other pay type <strong
                                 title="Use this if payment method not listed in above dropdown"
                                 class="qm-tooltip">?</strong></strong>
                         <input type="checkbox" v-model="isOtherPaymentMethod">
                         <div v-if="isOtherPaymentMethod" class="other-wrapper">
-                            <input class="simple-input" style="width: 275px;" type="text" v-model="otherpaymentmethod"
+                            <input class="field-input w-68.75" type="text" v-model="otherpaymentmethod"
                                 placeholder="example (example.aspx)">
-                            <div style="display: flex; margin-top: 3px;">
-                                <button class="cof-button" @click="otherpaymentmethod = 'reverse'">reverse.aspx</button>
-                                <button class="cof-button" @click="otherpaymentmethod = 'credit'">credit.aspx</button>
+                            <div class="flex gap-1.5 mt-1.5">
+                                <button class="btn-chip" @click="otherpaymentmethod = 'reverse'">reverse.aspx</button>
+                                <button class="btn-chip" @click="otherpaymentmethod = 'credit'">credit.aspx</button>
                             </div>
                         </div>
                     </div>
-                    <hr style="opacity: .2; margin: 10px;">
-                    <h4 style="color: #1e5582; font-weight: 600; margin-bottom: 4px;">Encrypted parameters</h4>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">MsgVer=2.0 <strong
+                </AccordionSection>
+
+                <AccordionSection title="Encrypted parameters" v-model="accordionEncrypted">
+                    <p class="field-row">
+                        <strong class="field-label">MsgVer=2.0 <strong
                                 title="This parameter is required to indicate that your implementation supports 3-D Secure processing"
                                 class="qm-tooltip">?</strong></strong>
                         <input type="checkbox" v-model="isMsgVer2">
                     </p>
-                    <div class="simple-wrapper">
-                        <strong class="strong-label">Encryption
+                    <div class="field-row">
+                        <strong class="field-label">Encryption
                             password <strong title="Received from Computop" class="qm-tooltip">?</strong></strong>
-                        <div>
-                            <input type="text" class="simple-input" v-model="this.auth.bf_password"
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <input type="text" class="field-input" v-model="this.auth.bf_password"
                                 placeholder="(mandatory)">
-                            <button class="order-desc-button" @click="this.auth.bf_password = 'AaAaAaAaAaAaAaAa'">AaAaAaAaAaAaAaAa</button>
+                            <button class="btn-secondary" @click="this.auth.bf_password = 'AaAaAaAaAaAaAaAa'">AaAaAaAaAaAaAaAa</button>
                         </div>
                     </div>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">HMAC password:</strong>
-                        <input type="text" placeholder="(optional)" class="simple-input" v-model="hmac_password">
+                    <p class="field-row">
+                        <strong class="field-label">HMAC password:</strong>
+                        <input type="text" placeholder="(optional)" class="field-input" v-model="hmac_password">
                     </p>
-                    <p class="simple-wrapper">
-                        <strong class="strong-label">Merchant ID:</strong>
-                        <input type="text" class="simple-input" v-model="this.auth.merchantid"
-                            placeholder="(mandatory)">
-                    </p>
+                    <div class="mb-1.5">
+                        <p class="field-row">
+                            <strong class="field-label">Merchant ID:</strong>
+                            <input type="text" class="field-input" v-model="this.auth.merchantid"
+                                placeholder="(mandatory)">
+                        </p>
+                        <div class="order-desc-buttons">
+                            <button type="button" class="btn-chip" @click="this.auth.merchantid = 'npesic_test'">npesic_test</button>
+                        </div>
+                    </div>
                     <ParamInputRow label="Transaction ID" v-model="transid" v-model:includeValue="includeTransID"
-                        input-class="simple-input narrow">
-                        <button @click="generate_transid" class="generate-button custom-padding">Generate
+                        input-class="field-input narrow">
+                        <button @click="generate_transid" class="btn-secondary custom-padding">Generate
                             TransID</button>
                     </ParamInputRow>
                     <ParamInputRow label="RefNr" v-model="refnr" v-model:includeValue="includeRefNr" />
@@ -90,274 +102,297 @@
                     <ParamInputRow label="URLFailure" v-model="urlfailure" v-model:includeValue="includeURLFailure" />
                     <ParamInputRow label="URLNotify" v-model="urlnotify" v-model:includeValue="includeURLNotify" />
                     <ParamInputRow label="URLBack" v-model="urlback" v-model:includeValue="includeURLBack" />
-                    <div style="margin: 2px; display: flex;">
-                        <strong class="strong-label">ArticleList:</strong>
-                        <div class="simple-wrapper">
-                            <input type="text" class="simple-input" v-model="articlelist">
+                    <div class="flex gap-2 mb-1.5 mt-1.5">
+                        <strong class="field-label">ArticleList:</strong>
+                        <div class="field-row mb-0!">
+                            <input type="text" class="field-input" v-model="articlelist" :disabled="!isArticleList">
                             <input type="checkbox" v-model="isArticleList">
                         </div>
                     </div>
-                    <div style="margin: 2px;  display: flex;">
-                        <strong class="strong-label">OrderItem:</strong>
-                        <div style="display: flex; gap: 5px;">
-                            <input type="text" class="simple-input" v-model="orderitem">
+                    <div class="flex gap-2 mb-1.5">
+                        <strong class="field-label">OrderItem:</strong>
+                        <div class="flex gap-1.5">
+                            <input type="text" class="field-input" v-model="orderitem" :disabled="!isOrderItem">
                             <input type="checkbox" v-model="isOrderItem">
                         </div>
                     </div>
-                    <p v-if="paytype === 'paytweak'" style="margin: 2px;">
-                        <strong class="strong-label">Service (Paytweak) <strong title="Values: link|email|sms"
+                    <p v-if="paytype === 'paytweak'" class="field-row">
+                        <strong class="field-label">Service (Paytweak) <strong title="Values: link|email|sms"
                                 class="qm-tooltip">?</strong></strong>
-                        <input type="text" class="simple-input" v-model="paytweak_service">
+                        <input type="text" class="field-input" v-model="paytweak_service" :disabled="!includePaytweakService">
                         <input type="checkbox" v-model="includePaytweakService">
                     </p>
-                    <p v-if="paytype === 'paytweak'" style="margin: 2px;">
-                        <strong class="strong-label">Reminder email</strong>
-                        <input type="text" class="simple-input" v-model="paytweak_reminder_email">
+                    <p v-if="paytype === 'paytweak'" class="field-row">
+                        <strong class="field-label">Reminder email</strong>
+                        <input type="text" class="field-input" v-model="paytweak_reminder_email" :disabled="!includePaytweakReminderEmail">
                         <input type="checkbox" v-model="includePaytweakReminderEmail">
                     </p>
-                    <p v-if="paytype === 'paybylink'" style="margin: 2px;">
-                        <strong class="strong-label">PBL expiration date:</strong>
-                        <input type="text" class="simple-input" v-model="paybylinkexpiration"
-                            placeholder="YYYY-MM-DD HH:MM:SS">
+                    <p v-if="paytype === 'paybylink'" class="field-row">
+                        <strong class="field-label">PBL expiration date:</strong>
+                        <input type="text" class="field-input" v-model="paybylinkexpiration"
+                            placeholder="YYYY-MM-DD HH:MM:SS" :disabled="!includeExpirationDate">
                         <input type="checkbox" v-model="includeExpirationDate">
                     </p>
-                    <div style="margin: 2px;">
+                    <div class="mb-1.5">
                         <ParamInputRow label="Email" v-model="email" v-model:includeValue="includeEmail" />
                         <div class="order-desc-buttons only-margin">
-                            <button class="order-desc-button" @click="this.email = this.email + '@computop.com'"
+                            <button class="btn-chip" @click="this.email = this.email + '@computop.com'"
                                 title="Use this for simulating successful payment">@computop.com</button>
-                            <button class="order-desc-button"
+                            <button class="btn-chip"
                                 @click="this.email = this.email + '@gmail.com'">@gmail.com</button>
                         </div>
                     </div>
-                    <!-- <p style="margin: 2px;">
-                    <strong class="strong-label">Preauth:</strong>
-                    <input type="checkbox" v-model="preauth_flag" disabled>
-                </p> -->
-                    <div style="margin: 2px;">
+                    <div class="mb-1.5">
                         <ParamInputRow label="OrderDesc" v-model="orderdesc" v-model:includeValue="includeOrderDesc" />
                         <div class="order-desc-buttons">
-                            <button class="order-desc-button" @click="this.orderdesc = 'test:0000'"
+                            <button class="btn-chip" @click="this.orderdesc = 'test:0000'"
                                 title="Use this for simulating successful payment">test:0000</button>
-                            <button class="order-desc-button" @click="this.orderdesc = 'test:0305'">test:0305</button>
+                            <button class="btn-chip" @click="this.orderdesc = 'test:0305'">test:0305</button>
                         </div>
                     </div>
-                    <div style="margin: 2px; display: flex; flex-direction: column;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">Card:</strong>
+                </AccordionSection>
+
+                <AccordionSection title="Advanced / 3DS &amp; tokens" v-model="accordionAdvanced">
+                    <div class="flex flex-col gap-1.5 mb-1.5">
+                        <div class="field-row">
+                            <strong class="field-label">Card:</strong>
                             <input type="checkbox" v-model="isCard">
                         </div>
-                        <div><textarea class="custom-height" v-if="isCard" :rows="rows(card)" name="card" id="card"
+                        <div><textarea class="custom-height field-textarea" v-if="isCard" :rows="rows(card)" name="card" id="card"
                                 v-model="card"></textarea></div>
                     </div>
-                    <div style="margin: 2px; display: flex; flex-direction: column;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">credentialOnFile:</strong>
+                    <div class="flex flex-col gap-1.5 mb-1.5">
+                        <div class="field-row">
+                            <strong class="field-label">credentialOnFile:</strong>
                             <input type="checkbox" v-model="isCredentialOnFile">
                         </div>
-                        <div><textarea class="custom-height" v-if="isCredentialOnFile" name="cof" id="cof"
+                        <div><textarea class="custom-height field-textarea" v-if="isCredentialOnFile" name="cof" id="cof"
                                 v-model="credentialOnFile" :rows="rows(credentialOnFile)"></textarea>
                         </div>
                         <div v-if="isCredentialOnFile" class="cof-buttons">
-                            <button class="cof-button" @click="setCit">CIT</button>
-                            <button class="cof-button" @click="setCitC">CIT (RTF=C)</button>
-                            <button class="cof-button" @click="setMitE">MIT (RTF=E)</button>
-                            <button class="cof-button" @click="setMitM">MIT (RTF=M)</button>
-                            <button class="cof-button" @click="setInstallments">Installments (RTF=I)</button>
-                            <button class="cof-button" @click="setInstallmentsR">Installments (RTF=R)</button>
-                            <button class="cof-button" @click="setRecurring">Recurring (RTF=I)</button>
-                            <button class="cof-button" @click="setRecurringR">Recurring (RTF=R)</button>
+                            <button class="btn-chip" @click="setCit">CIT</button>
+                            <button class="btn-chip" @click="setCitC">CIT (RTF=C)</button>
+                            <button class="btn-chip" @click="setMitE">MIT (RTF=E)</button>
+                            <button class="btn-chip" @click="setMitM">MIT (RTF=M)</button>
+                            <button class="btn-chip" @click="setInstallments">Installments (RTF=I)</button>
+                            <button class="btn-chip" @click="setInstallmentsR">Installments (RTF=R)</button>
+                            <button class="btn-chip" @click="setRecurring">Recurring (RTF=I)</button>
+                            <button class="btn-chip" @click="setRecurringR">Recurring (RTF=R)</button>
                         </div>
                     </div>
-                    <div style="margin: 2px; display: flex; flex-direction: column;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">billToCustomer:</strong>
+                    <div class="flex flex-col gap-1.5 mb-1.5">
+                        <div class="field-row">
+                            <strong class="field-label">billToCustomer:</strong>
                             <input type="checkbox" v-model="isBillToCustomer">
                         </div>
-                        <div><textarea style="height: 150px;" v-if="isBillToCustomer" name="billToCustomer"
+                        <div><textarea class="h-37.5 field-textarea" v-if="isBillToCustomer" name="billToCustomer"
                                 id="billToCustomer" v-model="billToCustomer" :rows="rows(billToCustomer)"></textarea>
                         </div>
                     </div>
-                    <div style="margin: 2px; display: flex; flex-direction: column;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">billingAddress:</strong>
+                    <div class="flex flex-col gap-1.5 mb-1.5">
+                        <div class="field-row">
+                            <strong class="field-label">billingAddress:</strong>
                             <input type="checkbox" v-model="isBillingAddress">
                         </div>
-                        <div><textarea style="height: 150px;" v-if="isBillingAddress" name="billToCustomer"
+                        <div><textarea class="h-37.5 field-textarea" v-if="isBillingAddress" name="billToCustomer"
                                 id="billToCustomer" v-model="billingAddress" :rows="rows(billingAddress)"></textarea>
                         </div>
                     </div>
-                    <div style="margin: 2px; display: flex; flex-direction: column;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">threeDsData:</strong>
+                    <div class="flex flex-col gap-1.5 mb-1.5">
+                        <div class="field-row">
+                            <strong class="field-label">threeDsData:</strong>
                             <input type="checkbox" v-model="isThreeDsData">
                         </div>
-                        <div v-if="isThreeDsData"><textarea class="custom-height" name="threeDsData" id="threeDsData"
+                        <div v-if="isThreeDsData"><textarea class="custom-height field-textarea" name="threeDsData" id="threeDsData"
                                 v-model="threeDsData"></textarea>
-                            <div class="simple-wrapper">
-                                <button class="cof-button" @click="seEci07()">ECI=07/04</button>
-                                <button class="cof-button" @click="seEci05()">ECI=05/02</button>
+                            <div class="field-row">
+                                <button class="btn-chip" @click="seEci07()">ECI=07/04</button>
+                                <button class="btn-chip" @click="seEci05()">ECI=05/02</button>
                             </div>
                         </div>
                     </div>
-                    <div style="margin: 2px; display: flex; flex-direction: column;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">threeDsPolicy:</strong>
+                    <div class="flex flex-col gap-1.5 mb-1.5">
+                        <div class="field-row">
+                            <strong class="field-label">threeDsPolicy:</strong>
                             <input type="checkbox" v-model="isThreeDsPolicy">
                         </div>
-                        <div><textarea class="custom-height" v-if="isThreeDsPolicy" name="threeDsData" id="threeDsData"
+                        <div><textarea class="custom-height field-textarea" v-if="isThreeDsPolicy" name="threeDsData" id="threeDsData"
                                 v-model="threeDsPolicy"></textarea>
                             <div v-if="isThreeDsPolicy">
-                                <button class="cof-button" @click="setSkipThreeDs">Skip 3DS</button>
-                                <button class="cof-button" @click="mandateChallenge">Mandate challenge</button>
-                                <button class="cof-button" @click="tra">TRA</button>
-                                <button class="cof-button" @click="lowvalue">Low Value</button>
+                                <button class="btn-chip" @click="setSkipThreeDs">Skip 3DS</button>
+                                <button class="btn-chip" @click="mandateChallenge">Mandate challenge</button>
+                                <button class="btn-chip" @click="tra">TRA</button>
+                                <button class="btn-chip" @click="lowvalue">Low Value</button>
                             </div>
                         </div>
                     </div>
-                    <div style="margin: 2px; display: flex; flex-direction: column;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">browserInfo:</strong>
+                    <div class="flex flex-col gap-1.5 mb-1.5">
+                        <div class="field-row">
+                            <strong class="field-label">browserInfo:</strong>
                             <input type="checkbox" v-model="isBrowserInfo">
                         </div>
-                        <div><textarea class="custom-height" v-if="isBrowserInfo" name="browserIno" id="browserInfo"
+                        <div><textarea class="custom-height field-textarea" v-if="isBrowserInfo" name="browserIno" id="browserInfo"
                                 v-model="browserInfo"></textarea>
                         </div>
                     </div>
-                    <div style="margin: 2px; display: flex; flex-direction: column;">
-                        <div class="simple-wrapper">
-                            <strong class="strong-label">tokenData:</strong>
+                    <div class="flex flex-col gap-1.5">
+                        <div class="field-row">
+                            <strong class="field-label">tokenData:</strong>
                             <input type="checkbox" v-model="isTokenData">
                         </div>
-                        <div><textarea class="custom-height" v-if="isTokenData" name="tokenData" id="tokenData"
+                        <div><textarea class="custom-height field-textarea" v-if="isTokenData" name="tokenData" id="tokenData"
                                 v-model="tokenData"></textarea>
                         </div>
                     </div>
-                    <div style="margin: 2px;">
-                        <strong class="strong-label">Other parameters <strong
+                </AccordionSection>
+
+                <AccordionSection title="Other parameters" v-model="accordionOther">
+                    <div class="flex items-center gap-2">
+                        <strong class="field-label w-auto! text-left!">Manual entry <strong
                                 title="Use this field to manually add payment specific parameters. Example: key1=value1&key2=value2. It will automatically be parsed and included in the request. Or click on Show all parameters button to add parameters on a click."
                                 class="qm-tooltip">?</strong></strong>
                         <input type="checkbox" v-model="isOtherParameters">
-                        <div v-if="isOtherParameters">
-                            <textarea class="only-height" type="text" v-model="otherparams"
-                                :rows="this.otherparams.length / 75" placeholder=""></textarea>
-                            <div style="display: flex; margin-top: 4px; justify-content: center;">
-                                <button class="show-all-button" @click="isParametersModal = true">Show all
-                                    parameters</button>
-                                <button class="show-all-button" @click="this.otherparams = ''">Clear field</button>
+                    </div>
+                    <div v-if="isOtherParameters" class="mt-1.5">
+                        <textarea class="only-height field-textarea" type="text" v-model="otherparams"
+                            :rows="this.otherparams.length / 75" placeholder=""></textarea>
+                        <div class="flex gap-2 mt-1.5 justify-center">
+                            <button class="btn-secondary" @click="isParametersModal = true">Show all
+                                parameters</button>
+                            <button class="btn-secondary" @click="this.otherparams = ''">Clear field</button>
+                        </div>
+                    </div>
+                </AccordionSection>
+
+                <AccordionSection title="Unencrypted parameters" v-model="showUnencryptedParamsDiv">
+                    <div class="mb-1.5">
+                        <p class="field-row">
+                            <strong class="field-label">Template:</strong>
+                            <input type="text" class="field-input" v-model="template">
+                        </p>
+                        <div class="order-desc-buttons">
+                            <button type="button" class="btn-chip" @click="template = 'ct_cards_v2'">ct_cards_v2</button>
+                            <button type="button" class="btn-chip" @click="template = 'ct_PaymentPageDropDown_v1'">ct_PaymentPageDropDown_v1</button>
+                        </div>
+                    </div>
+                    <p class="field-row">
+                        <strong class="field-label">CCTemplate:</strong>
+                        <input type="text" class="field-input" v-model="cctemplate">
+                    </p>
+                    <p class="field-row">
+                        <strong class="field-label">Pay Types:</strong>
+                        <input type="text" class="field-input" v-model="hpppaytypes">
+                    </p>
+                    <div class="mb-1.5">
+                        <p class="field-row">
+                            <strong class="field-label">Language:</strong>
+                            <input type="text" class="field-input" v-model="language">
+                        </p>
+                        <div class="order-desc-buttons">
+                            <button type="button" class="btn-chip" v-for="lang in ['en', 'de', 'fr', 'it', 'es']" :key="lang"
+                                @click="language = lang">{{ lang }}</button>
+                        </div>
+                    </div>
+                    <div class="mb-1.5">
+                        <p class="field-row">
+                            <strong class="field-label">CustomField1:</strong>
+                            <input type="text" class="field-input" v-model="customfield1">
+                        </p>
+                        <div class="order-desc-buttons">
+                            <button type="button" class="btn-chip" @click="customfield1 = '1.00 EUR'">1.00 EUR</button>
+                        </div>
+                    </div>
+                    <p class="field-row">
+                        <strong class="field-label">CustomField2:</strong>
+                        <input type="text" class="field-input" v-model="customfield2">
+                    </p>
+                    <p class="field-row">
+                        <strong class="field-label">CustomField3:</strong>
+                        <input type="text" class="field-input" v-model="customfield3">
+                    </p>
+                    <p class="field-row">
+                        <strong class="field-label">CustomField4:</strong>
+                        <input type="text" class="field-input" v-model="customfield4">
+                    </p>
+                    <p class="field-row">
+                        <strong class="field-label">CustomField5:</strong>
+                        <input type="text" class="field-input" v-model="customfield5">
+                    </p>
+                    <p class="field-row">
+                        <strong class="field-label">CustomField6:</strong>
+                        <input type="text" class="field-input" v-model="customfield6">
+                    </p>
+                    <p class="field-row">
+                        <strong class="field-label">CustomField7:</strong>
+                        <input type="text" class="field-input" v-model="customfield7">
+                    </p>
+                    <p class="field-row">
+                        <strong class="field-label">CustomField8:</strong>
+                        <input type="text" class="field-input" v-model="customfield8">
+                    </p>
+                </AccordionSection>
+
+                <AccordionSection title="Result" v-model="accordionResult">
+                    <p class="field-row">
+                        <strong class="field-label">Plain text:</strong>
+                        <textarea readonly name="" id="" class="field-textarea" :rows="rows(plaintext)">{{ plaintext }}</textarea>
+                        <button type="button" class="btn-secondary" @click="copyText(plaintext, 'plaintext')">{{ copiedField === 'plaintext' ? 'Copied!' : 'Copy' }}</button>
+                    </p>
+                    <p class="field-row">
+                        <strong class="field-label">Len:</strong>
+                        <span>{{ len }}</span>
+                    </p>
+                    <p class="field-row" v-if="encrypted_data">
+                        <strong class="field-label">Encrypted data:</strong>
+                        <textarea name="" id="" class="field-textarea"
+                            :rows="rows(encrypted_data)">{{ encrypted_data }}</textarea>
+                        <button type="button" class="btn-secondary" @click="copyText(encrypted_data, 'encrypted')">{{ copiedField === 'encrypted' ? 'Copied!' : 'Copy' }}</button>
+                    </p>
+                    <div>
+                        <h4 class="section-title">Payment request (click to open in a new tab)</h4>
+                        <div class="flex flex-col gap-2 mb-1.5">
+                            <strong>{{ this.paytype }}:</strong>
+                            <div class="flex flex-col gap-2">
+                                <p class="redirect-url">{{ testurl_ohne_data }}</p>
+                                <div class="flex items-center gap-1.5" v-if="isDataEncrypted">
+                                    <a class="payment-url-button" :href=testurl
+                                        target="_blank"><span>Call</span> {{
+                                            this.paytype }}</a>
+                                    <button type="button" class="btn-secondary" @click="copyText(testurl, 'url')">{{ copiedField === 'url' ? 'Copied!' : 'Copy URL' }}</button>
+                                </div>
+                            </div>
+                            <div class="field-row" v-if="isDataEncrypted">
+                                <canvas ref="qrcodeCanvas"></canvas>
+                                <p v-if="!this.isQRCodeGenerated" class="flex muted-text text-xs">Or
+                                    generate QR code with payment URL:</p>
+                                <button class="simpler-button" @click="generateQR()" v-if="!this.isQRCodeGenerated">Generate
+                                    QR
+                                    code</button>
                             </div>
                         </div>
                     </div>
-                    <hr style="opacity: .2; margin: 10px;">
-                    <div style="display: flex; align-items: baseline; gap:7px; margin-bottom: 5px;">
-                        <h3 style="color: #1e5582; font-weight: 600;">Unencrypted parameters</h3>
-                        <button
-                            style="border: none; background: none; cursor: pointer; padding: 0; margin: 0; font-weight: 600; color: blue;"
-                            @click="showUnencryptedParamsDiv = !showUnencryptedParamsDiv">{{ buttonLabel }}</button>
-                    </div>
-                    <div v-if="showUnencryptedParamsDiv" style="display: contents;">
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">Template:</strong>
-                            <input type="text" class="simple-input" v-model="template">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">CCTemplate:</strong>
-                            <input type="text" class="simple-input" v-model="cctemplate">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">Pay Types:</strong>
-                            <input type="text" class="simple-input" v-model="hpppaytypes">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">Language:</strong>
-                            <input type="text" class="simple-input" v-model="language">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">CustomField1:</strong>
-                            <input type="text" class="simple-input" v-model="customfield1">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">CustomField2:</strong>
-                            <input type="text" class="simple-input" v-model="customfield2">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">CustomField3:</strong>
-                            <input type="text" class="simple-input" v-model="customfield3">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">CustomField4:</strong>
-                            <input type="text" class="simple-input" v-model="customfield4">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">CustomField5:</strong>
-                            <input type="text" class="simple-input" v-model="customfield5">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">CustomField6:</strong>
-                            <input type="text" class="simple-input" v-model="customfield6">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">CustomField7:</strong>
-                            <input type="text" class="simple-input" v-model="customfield7">
-                        </p>
-                        <p class="simple-wrapper">
-                            <strong class="strong-label">CustomField8:</strong>
-                            <input type="text" class="simple-input" v-model="customfield8">
-                        </p>
-                    </div>
-                    <div style="margin: 2px;">
-                        <div class="only-text-align">
-                            <button @click="encryptData(plaintext)" class="simple-button"
-                                :class="{ 'simple-button-disabled': !canEncrypt }" :disabled="!canEncrypt">Encrypt</button>
-                            <p v-if="!canEncrypt" class="validation-error">{{ encryptDisabledReason }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="wrapper">
-                <p style="margin: 2px;">
-                    <strong class="strong-label">Plain text:</strong>
-                    <textarea readonly name="" id="" :rows="rows(plaintext)">{{ plaintext }}</textarea>
-                </p>
-                <p style="margin: 2px;">
-                    <strong class="strong-label">Len:</strong>
-                    <span>{{ len }}</span>
-                </p>
-                <p style="margin: 2px;">
-                    <strong class="strong-label">Encrypted data:</strong>
-                    <textarea v-if="encrypted_data" name="" id=""
-                        :rows="rows(encrypted_data)">{{ encrypted_data }}</textarea>
-                </p>
-                <div style="margin: 0;">
-                    <h3 style="color: #1e5582; font-weight: 600;">Payment request (click to open in a new tab)</h3>
-                    <div style="margin: 2px; display: flex; flex-direction: column; gap: 5px;">
-                        <strong>{{ this.paytype }}:</strong>
-                        <div style="display: flex; align-items: center;">
-                            <p class="redirect-url">{{ testurl_ohne_data }}</p>
-                            <a class="payment-url-button" v-if="isDataEncrypted" :href=testurl
-                                target="_blank"><span>Call</span> {{
-                                    this.paytype }}</a>
-                        </div>
-                        <div class="simple-wrapper" v-if="isDataEncrypted">
-                            <canvas ref="qrcodeCanvas"></canvas>
-                            <p v-if="!this.isQRCodeGenerated" style="display: flex; font-size: 12px; color: #1e5582">Or
-                                generate QR code with payment URL:</p>
-                            <button class="simpler-button" @click="generateQR()" v-if="!this.isQRCodeGenerated">Generate
-                                QR
-                                code</button>
-                        </div>
-                    </div>
-                    <!-- <div v-if="isDataEncrypted" class="wrapper wider">
-                <h3 style="color: #1e5582; font-weight: 600;">Embedded in iframe:</h3>
-                <iframe :src="testurl" width="750" height="650" ref="paymentIframe" @load="onIframeLoad"></iframe>
-            </div> -->
-                </div>
+                </AccordionSection>
             </div>
         </div>
     </div>
+
+    <div class="action-bar">
+        <div class="action-bar-inner">
+            <div>
+                <button @click="encryptData(plaintext)" class="btn-primary" :disabled="!canEncrypt">Encrypt</button>
+                <p v-if="!canEncrypt" class="validation-error">{{ encryptDisabledReason }}</p>
+            </div>
+            <a class="payment-url-button" v-if="isDataEncrypted" :href="testurl" target="_blank">
+                <span>Open</span> {{ this.paytype }}
+            </a>
+        </div>
+    </div>
+
     <!-- <LoginModal /> -->
     <ParametersModal v-show="isParametersModal" @close="isParametersModal = false" ref="menu"
         @setparameter="handleReceivedParameter" />
+    <FloatingParamsPanel title="Request parameters" :params="plaintextParams" :payment-url="testurl"
+        :show-payment-url="isDataEncrypted" :copied="copiedField === 'url'" @copy-url="copyText(testurl, 'url')" />
 </template>
 
 <script>
@@ -367,13 +402,16 @@ import Navbar from '@/components/Navbar.vue'
 import Header from "@/components/Header.vue";
 import ParametersModal from "@/components/ParametersModal.vue";
 import ParamInputRow from "@/components/ParamInputRow.vue";
+import AccordionSection from "@/components/AccordionSection.vue";
+import FloatingParamsPanel from "@/components/FloatingParamsPanel.vue";
 import useAuthStore from '@/stores/auth.js'
 import QRCode from "qrcode";
+import { PARTNERS, getBaseUrl } from '@/utils/partners.js'
 export default {
     data() {
         return {
             auth: useAuthStore(),
-            environment: 'test',
+            partners: PARTNERS,
             // merchantid: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_MERCHANTID : '',
             transid: '',
             refnr: '',
@@ -390,7 +428,6 @@ export default {
             paytype: 'paymentpage',
             paytweak_service: 'link',
             paytweak_reminder_email: '{"ResendAfterDays":"1","MaxAttempts":"1"}',
-            preauth_flag: false,
             isCard: false,
             card: '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"4111111111111111","brand":"VISA"}',
             isMsgVer2: true,
@@ -422,7 +459,6 @@ export default {
             articlelist: '{"order_lines":[{"name":"Advanced Care","quantity":1,"quantity_unit":"STK","reference":"1452906","tax_rate":1900,"total_amount":500,"type":"physical","unit_price":500}]}',
             orderitem: '{"items":[{"name":"Advanced Care","quantity":1,"quantity_unit":"STK","reference":"1452906","tax_rate":1900,"total_amount":500,"type":"physical","unit_price":500}]}',
             isParametersModal: false,
-            receivedParameter: null,
             isQRCodeGenerated: false,
             isOtherParameters: false,
             isOtherPaymentMethod: false,
@@ -453,6 +489,12 @@ export default {
             includePaytweakReminderEmail: true,
             includeExpirationDate: true,
             showUnencryptedParamsDiv: false,
+            accordionGeneral: true,
+            accordionResult: true,
+            accordionEncrypted: true,
+            accordionAdvanced: false,
+            accordionOther: false,
+            copiedField: '',
         }
     },
     components: {
@@ -460,20 +502,16 @@ export default {
         Navbar,
         // LoginModal,
         ParametersModal,
-        ParamInputRow
+        ParamInputRow,
+        AccordionSection,
+        FloatingParamsPanel
     },
     computed: {
         hmac_data() {
             return `*${this.transid}*${this.auth.merchantid}*${this.amount}*${this.currency}`
         },
         baseurl() {
-            if (this.environment === 'dev') {
-                return 'dev.computop.de/paygate'
-            } else if (this.environment === 'test') {
-                return 'test.computop-paygate.com'
-            } else {
-                return 'computop-paygate.com'
-            }
+            return getBaseUrl(this.auth.partner, this.auth.environment)
         },
         replaceFrontEnd() {
             if (this.isOtherPaymentMethod && this.otherpaymentmethod.length > 0) {
@@ -525,6 +563,9 @@ export default {
         },
         otherparamsarray() {
             return this.otherparams ? this.otherparams.split('&') : [];
+        },
+        plaintextParams() {
+            return this.plaintext ? this.plaintext.split('&').filter(p => p.length > 0) : [];
         },
         frontend() {
             if (this.paytype === 'paymentpage') {
@@ -671,9 +712,6 @@ export default {
             }
             return base_url
         },
-        buttonLabel() {
-            return this.showUnencryptedParamsDiv ? 'Hide...' : 'Show more...'
-        }
     },
     methods: {
         buildParams() {
@@ -789,10 +827,6 @@ export default {
                 delete params.OrderDesc;
                 delete params.MsgVer;
                 delete params.email;
-            }
-
-            if (this.preauth_flag) {
-                params.TxType = 'preauth';
             }
 
             if (this.includeChannel && this.channel.length > 0) {
@@ -933,14 +967,32 @@ export default {
             });
             this.isQRCodeGenerated = true
         },
-        onIframeLoad() {
-            const iframe = this.$refs.paymentIframe;
-            try {
-                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                console.log(iframeDoc.body); // Access the <body> of the iframe
-            } catch (error) {
-                console.error("Cannot access iframe contents due to cross-origin restrictions.", error);
+        handleEnterKey(event) {
+            if (event.target.tagName === 'TEXTAREA') {
+                return;
             }
+            event.preventDefault();
+            if (this.canEncrypt) {
+                this.encryptData(this.plaintext);
+            }
+        },
+        async copyText(text, field) {
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch (e) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+            this.copiedField = field;
+            setTimeout(() => {
+                if (this.copiedField === field) {
+                    this.copiedField = '';
+                }
+            }, 1500);
         },
         generateHMAC(hmac_data, secret) {
             return CryptoJS.HmacSHA256(hmac_data, secret).toString(CryptoJS.enc.Hex);
@@ -954,6 +1006,9 @@ export default {
 
         },
         handleParentClick(event) {
+            if (!this.isParametersModal) {
+                return;
+            }
             const menu = this.$refs.menu;
             const el = menu?.$el || menu; // use $el if it's a component
             if (el && !el.contains(event.target)) {
@@ -963,35 +1018,18 @@ export default {
         rows(e) {
             return Math.ceil(e.length / 69) + 1
         },
-        quickhpp() {
-            const params = {
-                "MerchantID": "npesic_test",
-                "TransID": this.generate_transid(),
-                "Amount": "1000",
-                "Currency": "EUR",
-                "URLSuccess": this.urlsuccess,
-                "URLFailure": this.urlfailure,
-                "URLNotify": this.urlnotify,
-                "URLBack": this.urlback,
-                "email": this.email,
-                "OrderDesc": "quick order desc"
-            };
-        }
     },
     mounted() {
         this.generate_transid()
+        document.addEventListener('mousedown', this.handleParentClick)
+    },
+    beforeUnmount() {
+        document.removeEventListener('mousedown', this.handleParentClick)
     },
     watch: {
         paytype() {
             if (this.paytype === 'simplepay') {
                 this.currency = 'HUF'
-            }
-        },
-        customerid() {
-            if (this.customerid.length > 0 && this.paytype === 'floapay') {
-                this.inputClass = 'simple-input'
-            } else if (this.customerid.length === 0 && this.paytype === 'floapay') {
-                this.inputClass = 'simple-input-mandatory'
             }
         },
         otherparams(newValue) {
@@ -1007,7 +1045,7 @@ export default {
                 this.otherparams = '';
             }
         },
-        environment(newVal) {
+        'auth.environment'(newVal) {
             if (newVal) {
                 this.generate_transid()
                 this.isDataEncrypted = false
@@ -1032,110 +1070,21 @@ export default {
     margin-top: 20px;
     position: relative;
     width: 100%;
-    max-width: 1200px;
-}
-
-.wrapper {
-    background-color: white;
-    margin: auto;
-    padding: 20px;
-    padding-top: 10px;
-    border-radius: 10px;
-    margin-top: 0;
-    margin-bottom: 20px;
-    width: 100%;
+    max-width: 800px;
+    padding: 0 16px 90px;
 }
 
 .parameters {
     margin-top: 10px;
 }
 
-select {
-    width: 200px;
-    padding: 4px;
-    border: 1px solid;
-    border-radius: 5px;
-    background-color: white;
-    border-color: #d4d4d4;
-
-}
-
-textarea {
-    border-radius: 10px;
-    outline: none;
-    padding: 5px;
-    border: 1px solid;
-    border-color: #d4d4d4;
-    width: 100%;
-}
-
 .custom-height {
     height: 50px;
 }
 
-.simple-input {
-    padding: 3px;
-    border-radius: 5px;
-    border: 1px solid;
-    border-color: #d4d4d4;
-    width: 300px;
-    outline: none;
-}
-
-.simple-input-mandatory {
-    padding: 4px;
-    border-radius: 5px;
-    border: 1px solid;
-    border-color: #d4d4d4;
-    width: 300px;
-    outline: none;
-    background-color: #ff857c;
-}
-
-.simple-button {
-    border: none;
-    background-color: #a5f729;
-    border-radius: 5px;
-    padding: 10px 45px 10px 45px;
-    margin-top: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    color: #1e5582;
-    font-weight: 600;
-    outline: none;
-}
-
-.simpler-button {
-    border: none;
-    background-color: #a5f729;
-    border-radius: 5px;
-    padding: 5px 15px 5px 15px;
-    cursor: pointer;
-    font-size: 12px;
-    color: #1e5582;
-    font-weight: 600;
-    outline: none;
-}
-
-.simple-button-disabled {
-    border: none;
-    background-color: #ececec;
-    border-radius: 5px;
-    padding: 10px 45px 10px 45px;
-    cursor: not-allowed;
-    font-size: 16px;
-    color: white;
-    font-weight: 600;
-}
-
-.only-text-align {
-    text-align: center;
-    margin-top: 10px;
-}
-
 .validation-error {
-    margin-top: 6px;
-    font-size: 12px;
+    margin-top: 4px;
+    font-size: 11px;
     color: #d12f2f;
 }
 
@@ -1144,17 +1093,15 @@ textarea {
 }
 
 .redirect-url {
-    width: 400px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    font-size: 12px;
-    display: inline;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+    font-size: 11px;
 }
 
 .payment-url-button {
     text-decoration: none;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: #1e5582;
     background-color: #a5f729;
@@ -1162,41 +1109,11 @@ textarea {
     border-radius: 5px;
     display: flex;
     gap: 4px;
-}
-
-.generate-button {
-    border: none;
-    border-radius: 5px;
-    background-color: #1e5582;
-    color: white;
-    margin-left: 5px;
-    font-size: 12px;
-    cursor: pointer;
-    padding: 0 5px 0 5px;
+    align-items: center;
 }
 
 .custom-padding {
     padding: 5px;
-}
-
-.show-all-button {
-    border: none;
-    border-radius: 5px;
-    background-color: #1e5582;
-    color: white;
-    margin-left: 5px;
-    font-size: 12px;
-    cursor: pointer;
-    padding: 2px 7px 2px 7px;
-}
-
-.cof-button {
-    border: none;
-    margin-right: 6px;
-    background-color: #a5f729;
-    padding: 1px 2px;
-    border-radius: 3px;
-    cursor: pointer;
 }
 
 .qm-tooltip {
@@ -1209,38 +1126,48 @@ textarea {
     max-height: 15px;
     text-align: center;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .order-desc-buttons {
     text-align: center;
-}
-
-.order-desc-button {
-    border: none;
-    margin-right: 6px;
-    background-color: #a5f729;
-    padding: 1px 2px;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 12px;
+    margin-top: 6px;
 }
 
 .only-margin {
     margin-left: 60px;
 }
 
-.simple-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 5px;
+.simpler-button {
+    border: none;
+    background-color: #a5f729;
+    border-radius: 5px;
+    padding: 5px 15px 5px 15px;
+    cursor: pointer;
+    font-size: 11px;
+    color: #1e5582;
+    font-weight: 600;
+    outline: none;
 }
 
-.strong-label {
-    width: 160px;
-    text-align: right;
-    user-select: none;
-    font-size: 14px;
+.action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-top: 1px solid #d4d4d4;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 50;
+}
+
+.action-bar-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
 }
 </style>
