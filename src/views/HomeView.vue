@@ -54,6 +54,27 @@
                             </div>
                         </div>
                     </div>
+                    <div class="field-row">
+                        <strong class="field-label">Preset <strong
+                                title="Quickly fill the form with a sample request for a specific flow"
+                                class="qm-tooltip">?</strong></strong>
+                        <select name="preset" id="preset" class="field-select" v-model="preset" @change="applyPreset">
+                            <option value="">-- none --</option>
+                            <option value="easycollect_payment">Easy Collect PAYMENT</option>
+                            <option value="easycollect_mandate">Easy Collect MANDATE</option>
+                            <option value="floa">Floa</option>
+                        </select>
+                    </div>
+                    <div class="field-row" v-if="isEasyCollectPreset">
+                        <strong class="field-label">Agreement Scheme <strong title="Required for Easy Collect"
+                                class="qm-tooltip">?</strong></strong>
+                        <select name="agreementScheme" id="agreementScheme" class="field-select"
+                            v-model="agreementScheme">
+                            <option value="">-- select --</option>
+                            <option value="SMS">SMS</option>
+                            <option value="EMAIL">EMAIL</option>
+                        </select>
+                    </div>
                 </AccordionSection>
 
                 <AccordionSection title="Encrypted parameters" v-model="accordionEncrypted">
@@ -62,6 +83,12 @@
                                 title="This parameter is required to indicate that your implementation supports 3-D Secure processing"
                                 class="qm-tooltip">?</strong></strong>
                         <input type="checkbox" v-model="isMsgVer2">
+                    </p>
+                    <p class="field-row">
+                        <strong class="field-label">Duplication check <strong
+                                title="Adds InvoiceId and OrderId parameters with random values"
+                                class="qm-tooltip">?</strong></strong>
+                        <input type="checkbox" v-model="isDuplicationCheck">
                     </p>
                     <div class="field-row">
                         <strong class="field-label">Encryption
@@ -191,11 +218,29 @@
                     </div>
                     <div class="flex flex-col gap-1.5 mb-1.5">
                         <div class="field-row">
+                            <strong class="field-label">shipToCustomer:</strong>
+                            <input type="checkbox" v-model="isShipToCustomer">
+                        </div>
+                        <div><textarea class="h-37.5 field-textarea" v-if="isShipToCustomer" name="shipToCustomer"
+                                id="shipToCustomer" v-model="shipToCustomer" :rows="rows(shipToCustomer)"></textarea>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5 mb-1.5">
+                        <div class="field-row">
                             <strong class="field-label">billingAddress:</strong>
                             <input type="checkbox" v-model="isBillingAddress">
                         </div>
                         <div><textarea class="h-37.5 field-textarea" v-if="isBillingAddress" name="billToCustomer"
                                 id="billToCustomer" v-model="billingAddress" :rows="rows(billingAddress)"></textarea>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1.5 mb-1.5">
+                        <div class="field-row">
+                            <strong class="field-label">shippingAddress:</strong>
+                            <input type="checkbox" v-model="isShippingAddress">
+                        </div>
+                        <div><textarea class="h-37.5 field-textarea" v-if="isShippingAddress" name="shippingAddress"
+                                id="shippingAddress" v-model="shippingAddress" :rows="rows(shippingAddress)"></textarea>
                         </div>
                     </div>
                     <div class="flex flex-col gap-1.5 mb-1.5">
@@ -378,7 +423,9 @@
 
     <div class="action-bar">
         <div class="action-bar-inner">
-            <div>
+            <div class="action-buttons">
+                <button @click="resetForm" class="btn-secondary action-btn-lg">Reset</button>
+                <button @click="generate_transid" class="btn-secondary action-btn-lg">Generate TransID</button>
                 <button @click="encryptData(plaintext)" class="btn-primary" :disabled="!canEncrypt">Encrypt</button>
                 <p v-if="!canEncrypt" class="validation-error">{{ encryptDisabledReason }}</p>
             </div>
@@ -431,6 +478,7 @@ export default {
             isCard: false,
             card: '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"4111111111111111","brand":"VISA"}',
             isMsgVer2: true,
+            isDuplicationCheck: false,
             isDataEncrypted: false,
             isCredentialOnFile: false,
             isThreeDsData: false,
@@ -443,6 +491,10 @@ export default {
             hpppaytypes: '',
             isBillToCustomer: false,
             billToCustomer: '{"consumer":{"salutation":"Mr","firstName":"John","lastName":"Doe"},"phone":{"countryCode":"49","subscriberNumber":"12345678910"},"mobilePhone":{"countryCode":"49","subscriberNumber":"12345678910"}}',
+            isShipToCustomer: false,
+            shipToCustomer: '{"customerNumber":"customer123456","email":"john.doe@example.com","phone":{"countryCode":"49","subscriberNumber":"12345678910"}}',
+            preset: '',
+            agreementScheme: '',
             customfield1: '',
             customfield2: '',
             customfield3: '',
@@ -470,6 +522,8 @@ export default {
             threeDsPolicy: '{"skipThreeDS":"thisTransaction","threeDSExemption":{"exemptionReason":"transactionRiskAnalysis"},"challengePreference":"noPreference"}',
             billingAddress: '{"city":"Cacakongma","country":{"countryA3":"SRB","countryA2":"SR"},"postalCode":"80331","addressLine1":{"street":"test street","streetNumber":"10"}}',
             isBillingAddress: false,
+            shippingAddress: '{"city":"Cacakongma","country":{"countryA3":"SRB","countryA2":"SR"},"postalCode":"80331","addressLine1":{"street":"test street","streetNumber":"10"}}',
+            isShippingAddress: false,
             tokenData: '{"eci":"07","tokenCryptogram":"AgAAAAAAAIR8CQrXcIhbQAAAAAA=","tokenRequestorID":"40000000082","tokenRequestor":"schemetokenization"}',
             isArticleList: false,
             isOrderItem: false,
@@ -553,6 +607,10 @@ export default {
                 errors.push('Currency is required when included.');
             }
 
+            if (this.isEasyCollectPreset && !this.agreementScheme) {
+                errors.push('Agreement Scheme is required.');
+            }
+
             return errors;
         },
         canEncrypt() {
@@ -560,6 +618,9 @@ export default {
         },
         encryptDisabledReason() {
             return this.validationErrors[0] || '';
+        },
+        isEasyCollectPreset() {
+            return this.preset === 'easycollect_payment' || this.preset === 'easycollect_mandate';
         },
         otherparamsarray() {
             return this.otherparams ? this.otherparams.split('&') : [];
@@ -767,6 +828,11 @@ export default {
                 params.MsgVer = "2.0";
             }
 
+            if (this.isDuplicationCheck) {
+                params.InvoiceId = 'INV' + this.random_digits(8);
+                params.OrderId = 'ORD' + this.random_digits(8);
+            }
+
             if (this.paytype === 'paytweak') {
                 if (this.includePaytweakService) {
                     params.Service = this.paytweak_service;
@@ -849,6 +915,10 @@ export default {
                 params.billingAddress = btoa(this.billingAddress);
             }
 
+            if (this.isShippingAddress) {
+                params.shippingAddress = btoa(this.shippingAddress);
+            }
+
             if (this.isCredentialOnFile) {
                 params.credentialOnFile = btoa(this.credentialOnFile);
             }
@@ -873,6 +943,14 @@ export default {
                 params.billToCustomer = btoa(this.billToCustomer);
             }
 
+            if (this.isShipToCustomer) {
+                params.shipToCustomer = btoa(this.shipToCustomer);
+            }
+
+            if (this.isEasyCollectPreset && this.agreementScheme) {
+                params.agreementScheme = this.agreementScheme;
+            }
+
             if (this.hmac_password.length > 0) {
                 params.MAC = this.generateHMAC(this.hmac_data, this.hmac_password);
             }
@@ -887,6 +965,77 @@ export default {
             });
 
             return params;
+        },
+        applyPreset() {
+            if (this.preset === 'easycollect_payment' || this.preset === 'easycollect_mandate') {
+                this.isOtherPaymentMethod = false
+                this.paytype = 'paymentpage'
+                this.agreementScheme = ''
+
+                this.includeURLSuccess = true
+                this.urlsuccess = 'http://localhost:4000/success'
+                this.includeURLFailure = true
+                this.urlfailure = 'http://localhost:4000/failure'
+                this.includeURLNotify = true
+                this.urlnotify = 'http://localhost:4000/notify'
+                this.includeURLBack = true
+                this.urlback = 'http://localhost:4000/back'
+
+                this.includeTransID = true
+                this.generate_transid()
+                this.includeAmount = true
+                this.amount = '1599'
+                this.includeCurrency = true
+                this.currency = 'EUR'
+
+                this.isBillToCustomer = true
+                this.billToCustomer = '{"customerNumber":"customerNumberDummy123","email":"nebojsa.pesic@computop.com","consumer":{"firstName":"Jane","lastName":"Doe"},"phone":{"countryCode":"+33","subscriberNumber":"600000000"}}'
+
+                this.isOtherParameters = true
+                this.otherparams = 'DueDate=2026-07-15&IBAN=DE02120300000000202051&EMail=nebojsa.pesic@computop.com&FirstName=Jane&LastName=Doe&bdStreet=Example Street&bdStreetNr=5&bdZip=10115&bdCity=Berlin&bdCountryCode=FR&phone=+4915163709420&DocumentSignature=false&GoogleAnalyticsConsent=false&SignatureBySca=false&Sps=false&Validation=True&EventToken=Payment'
+            } else if (this.preset === 'floa') {
+                this.isOtherPaymentMethod = false
+                this.paytype = 'paymentpage'
+
+                const randomCustomerId = 'customerNumber' + this.random_digits(6)
+                const randomOrderId = 'merchantReference' + this.random_digits(5)
+                const today = new Date()
+                const todayFormatted = String(today.getDate()).padStart(2, '0') + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + today.getFullYear()
+
+                this.includeTransID = true
+                this.generate_transid()
+                this.includeAmount = true
+                this.amount = '50000'
+                this.includeCurrency = true
+                this.currency = 'EUR'
+
+                this.includeCustomerID = true
+                this.customerid = randomCustomerId
+
+                this.includeURLSuccess = true
+                this.urlsuccess = 'http://localhost:4000/success'
+                this.includeURLFailure = true
+                this.urlfailure = 'http://localhost:4000/failure'
+                this.includeURLNotify = true
+                this.urlnotify = 'http://localhost:4000/notify'
+                this.includeURLBack = true
+                this.urlback = 'http://localhost:4000/back'
+
+                this.isBillToCustomer = true
+                this.billToCustomer = `{"customerNumber":"${randomCustomerId}","email":"nebojsa.pesic@computop.com","consumer":{"firstName":"NEBO","lastName":"TEST"},"phone":{"countryCode":"+33","subscriberNumber":"764445110"}}`
+
+                this.isShipToCustomer = true
+                this.shipToCustomer = `{"customerNumber":"${randomCustomerId}","email":"nebojsa.pesic@computop.com","phone":{"countryCode":"+33","subscriberNumber":"764445110"}}`
+
+                this.includeEmail = true
+                this.email = 'nebojsa.pesic@computop.com'
+
+                this.includeChannel = true
+                this.channel = 'DESKTOP'
+
+                this.isOtherParameters = true
+                this.otherparams = `OrderID=${randomOrderId}&InvoiceID=invoiceId123&FirstName=NEBO&LastName=TEST&MobileNr=+33764445110&AddrStreet=Bubbu Collange&AddrZip=92300&AddrCity=Levallois-Perret&AddrCountryCode=FR&Date=${todayFormatted}&NumberArticles=2&Homepage=https://example.com`
+            }
         },
         seEci07() {
             this.threeDsData = ''
@@ -952,6 +1101,16 @@ export default {
             this.transid = transid
             this.isDataEncrypted = false
             this.encrypted_data = ''
+        },
+        resetForm() {
+            window.location.reload()
+        },
+        random_digits(length) {
+            let digits = '';
+            for (let i = 0; i < length; i++) {
+                digits += Math.floor(Math.random() * 10);
+            }
+            return digits
         },
         encryptData(data) {
             this.encrypted_data = CryptoJS.Blowfish.encrypt(data, CryptoJS.enc.Utf8.parse(this.auth.bf_password), {
@@ -1169,5 +1328,16 @@ export default {
     align-items: center;
     justify-content: center;
     gap: 16px;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.action-btn-lg {
+    font-size: 14px;
+    padding: 10px 16px;
 }
 </style>
