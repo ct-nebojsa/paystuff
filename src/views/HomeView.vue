@@ -479,6 +479,8 @@ export default {
             card: '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"4111111111111111","brand":"VISA"}',
             isMsgVer2: true,
             isDuplicationCheck: false,
+            duplicationOrderId: '',
+            duplicationInvoiceId: '',
             isDataEncrypted: false,
             isCredentialOnFile: false,
             isThreeDsData: false,
@@ -829,8 +831,8 @@ export default {
             }
 
             if (this.isDuplicationCheck) {
-                params.InvoiceId = 'INV' + this.random_digits(8);
-                params.OrderId = 'ORD' + this.random_digits(8);
+                params.InvoiceId = this.duplicationInvoiceId;
+                params.OrderId = this.duplicationOrderId;
             }
 
             if (this.paytype === 'paytweak') {
@@ -1180,6 +1182,8 @@ export default {
     },
     mounted() {
         this.generate_transid()
+        this.duplicationOrderId = 'ORD' + this.random_digits(8)
+        this.duplicationInvoiceId = 'INV' + this.random_digits(8)
         document.addEventListener('mousedown', this.handleParentClick)
     },
     beforeUnmount() {
