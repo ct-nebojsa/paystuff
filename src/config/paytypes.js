@@ -32,7 +32,7 @@ export const PAYTYPES = [
         value: 'installment', label: 'CB2A Installments (installment.aspx)', msgVer2: false,
         onSelect(vm) {
             vm.isCredentialOnFile = true
-            vm.credentialOnFile = '{"type":{"installments":{"total":3,"curIdx":1,"purchaseAmount":10000}},"initialPayment":false}'
+            vm.credentialOnFile = '{"type":{"installments":{"total":3,"curIdx":2,"purchaseAmount":10000}},"initialPayment":false}'
         },
     },
     {
