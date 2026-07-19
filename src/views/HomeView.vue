@@ -195,6 +195,12 @@
                             <button class="btn-chip" @click="setCardVisaOnly">VISA</button>
                             <button class="btn-chip" @click="setCardMastercardOnly">Mastercard</button>
                         </div>
+                        <div v-if="isCard" class="card-buttons">
+                            <span class="muted-text text-xs">Brand only:</span>
+                            <button class="btn-chip" @click="setCardBrand('VISA')">VISA</button>
+                            <button class="btn-chip" @click="setCardBrand('MasterCard')">MasterCard</button>
+                            <button class="btn-chip" @click="setCardBrand('Cartes Bancaires')">Cartes Bancaires</button>
+                        </div>
                     </div>
                     <div class="flex flex-col gap-1.5 mb-1.5">
                         <div class="field-row">
@@ -473,10 +479,10 @@ export default {
             amount: '1000',
             currency: 'EUR',
             orderdesc: 'test:payment',
-            urlsuccess: 'https://localhost/urls/success.php',
-            urlfailure: 'https://localhost/urls/failure.php',
+            urlsuccess: 'https://paygate-test.vercel.app/success',
+            urlfailure: 'https://paygate-test.vercel.app/failure',
             urlnotify: 'https://localhost/urls/notify.php',
-            urlback: 'https://localhost/urls/back.php',
+            urlback: 'https://paygate-test.vercel.app/back',
             email: import.meta.env.VITE_ENVIRONMENT === 'development' ? 'nebojsa.pesic@computop.com' : '',
             // secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
             encrypted_data: '',
@@ -1127,6 +1133,17 @@ export default {
         setCardMastercardOnly() {
             this.card = ''
             this.card = '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"5200000000000007","brand":"MASTERCARD"}'
+        },
+        setCardBrand(brand) {
+            let parsed;
+            try {
+                parsed = JSON.parse(this.card);
+            } catch (e) {
+                parsed = { securityCode: '123', expiryDate: '202906', cardholderName: 'John Doe', number: '4111111111111111' };
+            }
+            parsed.brand = brand;
+            this.card = ''
+            this.card = JSON.stringify(parsed);
         },
         setCit() {
             this.credentialOnFile = ''
