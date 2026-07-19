@@ -305,6 +305,13 @@
                     <div v-if="isOtherParameters" class="mt-1.5">
                         <textarea class="only-height field-textarea" type="text" v-model="otherparams"
                             :rows="this.otherparams.length / 75" placeholder=""></textarea>
+                        <div class="mt-1.5">
+                            <button class="btn-chip"
+                                @click="appendOtherParams('CCNr=4111111111111111&CCBrand=VISA&CCExpiry=202906&CCCVC=123')">Card</button>
+                            <button class="btn-chip"
+                                @click="appendOtherParams('AccVerify=yes&delayedShipment=initial')">Delayed
+                                Shipment</button>
+                        </div>
                         <div class="flex gap-2 mt-1.5 justify-center">
                             <button class="btn-secondary" @click="isParametersModal = true">Show all
                                 parameters</button>
@@ -1082,6 +1089,13 @@ export default {
         },
         generateHMAC(hmac_data, secret) {
             return CryptoJS.HmacSHA256(hmac_data, secret).toString(CryptoJS.enc.Hex);
+        },
+        appendOtherParams(pairs) {
+            if (this.otherparams.length === 0) {
+                this.otherparams = pairs
+            } else {
+                this.otherparams += '&' + pairs
+            }
         },
         handleReceivedParameter(value) {
             if (this.otherparams.length === 0) {
