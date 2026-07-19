@@ -57,17 +57,24 @@
                 </div>
                 <h4 class="section-title">Paygate response</h4>
                 <iframe :src="requestUrl" width="100%" height="150"></iframe>
-                <p class="muted-text text-xs">The Data value in the response is encrypted - paste it into the
-                    <router-link to="/decrypt">Decryption</router-link> page.</p>
+                <h4 class="section-title mt-3">Decrypt response</h4>
+                <textarea class="field-textarea" rows="4" v-model="responseInput"
+                    placeholder="Paste the response from above (Len=...&Data=... or just the Data value) - it decrypts automatically"></textarea>
+                <div v-if="decryptedResponse.length" class="subsection mt-2">
+                    <DecryptedParams :params="decryptedResponse" />
+                </div>
+                <p v-else-if="responseInput.trim().length > 0" class="validation-error">Could not decrypt - check the
+                    pasted value and the encryption password.</p>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import DecryptedParams from '@/components/DecryptedParams.vue'
 import useAuthStore from '@/stores/auth.js'
 import { getBaseUrl } from '@/utils/partners.js'
-import { encryptBlowfish } from '@/utils/blowfish.js'
+import { encryptBlowfish, decryptBlowfish } from '@/utils/blowfish.js'
 
 const CARD = '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"4111111111111111","brand":"VISA"}'
 const BROWSER_INFO = '{"timeZoneOffset":"120","acceptHeaders":"text","ipAddress":"93.176.166.240","javaEnabled":false,"javaScriptEnabled":true,"language":"US","colorDepth":32,"screenWidth":1060,"screenHeight":1050,"userAgent":"Mozilla/5.0"}'
@@ -111,6 +118,9 @@ const QUICK_TESTS = [
 ]
 
 export default {
+    components: {
+        DecryptedParams
+    },
     data() {
         return {
             auth: useAuthStore(),
@@ -123,6 +133,7 @@ export default {
             encrypted_data: '',
             isRun: false,
             copied: false,
+            responseInput: '',
         }
     },
     computed: {
@@ -135,10 +146,26 @@ export default {
         requestUrl() {
             return `https://${this.baseurl}/direct.aspx?MerchantID=${this.auth.merchantid}&Len=${this.plaintext.length}&Data=${this.encrypted_data}`
         },
+        decryptedResponse() {
+            const input = this.responseInput.trim()
+            if (!input || !this.auth.bf_password) return []
+            const dataMatch = input.match(/Data=([0-9A-Fa-f]+)/)
+            const lenMatch = input.match(/Len=(\d+)/)
+            const hex = (dataMatch ? dataMatch[1] : input).replace(/\s+/g, '')
+            if (!/^[0-9A-Fa-f]+$/.test(hex) || hex.length % 16 !== 0) return []
+            try {
+                const text = decryptBlowfish(hex, this.auth.bf_password, lenMatch ? parseInt(lenMatch[1], 10) : 0)
+                if (!text || !text.includes('=')) return []
+                return text.split('&')
+            } catch (e) {
+                return []
+            }
+        },
     },
     methods: {
         runTest() {
             this.isRun = false
+            this.responseInput = ''
             let transid = 'NEBO_'
             for (let i = 0; i < 10; i++) {
                 transid += Math.floor(Math.random() * 10)
