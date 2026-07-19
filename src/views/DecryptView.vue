@@ -12,6 +12,11 @@
                 <p class="field-label w-37.5!">Encryption password:</p>
                 <input class="field-input" type="text" v-model="this.auth.bf_password">
             </div>
+            <div class="field-row mt-2.5">
+                <p class="field-label w-37.5!">Len (optional):</p>
+                <input class="field-input" type="text" v-model="len"
+                    placeholder="Len value received with the Data">
+            </div>
             <div class="mt-2.5 text-center">
                 <button class="btn-primary" @click="decryptData(encryptedData)">Decrypt</button>
             </div>
@@ -25,8 +30,8 @@
 <script>
 import Header from '@/components/Header.vue';
 import Navbar from '@/components/Navbar.vue'
-import CryptoJS from "crypto-js";
 import useAuthStore from '@/stores/auth.js'
+import { decryptBlowfish } from '@/utils/blowfish.js'
 export default {
     data() {
         return {
@@ -35,6 +40,7 @@ export default {
             decryptedData: '',
             decryptedDataArray: [],
             isDecrypted: false,
+            len: '',
             // secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
         }
     },
@@ -44,15 +50,7 @@ export default {
     },
     methods: {
         decryptData(encryptedData) {
-            const decrypted = CryptoJS.Blowfish.decrypt(
-                { ciphertext: CryptoJS.enc.Hex.parse(encryptedData) },
-                CryptoJS.enc.Utf8.parse(this.auth.bf_password),
-                {
-                    mode: CryptoJS.mode.ECB,
-                    padding: CryptoJS.pad.Pkcs7
-                }
-            );
-            this.decryptedData = decrypted.toString(CryptoJS.enc.Utf8);
+            this.decryptedData = decryptBlowfish(encryptedData, this.auth.bf_password, parseInt(this.len, 10) || 0);
             this.decryptedDataArray = this.decryptedData.split('&')
             this.isDecrypted = true
         }

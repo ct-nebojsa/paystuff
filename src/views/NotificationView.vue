@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import CryptoJS from "crypto-js";
 import useAuthStore from '@/stores/auth.js'
+import { decryptBlowfish } from '@/utils/blowfish.js'
 
 export default {
     props: {
@@ -72,15 +72,7 @@ export default {
     },
     methods: {
         decryptData() {
-            const decrypted = CryptoJS.Blowfish.decrypt(
-                { ciphertext: CryptoJS.enc.Hex.parse(this.query.Data) },
-                CryptoJS.enc.Utf8.parse(this.auth.bf_password),
-                {
-                    mode: CryptoJS.mode.ECB,
-                    padding: CryptoJS.pad.Pkcs7
-                }
-            );
-            this.decryptedData = decrypted.toString(CryptoJS.enc.Utf8);
+            this.decryptedData = decryptBlowfish(this.query.Data, this.auth.bf_password, parseInt(this.query.Len, 10) || 0);
             this.decryptedDataArray = this.decryptedData.split('&')
             this.isDecrypted = true
         }
