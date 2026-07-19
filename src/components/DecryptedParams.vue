@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import { splitParam, base64ParamValue } from '@/utils/base64.js'
+
 export default {
     name: 'DecryptedParams',
     props: {
@@ -26,31 +28,12 @@ export default {
         },
     },
     methods: {
-        splitParam(param) {
-            const i = param.indexOf('=')
-            return i === -1 ? [param, ''] : [param.slice(0, i), param.slice(i + 1)]
-        },
-        // returns the decoded text when the value is base64-encoded readable
-        // text (Paygate uses base64 for JSON blobs like card), otherwise null
         base64Value(param) {
-            const value = this.splitParam(param)[1]
-            if (value.length < 12 || value.length % 4 !== 0) return null
-            if (!/^[A-Za-z0-9+/]+={0,2}$/.test(value)) return null
-            try {
-                const decoded = atob(value)
-                if (decoded.length === 0) return null
-                const printable = [...decoded].every(c => {
-                    const n = c.charCodeAt(0)
-                    return (n >= 32 && n <= 126) || n === 9 || n === 10 || n === 13
-                })
-                return printable ? decoded : null
-            } catch (e) {
-                return null
-            }
+            return base64ParamValue(param)
         },
         displayed(param, idx) {
             if (!this.decodedIdx[idx]) return param
-            const [key] = this.splitParam(param)
+            const [key] = splitParam(param)
             return `${key}=${this.base64Value(param)}`
         },
         toggle(idx) {

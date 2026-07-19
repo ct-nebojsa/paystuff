@@ -6,7 +6,11 @@
     </div>
     <div v-show="!collapsed" class="floating-panel-body">
       <div v-if="params.length === 0" class="floating-panel-empty">No parameters</div>
-      <div v-for="(param, idx) in params" :key="idx" class="floating-panel-row">{{ param }}</div>
+      <div v-for="(param, idx) in params" :key="idx" class="floating-panel-row">
+        {{ displayed(param) }}
+        <button v-if="base64Value(param) !== null" type="button" class="floating-panel-decode-btn"
+          @click="toggleDecode(param)">{{ decodedKeys[paramKey(param)] ? 'Original' : 'Decode' }}</button>
+      </div>
       <div v-if="showPaymentUrl" class="floating-panel-url-section">
         <div class="floating-panel-url-label">Payment URL</div>
         <div class="floating-panel-url-value">{{ paymentUrl }}</div>
@@ -20,6 +24,8 @@
 </template>
 
 <script>
+import { splitParam, base64ParamValue } from '@/utils/base64.js'
+
 export default {
   name: 'FloatingParamsPanel',
   props: {
@@ -48,6 +54,7 @@ export default {
   data() {
     return {
       collapsed: false,
+      decodedKeys: {},
       position: {
         top: 90,
         left: Math.max(20, window.innerWidth - 340),
@@ -57,6 +64,21 @@ export default {
     }
   },
   methods: {
+    paramKey(param) {
+      return splitParam(param)[0]
+    },
+    base64Value(param) {
+      return base64ParamValue(param)
+    },
+    displayed(param) {
+      if (!this.decodedKeys[this.paramKey(param)]) return param
+      const decoded = this.base64Value(param)
+      return decoded === null ? param : `${this.paramKey(param)}=${decoded}`
+    },
+    toggleDecode(param) {
+      const key = this.paramKey(param)
+      this.decodedKeys[key] = !this.decodedKeys[key]
+    },
     startDrag(event) {
       this.dragging = true
       this.offset = {
@@ -186,5 +208,18 @@ export default {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+}
+
+.floating-panel-decode-btn {
+  border: none;
+  border-radius: 4px;
+  background-color: #a5f729;
+  color: #1e5582;
+  font-weight: 600;
+  font-size: 10px;
+  padding: 1px 6px;
+  margin-left: 4px;
+  cursor: pointer;
+  vertical-align: middle;
 }
 </style>
