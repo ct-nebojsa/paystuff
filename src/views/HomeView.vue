@@ -288,6 +288,10 @@
                         <div><textarea class="custom-height field-textarea" v-if="isTokenData" name="tokenData" id="tokenData"
                                 v-model="tokenData"></textarea>
                         </div>
+                        <div v-if="isTokenData">
+                            <button class="btn-chip" @click="setTokenRequestor('applepay')">ApplePay</button>
+                            <button class="btn-chip" @click="setTokenRequestor('googlepay')">GooglePay</button>
+                        </div>
                     </div>
                 </AccordionSection>
 
@@ -945,6 +949,17 @@ export default {
         setCardMastercardOnly() {
             this.card = ''
             this.card = '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"5200000000000007","brand":"MASTERCARD"}'
+        },
+        setTokenRequestor(requestor) {
+            let parsed;
+            try {
+                parsed = JSON.parse(this.tokenData);
+            } catch (e) {
+                parsed = { eci: '07', tokenCryptogram: 'AgAAAAAAAIR8CQrXcIhbQAAAAAA=', tokenRequestorID: '40000000082' };
+            }
+            parsed.tokenRequestor = requestor;
+            this.tokenData = ''
+            this.tokenData = JSON.stringify(parsed);
         },
         setCardBrand(brand) {
             let parsed;
