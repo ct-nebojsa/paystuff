@@ -100,8 +100,8 @@ export default {
 }
 
 .floating-panel-header {
-  background: #1e5582;
-  color: white;
+  background: #a5f729;
+  color: #1e5582;
   padding: 8px 10px;
   display: flex;
   align-items: center;
@@ -115,8 +115,8 @@ export default {
 
 .floating-panel-toggle {
   border: none;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
+  background: rgba(30, 85, 130, 0.15);
+  color: #1e5582;
   border-radius: 4px;
   width: 22px;
   height: 22px;
