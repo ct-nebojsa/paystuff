@@ -42,7 +42,7 @@ export default {
         status: {
             type: String,
             required: true,
-            validator: (v) => ['success', 'failure', 'back'].includes(v)
+            validator: (v) => ['success', 'failure', 'back', 'notify'].includes(v)
         }
     },
     data() {
@@ -63,6 +63,7 @@ export default {
         title() {
             if (this.status === 'success') return 'Payment Successful'
             if (this.status === 'failure') return 'Payment Failed'
+            if (this.status === 'notify') return 'Notification Received'
             return 'Redirected Back'
         },
         statusClass() {
@@ -115,6 +116,10 @@ export default {
 }
 
 .status-back {
+    color: #1e5582;
+}
+
+.status-notify {
     color: #1e5582;
 }
 </style>

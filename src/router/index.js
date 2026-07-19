@@ -19,6 +19,7 @@ const router = createRouter({
     {path: '/success', name: 'success', component: NotificationView, props: { status: 'success' }},
     {path: '/failure', name: 'failure', component: NotificationView, props: { status: 'failure' }},
     {path: '/back', name: 'back', component: NotificationView, props: { status: 'back' }},
+    {path: '/notify', name: 'notify', component: NotificationView, props: { status: 'notify' }},
   ],
 })
 

@@ -481,7 +481,7 @@ export default {
             orderdesc: 'test:payment',
             urlsuccess: 'https://paygate-test.vercel.app/success',
             urlfailure: 'https://paygate-test.vercel.app/failure',
-            urlnotify: 'https://localhost/urls/notify.php',
+            urlnotify: 'https://paygate-test.vercel.app/notify',
             urlback: 'https://paygate-test.vercel.app/back',
             email: import.meta.env.VITE_ENVIRONMENT === 'development' ? 'nebojsa.pesic@computop.com' : '',
             // secret_test: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_SECRET : '',
