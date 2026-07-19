@@ -450,7 +450,8 @@
         @setparameter="handleReceivedParameter" />
     <FloatingParamsPanel title="Request parameters" :params="plaintextParams" :payment-url="testurl"
         :show-payment-url="isDataEncrypted" :copied="copiedField === 'url'" @copy-url="copyText(testurl, 'url')" />
-    <FloatingResponsePanel v-if="replaceFrontEnd === 'direct'" :password="auth.bf_password" />
+    <FloatingResponsePanel v-if="replaceFrontEnd === 'direct' || replaceFrontEnd === 'paybylinkexternal'"
+        :password="auth.bf_password" />
 </template>
 
 <script>
