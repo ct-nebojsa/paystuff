@@ -189,6 +189,12 @@
                         </div>
                         <div><textarea class="custom-height field-textarea" v-if="isCard" :rows="rows(card)" name="card" id="card"
                                 v-model="card"></textarea></div>
+                        <div v-if="isCard" class="card-buttons">
+                            <button class="btn-chip" @click="setCardVisa">VISA/CB</button>
+                            <button class="btn-chip" @click="setCardMastercard">MC/CB</button>
+                            <button class="btn-chip" @click="setCardVisaOnly">VISA</button>
+                            <button class="btn-chip" @click="setCardMastercardOnly">Mastercard</button>
+                        </div>
                     </div>
                     <div class="flex flex-col gap-1.5 mb-1.5">
                         <div class="field-row">
@@ -1105,6 +1111,22 @@ export default {
         seEci05() {
             this.threeDsData = ''
             this.threeDsData = '{"acsProtocolVersion":"2.2.0","authenticationValue":"kAMACEJBakKSOSzNLnxNiZeBQnf+","eci":"02","threeDSServerTransID":"a3dd2b66-6c06-423b-acd4-1cc19697a08f","dsTransID":"9e0e91c0-24e3-423c-a136-97023269d580","intermediateStatus":"Y","finalStatus":"Y"}'
+        },
+        setCardVisa() {
+            this.card = ''
+            this.card = '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"4111111111111111","brand":"VISA"}'
+        },
+        setCardMastercard() {
+            this.card = ''
+            this.card = '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"5555555555554444","brand":"MASTERCARD"}'
+        },
+        setCardVisaOnly() {
+            this.card = ''
+            this.card = '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"4000000000000002","brand":"VISA"}'
+        },
+        setCardMastercardOnly() {
+            this.card = ''
+            this.card = '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"5200000000000007","brand":"MASTERCARD"}'
         },
         setCit() {
             this.credentialOnFile = ''
