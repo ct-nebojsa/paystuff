@@ -1,5 +1,12 @@
 import CryptoJS from 'crypto-js'
 
+export function encryptBlowfish(text, password) {
+    return CryptoJS.Blowfish.encrypt(text, CryptoJS.enc.Utf8.parse(password), {
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7
+    }).ciphertext.toString(CryptoJS.enc.Hex)
+}
+
 // Paygate pads Blowfish data with zero bytes, not PKCS7. Unpadding with
 // PKCS7 reads the last plaintext byte as a pad length and strips up to 255
 // real characters, so decrypt without padding and cut to Len (when known)

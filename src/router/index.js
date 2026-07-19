@@ -4,6 +4,7 @@ import DecryptView from '../views/DecryptView.vue'
 import OtherView from '../views/OtherView.vue'
 import Cb2aView from '@/views/Cb2aView.vue'
 import NotificationView from '@/views/NotificationView.vue'
+import QuickTestView from '@/views/QuickTestView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,6 +16,7 @@ const router = createRouter({
     },
     {path: '/decrypt', name: 'decrypt', component: DecryptView},
     {path: '/other', name: 'other', component: OtherView},
+    {path: '/quick-testing', name: 'quicktest', component: QuickTestView},
     {path: '/cb2a-builder', name: 'cb2a', component: Cb2aView},
     {path: '/success', name: 'success', component: NotificationView, props: { status: 'success' }},
     {path: '/failure', name: 'failure', component: NotificationView, props: { status: 'failure' }},
