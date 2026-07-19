@@ -12,7 +12,9 @@
     </div>
     <div v-show="!collapsed" class="floating-panel-body" :style="{ fontSize: fontSize + 'px' }">
       <div v-if="params.length === 0" class="floating-panel-empty">No parameters</div>
-      <div v-for="(param, idx) in params" :key="idx" class="floating-panel-row">
+      <div v-for="(param, idx) in params" :key="idx" class="floating-panel-row"
+        :class="{ 'has-json': jsonValue(param) !== null }" @mouseenter="showJson(param, $event)"
+        @mouseleave="hideJson">
         {{ displayed(param) }}
         <button v-if="base64Value(param) !== null" type="button" class="floating-panel-decode-btn"
           @click="toggleDecode(param)">{{ decodedKeys[paramKey(param)] ? 'Original' : 'Decode' }}</button>
@@ -25,6 +27,10 @@
           <a class="floating-panel-action-btn floating-panel-open-btn" :href="paymentUrl" target="_blank">Open</a>
         </div>
       </div>
+    </div>
+    <div v-if="hoverJson" class="floating-panel-json-tooltip"
+      :style="{ top: hoverPos.top + 'px', left: hoverPos.left + 'px' }">
+      <pre>{{ hoverJson }}</pre>
     </div>
   </div>
 </template>
@@ -62,6 +68,8 @@ export default {
       collapsed: false,
       fontSize: 11,
       decodedKeys: {},
+      hoverJson: null,
+      hoverPos: { top: 0, left: 0 },
       position: {
         top: 90,
         left: Math.max(20, window.innerWidth - 340),
@@ -84,6 +92,37 @@ export default {
       if (!this.decodedKeys[this.paramKey(param)]) return param
       const decoded = this.base64Value(param)
       return decoded === null ? param : `${this.paramKey(param)}=${decoded}`
+    },
+    // pretty-printed JSON when the value is JSON text, either directly or
+    // behind base64, otherwise null
+    jsonValue(param) {
+      const candidates = [splitParam(param)[1], this.base64Value(param)]
+      for (const candidate of candidates) {
+        if (!candidate) continue
+        const trimmed = candidate.trim()
+        if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) continue
+        try {
+          return JSON.stringify(JSON.parse(trimmed), null, 2)
+        } catch (e) { /* not valid JSON, try the next candidate */ }
+      }
+      return null
+    },
+    showJson(param, event) {
+      const json = this.jsonValue(param)
+      if (json === null) return
+      const panelRect = this.$el.getBoundingClientRect()
+      const rowRect = event.currentTarget.getBoundingClientRect()
+      const width = 380
+      let left = panelRect.left - width - 10
+      if (left < 8) {
+        left = panelRect.right + 10
+      }
+      const top = Math.max(8, Math.min(rowRect.top, window.innerHeight - 320))
+      this.hoverJson = json
+      this.hoverPos = { top, left }
+    },
+    hideJson() {
+      this.hoverJson = null
     },
     toggleDecode(param) {
       const key = this.paramKey(param)
@@ -225,6 +264,32 @@ export default {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+}
+
+.floating-panel-row.has-json {
+  cursor: help;
+}
+
+.floating-panel-json-tooltip {
+  position: fixed;
+  width: 380px;
+  max-height: 310px;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #1e5582;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  padding: 8px 10px;
+  z-index: 300;
+  pointer-events: none;
+}
+
+.floating-panel-json-tooltip pre {
+  margin: 0;
+  font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .floating-panel-decode-btn {
