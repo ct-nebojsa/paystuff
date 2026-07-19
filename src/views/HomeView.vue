@@ -33,6 +33,7 @@
                             <option value="paybylink">paybylink (paybylink.aspx)</option>
                             <option value="paytweak">paytweak (paybylinkexternal.aspx)</option>
                             <option value="direct">S2S (direct.aspx)</option>
+                            <option value="applepay">Apple Pay S2S (applepay.aspx)</option>
                             <option value="simplepay">SimplePay (simplepay.aspx)</option>
                             <option value="twintpp">TWINT via PPRO (twintpp.aspx)</option>
                             <option value="---" disabled>----------------</option>
@@ -63,6 +64,7 @@
                             <option value="easycollect_payment">Easy Collect PAYMENT</option>
                             <option value="easycollect_mandate">Easy Collect MANDATE</option>
                             <option value="floa">Floa</option>
+                            <option value="applepay_server">Apple Pay (Server)</option>
                         </select>
                     </div>
                     <div class="field-row" v-if="isEasyCollectPreset">
@@ -663,6 +665,12 @@ export default {
                 this.isThreeDsData = true
                 this.isCard = true
                 return 'direct'
+            } else if (this.paytype === 'applepay') {
+                this.isMsgVer2 = false
+                this.isDataEncrypted = false
+                this.encrypted_data = ''
+                this.isOtherParameters = true
+                return 'applepay'
             } else if (this.paytype === 'instanea') {
                 this.isMsgVer2 = false
                 this.isDataEncrypted = false
@@ -854,6 +862,12 @@ export default {
                 delete params.URLBack;
             }
 
+            if (this.paytype === 'applepay') {
+                delete params.URLSuccess;
+                delete params.URLFailure;
+                delete params.URLBack;
+            }
+
             if (this.paytype === 'paybylink' && this.includeExpirationDate) {
                 params.ExpirationDate = this.paybylinkexpiration;
             }
@@ -1037,6 +1051,51 @@ export default {
 
                 this.isOtherParameters = true
                 this.otherparams = `OrderID=${randomOrderId}&InvoiceID=invoiceId123&FirstName=NEBO&LastName=TEST&MobileNr=+33764445110&AddrStreet=Bubbu Collange&AddrZip=92300&AddrCity=Levallois-Perret&AddrCountryCode=FR&Date=${todayFormatted}&NumberArticles=2&Homepage=https://example.com`
+            } else if (this.preset === 'applepay_server') {
+                this.isOtherPaymentMethod = false
+                this.paytype = 'applepay'
+
+                this.includeURLSuccess = false
+                this.includeURLFailure = false
+                this.includeURLBack = false
+                this.includeURLNotify = true
+                this.urlnotify = 'http://localhost:4000/notify'
+
+                this.includeTransID = true
+                this.generate_transid()
+                this.includeAmount = true
+                this.amount = '1599'
+                this.includeCurrency = true
+                this.currency = 'EUR'
+
+                this.includeOrderDesc = true
+                this.orderdesc = 'test:payment'
+
+                this.includeChannel = true
+                this.channel = 'WEBSITE'
+
+                // Sample PKPaymentToken from Computop's Apple Pay docs (https://developer.computop.com/display/EN/Apple+Pay)
+                const applePayToken = {
+                    paymentData: {
+                        data: 'GiZiyzsI6r6lnPYUeceR6itk2PDyBozl2Xy77c5u2X8Ze7l5EasyyH4Q6BoAevrvBfe0FnUNARBEXRySLwqqnpUHO6Du/amZEECRXxlrH91wFqH4oXry2CTDRu7TaIlmnR+s3ien5JI8iWo9hoEW7hyJOE7QGaS6rfR1CtQ4DWJEUq/tFnW98tj3kwKU6iOAAvE467boopMDGBS1fK5HzGXs4hH/6r+LPRfSOKBi1L5VWAexs9Bzw3ByyG69i52doRuFb1xOcMOJbmPg40hap13IjBW6dnj1phbsqP2i/JxvWPV3EcuqpuIoVZr5w53w//pPsl54kmeXNddIjVD5dIhhOKZ8AznD4eL2dbzkp6bic8xScBf3G8hrKXTRTL7V+KT2S+TQliHN0SNXrFu6B6o=',
+                        signature: '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',
+                        header: {
+                            publicKeyHash: 'OgiD2qBTWYf/a+LDshFeQcPq6tOmePu0epHpP4ZkNicc=',
+                            ephemeralPublicKey: 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEc/HxA3lJZrC+B0ITom0Iji+gFdn7ivGtpI+fl2u8n8XByPgBaVK2b44qUvsGigoNd0OFLNXo0Q07R2B54eIdS3A==',
+                            transactionId: '156632b2aadf355d4958d9051a42bf62e07aea5716e72083aa64247944f6e3e14d'
+                        },
+                        version: 'EC_v1'
+                    },
+                    paymentMethod: {
+                        displayName: 'MasterCard 0063',
+                        network: 'MasterCard',
+                        type: 'debit'
+                    },
+                    transactionIdentifier: '156632B2AAD12F355D4958D9051A42BF62E07AE5716E720AA6424794F6E3E14567D'
+                }
+
+                this.isOtherParameters = true
+                this.otherparams = `TokenExt=${btoa(JSON.stringify(applePayToken))}`
             }
         },
         seEci07() {
