@@ -32,3 +32,22 @@ export function decryptBlowfish(hexData, password, len = 0) {
     }
     return text.replace(/\0+$/, '')
 }
+
+// Parses a pasted Paygate response body ("Len=...&Data=..." or just the
+// Data hex) and returns the decrypted key=value pairs, or [] if the input
+// is not decryptable.
+export function decryptResponseBody(input, password) {
+    const trimmed = (input || '').trim()
+    if (!trimmed || !password) return []
+    const dataMatch = trimmed.match(/Data=([0-9A-Fa-f]+)/)
+    const lenMatch = trimmed.match(/Len=(\d+)/)
+    const hex = (dataMatch ? dataMatch[1] : trimmed).replace(/\s+/g, '')
+    if (!/^[0-9A-Fa-f]+$/.test(hex) || hex.length % 16 !== 0) return []
+    try {
+        const text = decryptBlowfish(hex, password, lenMatch ? parseInt(lenMatch[1], 10) : 0)
+        if (!text || !text.includes('=')) return []
+        return text.split('&')
+    } catch (e) {
+        return []
+    }
+}

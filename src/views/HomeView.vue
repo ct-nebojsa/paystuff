@@ -450,6 +450,7 @@
         @setparameter="handleReceivedParameter" />
     <FloatingParamsPanel title="Request parameters" :params="plaintextParams" :payment-url="testurl"
         :show-payment-url="isDataEncrypted" :copied="copiedField === 'url'" @copy-url="copyText(testurl, 'url')" />
+    <FloatingResponsePanel v-if="replaceFrontEnd === 'direct'" :password="auth.bf_password" />
 </template>
 
 <script>
@@ -460,6 +461,7 @@ import ParametersModal from "@/components/ParametersModal.vue";
 import ParamInputRow from "@/components/ParamInputRow.vue";
 import AccordionSection from "@/components/AccordionSection.vue";
 import FloatingParamsPanel from "@/components/FloatingParamsPanel.vue";
+import FloatingResponsePanel from "@/components/FloatingResponsePanel.vue";
 import useAuthStore from '@/stores/auth.js'
 import QRCode from "qrcode";
 import { PARTNERS, getBaseUrl } from '@/utils/partners.js'
@@ -570,7 +572,8 @@ export default {
         ParametersModal,
         ParamInputRow,
         AccordionSection,
-        FloatingParamsPanel
+        FloatingParamsPanel,
+        FloatingResponsePanel
     },
     computed: {
         hmac_data() {
