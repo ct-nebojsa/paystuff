@@ -22,7 +22,7 @@
             </div>
         </div>
         <div v-if="isDecrypted" class="card decrypt">
-            <p v-for="parameter in this.decryptedDataArray" :key="parameter.id">{{ parameter }}</p>
+            <DecryptedParams :params="decryptedDataArray" />
         </div>
     </div>
 </template>
@@ -30,6 +30,7 @@
 <script>
 import Header from '@/components/Header.vue';
 import Navbar from '@/components/Navbar.vue'
+import DecryptedParams from '@/components/DecryptedParams.vue';
 import useAuthStore from '@/stores/auth.js'
 import { decryptBlowfish } from '@/utils/blowfish.js'
 export default {
@@ -46,7 +47,8 @@ export default {
     },
     components: {
         Header,
-        Navbar
+        Navbar,
+        DecryptedParams
     },
     methods: {
         decryptData(encryptedData) {

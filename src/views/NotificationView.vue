@@ -22,7 +22,7 @@
                     <button class="btn-primary" @click="decryptData">Decrypt</button>
                 </div>
                 <div v-if="isDecrypted" class="mt-2">
-                    <p class="muted-text" v-for="(param, idx) in decryptedDataArray" :key="idx">{{ param }}</p>
+                    <DecryptedParams :params="decryptedDataArray" />
                 </div>
             </div>
 
@@ -34,10 +34,14 @@
 </template>
 
 <script>
+import DecryptedParams from '@/components/DecryptedParams.vue'
 import useAuthStore from '@/stores/auth.js'
 import { decryptBlowfish } from '@/utils/blowfish.js'
 
 export default {
+    components: {
+        DecryptedParams
+    },
     props: {
         status: {
             type: String,
