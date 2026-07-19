@@ -69,7 +69,6 @@
 
 <script>
 import Navbar from '@/components/Navbar.vue'
-import LoginModal from "@/components/LoginModal.vue";
 import Header from "@/components/Header.vue";
 import CryptoJS from "crypto-js";
 import { PARTNERS, getBaseUrl } from '@/utils/partners.js'

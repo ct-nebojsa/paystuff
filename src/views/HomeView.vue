@@ -435,7 +435,6 @@
         </div>
     </div>
 
-    <!-- <LoginModal /> -->
     <ParametersModal v-show="isParametersModal" @close="isParametersModal = false" ref="menu"
         @setparameter="handleReceivedParameter" />
     <FloatingParamsPanel title="Request parameters" :params="plaintextParams" :payment-url="testurl"
@@ -445,7 +444,6 @@
 <script>
 import CryptoJS from "crypto-js";
 import Navbar from '@/components/Navbar.vue'
-// import LoginModal from "@/components/LoginModal.vue";
 import Header from "@/components/Header.vue";
 import ParametersModal from "@/components/ParametersModal.vue";
 import ParamInputRow from "@/components/ParamInputRow.vue";
@@ -558,7 +556,6 @@ export default {
     components: {
         Header,
         Navbar,
-        // LoginModal,
         ParametersModal,
         ParamInputRow,
         AccordionSection,
