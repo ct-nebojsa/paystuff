@@ -759,39 +759,24 @@ export default {
         },
         testurl() {
             let base_url = `https://${this.baseurl}/${this.replaceFrontEnd}.aspx?MerchantID=${this.auth.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`
-            if (this.template.length > 0) {
-                base_url = base_url + `&Template=${this.template}`
+            const unencryptedParams = {
+                Template: this.template,
+                CCTemplate: this.cctemplate,
+                PayTypes: this.hpppaytypes,
+                Language: this.language,
+                CustomField1: this.customfield1,
+                CustomField2: this.customfield2,
+                CustomField3: this.customfield3,
+                CustomField4: this.customfield4,
+                CustomField5: this.customfield5,
+                CustomField6: this.customfield6,
+                CustomField7: this.customfield7,
+                CustomField8: this.customfield8,
             }
-            if (this.cctemplate.length > 0) {
-                base_url = base_url + `&CCTemplate=${this.cctemplate}`
-            }
-            if (this.hpppaytypes.length > 0) {
-                base_url = base_url + `&PayTypes=${this.hpppaytypes}`
-
-            }
-            if (this.language.length > 0) {
-                base_url = base_url + `&Language=${this.language}`
-
-            }
-            if (this.customfield1.length > 0) {
-                base_url = base_url + `&CustomField1=${this.customfield1}`
-
-            }
-            if (this.customfield2.length > 0) {
-                base_url = base_url + `&CustomField2=${this.customfield2}`
-
-            }
-            if (this.customfield3.length > 0) {
-                base_url = base_url + `&CustomField3=${this.customfield3}`
-
-            }
-            if (this.customfield4.length > 0) {
-                base_url = base_url + `&CustomField4=${this.customfield4}`
-
-            }
-            if (this.customfield5.length > 0) {
-                base_url = base_url + `&CustomField5=${this.customfield5}`
-
+            for (const [key, value] of Object.entries(unencryptedParams)) {
+                if (value.length > 0) {
+                    base_url = base_url + `&${key}=${encodeURIComponent(value)}`
+                }
             }
             return base_url
         },
@@ -1221,7 +1206,7 @@ export default {
             this.isQRCodeGenerated = false
         },
         generateQR() {
-            QRCode.toCanvas(this.$refs.qrcodeCanvas, `https://${this.baseurl}/${this.paytype}.aspx?MerchantId=${this.auth.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`, {
+            QRCode.toCanvas(this.$refs.qrcodeCanvas, this.testurl, {
                 width: 200
             });
             this.isQRCodeGenerated = true
@@ -1298,7 +1283,7 @@ export default {
                 this.otherparams = newValue.slice(0, -1);
             }
             if (newValue.startsWith('&')) {
-                this.otherparams = newValue.slice(0);
+                this.otherparams = newValue.slice(1);
             }
         },
         isOtherParameters(newVal) {
@@ -1314,8 +1299,8 @@ export default {
             }
 
         },
-        'auth.merchantid'(oldVal, newVal) {
-            if (oldVal != newVal) {
+        'auth.merchantid'(newVal, oldVal) {
+            if (newVal != oldVal) {
                 this.isDataEncrypted = false
                 this.encrypted_data = ''
             }
