@@ -2,9 +2,15 @@
   <div class="floating-panel" :style="{ top: position.top + 'px', left: position.left + 'px' }">
     <div class="floating-panel-header" @mousedown="startDrag">
       <span>{{ title }}</span>
-      <button type="button" class="floating-panel-toggle" @mousedown.stop @click="collapsed = !collapsed">{{ collapsed ? '▢' : '—' }}</button>
+      <div class="floating-panel-controls">
+        <button type="button" class="floating-panel-toggle" title="Smaller text" @mousedown.stop
+          @click="changeFontSize(-1)">A−</button>
+        <button type="button" class="floating-panel-toggle" title="Larger text" @mousedown.stop
+          @click="changeFontSize(1)">A+</button>
+        <button type="button" class="floating-panel-toggle" @mousedown.stop @click="collapsed = !collapsed">{{ collapsed ? '▢' : '—' }}</button>
+      </div>
     </div>
-    <div v-show="!collapsed" class="floating-panel-body">
+    <div v-show="!collapsed" class="floating-panel-body" :style="{ fontSize: fontSize + 'px' }">
       <div v-if="params.length === 0" class="floating-panel-empty">No parameters</div>
       <div v-for="(param, idx) in params" :key="idx" class="floating-panel-row">
         {{ displayed(param) }}
@@ -54,6 +60,7 @@ export default {
   data() {
     return {
       collapsed: false,
+      fontSize: 11,
       decodedKeys: {},
       position: {
         top: 90,
@@ -64,6 +71,9 @@ export default {
     }
   },
   methods: {
+    changeFontSize(delta) {
+      this.fontSize = Math.min(16, Math.max(8, this.fontSize + delta))
+    },
     paramKey(param) {
       return splitParam(param)[0]
     },
@@ -138,15 +148,22 @@ export default {
   font-size: 13px;
 }
 
+.floating-panel-controls {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
 .floating-panel-toggle {
   border: none;
   background: rgba(30, 85, 130, 0.15);
   color: #1e5582;
   border-radius: 4px;
-  width: 22px;
+  min-width: 22px;
   height: 22px;
+  padding: 0 3px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   flex-shrink: 0;
 }
 
