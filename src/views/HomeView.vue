@@ -23,22 +23,8 @@
                         <strong class="field-label">Pay type:</strong>
                         <select name="paytype" id="paytype" v-model="paytype" class="field-select"
                             @click="isOtherPaymentMethod = false">
-                            <option value="mandateform">EasyCollect (mandateform.aspx)</option>
-                            <option value="floapay">Floapay (floapay.aspx)</option>
-                            <option value="paymentpage">HPP (paymentpage.aspx)</option>
-                            <option value="installment">CB2A Installments (installment.aspx)</option>
-                            <option value="instanea">Instanea (instanea.aspx)</option>
-                            <option value="klarnapayments">KlarnaPM (klarnapayments.aspx)</option>
-                            <option value="payssl">payssl (payssl.aspx)</option>
-                            <option value="paybylink">paybylink (paybylink.aspx)</option>
-                            <option value="paytweak">paytweak (paybylinkexternal.aspx)</option>
-                            <option value="direct">S2S (direct.aspx)</option>
-                            <option value="applepay">Apple Pay S2S (applepay.aspx)</option>
-                            <option value="simplepay">SimplePay (simplepay.aspx)</option>
-                            <option value="twintpp">TWINT via PPRO (twintpp.aspx)</option>
-                            <option value="---" disabled>----------------</option>
-                            <option value="credit">Refund (credit.aspx)</option>
-                            <option value="increment">Increment (increment.aspx)</option>
+                            <option v-for="pt in paytypes" :key="pt.value" :value="pt.value" :disabled="pt.divider">
+                                {{ pt.divider ? '----------------' : pt.label }}</option>
                         </select>
                     </p>
                     <div class="field-row">
@@ -468,11 +454,13 @@ import FloatingParamsPanel from "@/components/FloatingParamsPanel.vue";
 import useAuthStore from '@/stores/auth.js'
 import QRCode from "qrcode";
 import { PARTNERS, getBaseUrl } from '@/utils/partners.js'
+import { PAYTYPES, getPaytypeConfig } from '@/config/paytypes.js'
 export default {
     data() {
         return {
             auth: useAuthStore(),
             partners: PARTNERS,
+            paytypes: PAYTYPES,
             // merchantid: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_MERCHANTID : '',
             transid: '',
             refnr: '',
@@ -645,114 +633,8 @@ export default {
             return this.plaintext ? this.plaintext.split('&').filter(p => p.length > 0) : [];
         },
         frontend() {
-            if (this.paytype === 'paymentpage') {
-                this.isMsgVer2 = true
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'paymentpage'
-            } else if (this.paytype === 'payssl') {
-                this.isMsgVer2 = true
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'payssl'
-            } else if (this.paytype === 'paytweak') {
-                this.isMsgVer2 = true
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                this.isOtherParameters = true
-                this.otherparams = 'Language=en&externalLanguage=US&bdEmail=nebojsa.pesic@computop.com'
-                return 'paybylinkexternal'
-            } else if (this.paytype === 'mandateform') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'mandateform'
-            } else if (this.paytype === 'direct') {
-                this.isMsgVer2 = true
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                this.isOtherParameters = true
-                this.otherparams = 'PayType=CB2A'
-                this.isBrowserInfo = true
-                this.isThreeDsData = true
-                this.isCard = true
-                return 'direct'
-            } else if (this.paytype === 'applepay') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                this.isOtherParameters = true
-                return 'applepay'
-            } else if (this.paytype === 'instanea') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'instanea'
-            } else if (this.paytype === 'paybylink') {
-                this.isMsgVer2 = true
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'paybylink'
-            } else if (this.paytype === 'simplepay') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'simplepay'
-            } else if (this.paytype === 'klarnapayments') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'klarnapayments'
-            }
-            else if (this.paytype === 'floapay') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'floapay'
-            }
-            else if (this.paytype === 'installment') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'installment'
-            }
-            else if (this.paytype === 'twintpp') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                return 'twintpp'
-            }
-            else if (this.paytype === 'credit') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                this.urlsuccess = ''
-                this.urlfailure = ''
-                this.urlback = ''
-                this.urlnotify = ''
-                this.isOtherParameters = true
-                return 'credit'
-
-            }
-
-            else if (this.paytype === 'increment') {
-                this.isMsgVer2 = false
-                this.isDataEncrypted = false
-                this.encrypted_data = ''
-                this.urlsuccess = ''
-                this.urlfailure = ''
-                this.urlback = ''
-                this.urlnotify = ''
-                this.isOtherParameters = true
-                this.otherparams = 'PayID='
-                return 'increment'
-
-            }
-
-            else {
-                this.isDataEncrypted = false
-                return '...'
-            }
+            const cfg = getPaytypeConfig(this.paytype)
+            return cfg ? (cfg.aspx || cfg.value) : '...'
         },
         testurl_ohne_data() {
             return `https://${this.baseurl}/${this.replaceFrontEnd}.aspx?MerchantID=${this.auth.merchantid}&Len=${this.len}&Data=[EncryptedData]`
@@ -840,61 +722,9 @@ export default {
                 params.OrderId = this.duplicationOrderId;
             }
 
-            if (this.paytype === 'paytweak') {
-                if (this.includePaytweakService) {
-                    params.Service = this.paytweak_service;
-                }
-                if (this.includePaytweakReminderEmail) {
-                    params.reminderEmail = btoa(this.paytweak_reminder_email);
-                }
-                delete params.URLSuccess;
-                delete params.URLFailure;
-                delete params.URLBack;
-                delete params.URLNotify;
-            }
-
-            if (this.paytype === 'direct') {
-                delete params.URLSuccess;
-                delete params.URLFailure;
-                delete params.URLBack;
-            }
-
-            if (this.paytype === 'applepay') {
-                delete params.URLSuccess;
-                delete params.URLFailure;
-                delete params.URLBack;
-            }
-
-            if (this.paytype === 'paybylink' && this.includeExpirationDate) {
-                params.ExpirationDate = this.paybylinkexpiration;
-            }
-
-            if (this.paytype === 'floapay') {
-                Object.assign(params, {
-                    Homepage: 'https://localhost:3005/homepage',
-                    CustomerID: this.customerid,
-                    LastName: 'User',
-                    FirstName: 'Test',
-                    AddrCountryCode: '276',
-                    Date: '2025/01/01',
-                    NumberArticles: '2',
-                });
-            }
-
-            if (this.paytype === 'twintpp') {
-                Object.assign(params, {
-                    AccOwner: 'Nebojsa Pesic'
-                });
-            }
-
-            if (this.paytype === 'klarnapayments') {
-                Object.assign(params, {
-                    ArticleList: btoa(this.articlelist),
-                    TaxAmount: '100',
-                    URLConfirm: 'https://localhost:3005/confirm',
-                    bdCountryCode: 'DE',
-                    Account: '1',
-                });
+            const paytypeConfig = getPaytypeConfig(this.paytype);
+            if (paytypeConfig && paytypeConfig.buildParams) {
+                paytypeConfig.buildParams(this, params);
             }
 
             if (this.otherpaymentmethod === 'reverse') {
@@ -1273,9 +1103,17 @@ export default {
         document.removeEventListener('mousedown', this.handleParentClick)
     },
     watch: {
-        paytype() {
-            if (this.paytype === 'simplepay') {
-                this.currency = 'HUF'
+        paytype(newVal) {
+            const cfg = getPaytypeConfig(newVal)
+            if (!cfg) {
+                this.isDataEncrypted = false
+                return
+            }
+            this.isMsgVer2 = cfg.msgVer2
+            this.isDataEncrypted = false
+            this.encrypted_data = ''
+            if (cfg.onSelect) {
+                cfg.onSelect(this)
             }
         },
         otherparams(newValue) {
