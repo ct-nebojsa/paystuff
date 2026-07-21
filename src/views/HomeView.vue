@@ -205,6 +205,13 @@
                             <button class="btn-chip" @click="setInstallmentsR">Installments (RTF=R)</button>
                             <button class="btn-chip" @click="setRecurring">Recurring (RTF=I)</button>
                             <button class="btn-chip" @click="setRecurringR">Recurring (RTF=R)</button>
+                            <button class="btn-chip" @click="setRecurringFixed">useCase=fixed (02)</button>
+                            <button class="btn-chip" @click="setRecurringFlexibleAmount">useCase=flexibleAmount
+                                (05)</button>
+                            <button class="btn-chip" @click="setRecurringFlexibleFrequency">useCase=flexibleFrequency
+                                (05)</button>
+                            <button class="btn-chip" @click="setCofInitialPayment(true)">initialPayment=true</button>
+                            <button class="btn-chip" @click="setCofInitialPayment(false)">initialPayment=false</button>
                         </div>
                     </div>
                     <div class="flex flex-col gap-1.5 mb-1.5">
@@ -1014,6 +1021,29 @@ export default {
         setRecurringR() {
             this.credentialOnFile = ''
             this.credentialOnFile = '{"type":{"recurring":{"recurringFrequency":30,"recurringStartDate":"2026-09-14","recurringExpiryDate":"2027-09-14"}},"initialPayment":false}'
+        },
+        setRecurringFixed() {
+            this.credentialOnFile = ''
+            this.credentialOnFile = '{"type":{"recurring":{"recurringFrequency":30,"recurringStartDate":"2026-09-14","recurringExpiryDate":"2027-09-14"}},"initialPayment":true, "useCase": "fixed"}'
+        },
+        setRecurringFlexibleAmount() {
+            this.credentialOnFile = ''
+            this.credentialOnFile = '{"type":{"recurring":{"recurringFrequency":30,"recurringStartDate":"2026-09-14","recurringExpiryDate":"2027-09-14"}},"initialPayment":true, "useCase": "flexibleAmount"}'
+        },
+        setRecurringFlexibleFrequency() {
+            this.credentialOnFile = ''
+            this.credentialOnFile = '{"type":{"recurring":{"recurringFrequency":30,"recurringStartDate":"2026-09-14","recurringExpiryDate":"2027-09-14"}},"initialPayment":true, "useCase": "flexibleFrequency"}'
+        },
+        setCofInitialPayment(value) {
+            let parsed;
+            try {
+                parsed = JSON.parse(this.credentialOnFile);
+            } catch (e) {
+                parsed = { type: { unscheduled: 'CIT' } };
+            }
+            parsed.initialPayment = value;
+            this.credentialOnFile = ''
+            this.credentialOnFile = JSON.stringify(parsed);
         },
         setSkipThreeDs() {
             this.threeDsPolicy = ''
