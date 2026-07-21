@@ -54,15 +54,16 @@
                     </div>
                 </div>
                 <h4 class="section-title">Paygate response</h4>
-                <iframe :src="requestUrl" width="100%" height="150"></iframe>
-                <h4 class="section-title mt-3">Decrypt response</h4>
-                <textarea class="field-textarea" rows="4" v-model="responseInput"
-                    placeholder="Paste the response from above (Len=...&Data=... or just the Data value) - it decrypts automatically"></textarea>
-                <div v-if="decryptedResponse.length" class="subsection mt-2">
-                    <DecryptedParams :params="decryptedResponse" />
+                <p v-if="isLoading" class="muted-text">Calling direct.aspx...</p>
+                <p v-else-if="responseError" class="validation-error">{{ responseError }}</p>
+                <div v-else-if="responseBody" class="subsection">
+                    <DecryptedParams v-if="decryptedResponse.length" :params="decryptedResponse" />
+                    <template v-else>
+                        <p class="validation-error">Received a response but could not decrypt it - raw body below.
+                        </p>
+                        <textarea readonly class="field-textarea mt-2" rows="3">{{ responseBody }}</textarea>
+                    </template>
                 </div>
-                <p v-else-if="responseInput.trim().length > 0" class="validation-error">Could not decrypt - check the
-                    pasted value and the encryption password.</p>
             </div>
         </div>
     </div>
@@ -164,7 +165,9 @@ export default {
             encrypted_data: '',
             isRun: false,
             copied: false,
-            responseInput: '',
+            isLoading: false,
+            responseBody: '',
+            responseError: '',
         }
     },
     computed: {
@@ -178,13 +181,14 @@ export default {
             return `https://${this.baseurl}/direct.aspx?MerchantID=${this.auth.merchantid}&Len=${this.plaintext.length}&Data=${this.encrypted_data}`
         },
         decryptedResponse() {
-            return decryptResponseBody(this.responseInput, this.auth.bf_password)
+            return decryptResponseBody(this.responseBody, this.auth.bf_password)
         },
     },
     methods: {
-        runTest() {
+        async runTest() {
             this.isRun = false
-            this.responseInput = ''
+            this.responseBody = ''
+            this.responseError = ''
             let transid = 'NEBO_'
             for (let i = 0; i < 10; i++) {
                 transid += Math.floor(Math.random() * 10)
@@ -207,6 +211,28 @@ export default {
                 .join('&')
             this.encrypted_data = encryptBlowfish(this.plaintext, this.auth.bf_password)
             this.isRun = true
+
+            this.isLoading = true
+            try {
+                const query = new URLSearchParams({
+                    partner: this.auth.partner,
+                    environment: this.auth.environment,
+                    merchantid: this.auth.merchantid,
+                    len: String(this.plaintext.length),
+                    data: this.encrypted_data,
+                })
+                const res = await fetch(`/api/direct-proxy?${query.toString()}`)
+                const json = await res.json()
+                if (!res.ok) {
+                    this.responseError = json.error || 'Request failed.'
+                } else {
+                    this.responseBody = json.body
+                }
+            } catch (e) {
+                this.responseError = 'Could not reach the proxy - this only works when deployed on Vercel (or via `vercel dev` locally).'
+            } finally {
+                this.isLoading = false
+            }
         },
         async copyUrl() {
             try {
@@ -244,10 +270,5 @@ export default {
     margin-top: 4px;
     font-size: 11px;
     color: #d12f2f;
-}
-
-iframe {
-    border: 1px solid #d4d4d4;
-    border-radius: 8px;
 }
 </style>
