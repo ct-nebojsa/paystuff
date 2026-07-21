@@ -50,8 +50,6 @@
                         <textarea readonly class="field-textarea" :rows="Math.ceil(plaintext.length / 69) + 1">{{ plaintext }}</textarea>
                     </p>
                     <div class="flex gap-2 items-center justify-center mt-2">
-                        <a class="payment-url-button" :href="requestUrl" target="_blank"><span>Open</span>
-                            direct.aspx</a>
                         <button class="btn-secondary" @click="copyUrl">{{ copied ? 'Copied!' : 'Copy URL' }}</button>
                     </div>
                 </div>
@@ -246,19 +244,6 @@ export default {
     margin-top: 4px;
     font-size: 11px;
     color: #d12f2f;
-}
-
-.payment-url-button {
-    text-decoration: none;
-    font-size: 11px;
-    font-weight: 600;
-    color: #1e5582;
-    background-color: #a5f729;
-    padding: 5px 10px;
-    border-radius: 5px;
-    display: flex;
-    gap: 4px;
-    align-items: center;
 }
 
 iframe {
