@@ -160,6 +160,11 @@ export default {
             }
             this.transid = transid
 
+            let orderdescSuffix = ''
+            for (let i = 0; i < 6; i++) {
+                orderdescSuffix += Math.floor(Math.random() * 10)
+            }
+
             const test = QUICK_TESTS.find(t => t.value === this.testtype)
             const params = {
                 MerchantID: this.auth.merchantid,
@@ -167,7 +172,7 @@ export default {
                 Amount: this.amount,
                 Currency: this.currency,
                 URLNotify: 'https://paygate-test.vercel.app/notify',
-                OrderDesc: 'test:0000',
+                OrderDesc: `test:${orderdescSuffix}`,
                 MsgVer: '2.0',
                 ...test.params(),
             }
