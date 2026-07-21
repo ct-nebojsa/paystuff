@@ -78,7 +78,40 @@ import { encryptBlowfish, decryptResponseBody } from '@/utils/blowfish.js'
 
 const CARD = '{"securityCode":"123","expiryDate":"202906","cardholderName":"John Doe","number":"4111111111111111","brand":"VISA"}'
 const BROWSER_INFO = '{"timeZoneOffset":"120","acceptHeaders":"text","ipAddress":"93.176.166.240","javaEnabled":false,"javaScriptEnabled":true,"language":"US","colorDepth":32,"screenWidth":1060,"screenHeight":1050,"userAgent":"Mozilla/5.0"}'
-const THREE_DS_ECI05 = '{"acsProtocolVersion":"2.2.0","authenticationValue":"kAMACEJBakKSOSzNLnxNiZeBQnf+","eci":"02","threeDSServerTransID":"a3dd2b66-6c06-423b-acd4-1cc19697a08f","dsTransID":"9e0e91c0-24e3-423c-a136-97023269d580","intermediateStatus":"Y","finalStatus":"Y"}'
+
+const ORDERDESC_WORDS = ['checkout', 'payment', 'order', 'purchase', 'invoice', 'cart', 'sale', 'txn',
+    'billing', 'settlement', 'refund', 'subscription', 'webstore', 'pos', 'wallet', 'receipt']
+
+function randomOrderDescSuffix() {
+    const a = ORDERDESC_WORDS[Math.floor(Math.random() * ORDERDESC_WORDS.length)]
+    const b = ORDERDESC_WORDS[Math.floor(Math.random() * ORDERDESC_WORDS.length)]
+    return `${a}-${b}`
+}
+
+function randomUuid() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID()
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.random() * 16 | 0
+        const v = c === 'x' ? r : (r & 0x3 | 0x8)
+        return v.toString(16)
+    })
+}
+
+// a fresh threeDSServerTransID/dsTransID each call, so repeated test runs
+// don't replay the same 3DS authentication session
+function freshThreeDsData() {
+    return btoa(JSON.stringify({
+        acsProtocolVersion: '2.2.0',
+        authenticationValue: 'kAMACEJBakKSOSzNLnxNiZeBQnf+',
+        eci: '02',
+        threeDSServerTransID: randomUuid(),
+        dsTransID: randomUuid(),
+        intermediateStatus: 'Y',
+        finalStatus: 'Y',
+    }))
+}
 
 const QUICK_TESTS = [
     {
@@ -86,7 +119,7 @@ const QUICK_TESTS = [
         params: () => ({
             card: btoa(CARD),
             browserInfo: btoa(BROWSER_INFO),
-            threeDsData: btoa(THREE_DS_ECI05),
+            threeDsData: freshThreeDsData(),
         }),
     },
     {
@@ -95,7 +128,7 @@ const QUICK_TESTS = [
             PayType: 'CB2A',
             card: btoa(CARD),
             browserInfo: btoa(BROWSER_INFO),
-            threeDsData: btoa(THREE_DS_ECI05),
+            threeDsData: freshThreeDsData(),
         }),
     },
     {
@@ -160,11 +193,6 @@ export default {
             }
             this.transid = transid
 
-            let orderdescSuffix = ''
-            for (let i = 0; i < 6; i++) {
-                orderdescSuffix += Math.floor(Math.random() * 10)
-            }
-
             const test = QUICK_TESTS.find(t => t.value === this.testtype)
             const params = {
                 MerchantID: this.auth.merchantid,
@@ -172,7 +200,7 @@ export default {
                 Amount: this.amount,
                 Currency: this.currency,
                 URLNotify: 'https://paygate-test.vercel.app/notify',
-                OrderDesc: `test:${orderdescSuffix}`,
+                OrderDesc: `test:${randomOrderDescSuffix()}`,
                 MsgVer: '2.0',
                 ...test.params(),
             }
