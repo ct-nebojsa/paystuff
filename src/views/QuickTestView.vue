@@ -136,6 +136,7 @@ const QUICK_TESTS = [
     },
     {
         value: 'googlepay', label: 'Google Pay (tokenized card)', aspx: 'direct',
+        omit: ['MsgVer'],
         params: () => ({
             PayType: 'GooglePay',
             GooglePayMethod: 'TOKENIZED_CARD',
