@@ -36,10 +36,12 @@ export default {
       default: '',
     },
   },
+  emits: ['response-decrypted'],
   data() {
     return {
       collapsed: false,
       responseInput: '',
+      loggedInput: '',
       position: {
         top: 90,
         left: Math.max(20, window.innerWidth - 680),
@@ -51,6 +53,16 @@ export default {
   computed: {
     decrypted() {
       return decryptResponseBody(this.responseInput, this.password)
+    },
+  },
+  watch: {
+    decrypted(value) {
+      // emit once per distinct successfully-decrypted paste, not on every
+      // keystroke while the value is still being typed/edited
+      if (value.length > 0 && this.responseInput !== this.loggedInput) {
+        this.loggedInput = this.responseInput
+        this.$emit('response-decrypted', { params: value, raw: this.responseInput })
+      }
     },
   },
   methods: {

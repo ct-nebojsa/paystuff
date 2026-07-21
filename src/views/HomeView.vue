@@ -1,8 +1,13 @@
 <template>
     <div class="main-wrapper">
         <div class="card mx-auto">
-            <h3 class="page-title">Paygate Encryption Test Tool</h3>
-            <h4 class="warning-text">Data is not stored on any server.</h4>
+            <div class="title-row">
+                <div>
+                    <h3 class="page-title">Paygate Encryption Test Tool</h3>
+                    <h4 class="warning-text">Data is not stored on any server.</h4>
+                </div>
+                <button class="btn-secondary" @click="isLogOpen = true">Event log</button>
+            </div>
             <div class="parameters" @keydown.enter="handleEnterKey">
                 <AccordionSection title="General" v-model="accordionGeneral">
                     <div class="field-row">
@@ -458,7 +463,8 @@
     <FloatingParamsPanel title="Request parameters" :params="plaintextParams" :payment-url="testurl"
         :show-payment-url="isDataEncrypted" :copied="copiedField === 'url'" @copy-url="copyText(testurl, 'url')" />
     <FloatingResponsePanel v-if="replaceFrontEnd === 'direct' || replaceFrontEnd === 'paybylinkexternal'"
-        :password="auth.bf_password" />
+        :password="auth.bf_password" @response-decrypted="logResponse" />
+    <EventLogPanel v-if="isLogOpen" @close="isLogOpen = false" />
 </template>
 
 <script>
@@ -470,6 +476,8 @@ import ParamInputRow from "@/components/ParamInputRow.vue";
 import AccordionSection from "@/components/AccordionSection.vue";
 import FloatingParamsPanel from "@/components/FloatingParamsPanel.vue";
 import FloatingResponsePanel from "@/components/FloatingResponsePanel.vue";
+import EventLogPanel from "@/components/EventLogPanel.vue";
+import useEventLogStore from '@/stores/eventLog.js'
 import useAuthStore from '@/stores/auth.js'
 import QRCode from "qrcode";
 import { PARTNERS, getBaseUrl } from '@/utils/partners.js'
@@ -478,6 +486,8 @@ export default {
     data() {
         return {
             auth: useAuthStore(),
+            eventLog: useEventLogStore(),
+            isLogOpen: false,
             partners: PARTNERS,
             paytypes: PAYTYPES,
             // merchantid: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_MERCHANTID : '',
@@ -581,7 +591,8 @@ export default {
         ParamInputRow,
         AccordionSection,
         FloatingParamsPanel,
-        FloatingResponsePanel
+        FloatingResponsePanel,
+        EventLogPanel
     },
     computed: {
         hmac_data() {
@@ -1087,6 +1098,23 @@ export default {
             }).ciphertext.toString(CryptoJS.enc.Hex);
             this.isDataEncrypted = true
             this.isQRCodeGenerated = false
+            this.eventLog.log({
+                page: 'Encryption',
+                kind: 'request',
+                aspx: this.replaceFrontEnd,
+                url: this.testurl,
+                params: data.split('&'),
+            })
+        },
+        logResponse({ params, raw }) {
+            this.eventLog.log({
+                page: 'Encryption',
+                kind: 'response',
+                aspx: this.replaceFrontEnd,
+                params,
+                raw: params.length ? '' : raw,
+                message: params.length ? '' : 'Could not decrypt response - raw body shown below.',
+            })
         },
         generateQR() {
             QRCode.toCanvas(this.$refs.qrcodeCanvas, this.testurl, {
@@ -1220,6 +1248,13 @@ export default {
 
 .parameters {
     margin-top: 10px;
+}
+
+.title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .custom-height {

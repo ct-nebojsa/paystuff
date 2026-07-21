@@ -1,8 +1,13 @@
 <template>
     <div class="qt-main-wrapper">
         <div class="card qt-wrapper">
-            <h3 class="page-title">Quick testing</h3>
-            <h4 class="warning-text">One-click S2S tests</h4>
+            <div class="qt-title-row">
+                <div>
+                    <h3 class="page-title">Quick testing</h3>
+                    <h4 class="warning-text">One-click S2S tests</h4>
+                </div>
+                <button class="btn-secondary" @click="isLogOpen = true">Event log</button>
+            </div>
             <div class="subsection">
                 <div class="field-row">
                     <strong class="field-label w-50! text-left!">Environment</strong>
@@ -73,11 +78,14 @@
                 </div>
             </div>
         </div>
+        <EventLogPanel v-if="isLogOpen" @close="isLogOpen = false" />
     </div>
 </template>
 
 <script>
 import DecryptedParams from '@/components/DecryptedParams.vue'
+import EventLogPanel from '@/components/EventLogPanel.vue'
+import useEventLogStore from '@/stores/eventLog.js'
 import useAuthStore from '@/stores/auth.js'
 import { getBaseUrl } from '@/utils/partners.js'
 import { encryptBlowfish, decryptResponseBody } from '@/utils/blowfish.js'
@@ -170,11 +178,14 @@ const QUICK_TESTS = [
 
 export default {
     components: {
-        DecryptedParams
+        DecryptedParams,
+        EventLogPanel
     },
     data() {
         return {
             auth: useAuthStore(),
+            eventLog: useEventLogStore(),
+            isLogOpen: false,
             quicktests: QUICK_TESTS,
             testtype: 'card',
             amount: '1000',
@@ -249,6 +260,14 @@ export default {
             this.encrypted_data = encryptBlowfish(this.plaintext, this.auth.bf_password)
             this.isRun = true
 
+            this.eventLog.log({
+                page: 'Quick testing',
+                kind: 'request',
+                aspx: this.aspxPage,
+                url: this.requestUrl,
+                params: this.plaintext.split('&'),
+            })
+
             this.isLoading = true
             try {
                 const query = new URLSearchParams({
@@ -263,11 +282,32 @@ export default {
                 const json = await res.json()
                 if (!res.ok) {
                     this.responseError = json.error || 'Request failed.'
+                    this.eventLog.log({
+                        page: 'Quick testing',
+                        kind: 'error',
+                        aspx: this.aspxPage,
+                        message: this.responseError,
+                    })
                 } else {
                     this.responseBody = json.body
+                    const decrypted = decryptResponseBody(this.responseBody, this.auth.bf_password)
+                    this.eventLog.log({
+                        page: 'Quick testing',
+                        kind: 'response',
+                        aspx: this.aspxPage,
+                        params: decrypted,
+                        raw: decrypted.length ? '' : this.responseBody,
+                        message: decrypted.length ? '' : 'Could not decrypt response - raw body shown below.',
+                    })
                 }
             } catch (e) {
                 this.responseError = 'Could not reach the proxy - this only works when deployed on Vercel (or via `vercel dev` locally).'
+                this.eventLog.log({
+                    page: 'Quick testing',
+                    kind: 'error',
+                    aspx: this.aspxPage,
+                    message: this.responseError,
+                })
             } finally {
                 this.isLoading = false
             }
@@ -302,6 +342,13 @@ export default {
 .qt-wrapper {
     width: 600px;
     margin: auto;
+}
+
+.qt-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .validation-error {
