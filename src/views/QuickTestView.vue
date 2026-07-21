@@ -47,8 +47,12 @@
                     </p>
                     <p class="field-row">
                         <strong class="field-label w-50! text-left!">Plain text:</strong>
-                        <textarea readonly class="field-textarea" :rows="Math.ceil(plaintext.length / 69) + 1">{{ plaintext }}</textarea>
+                        <textarea readonly class="field-textarea" :rows="plaintextRows">{{ displayedPlaintext }}</textarea>
                     </p>
+                    <div class="text-center">
+                        <button class="btn-chip" @click="oneParamPerLine = !oneParamPerLine">{{ oneParamPerLine ?
+                            'Single line' : 'One param per line' }}</button>
+                    </div>
                     <div class="flex gap-2 items-center justify-center mt-2">
                         <button class="btn-secondary" @click="copyUrl">{{ copied ? 'Copied!' : 'Copy URL' }}</button>
                     </div>
@@ -179,6 +183,7 @@ export default {
             isLoading: false,
             responseBody: '',
             responseError: '',
+            oneParamPerLine: false,
         }
     },
     computed: {
@@ -199,6 +204,14 @@ export default {
         },
         decryptedResponse() {
             return decryptResponseBody(this.responseBody, this.auth.bf_password)
+        },
+        displayedPlaintext() {
+            return this.oneParamPerLine ? this.plaintext.split('&').join('\r') : this.plaintext
+        },
+        plaintextRows() {
+            return this.oneParamPerLine
+                ? this.plaintext.split('&').length
+                : Math.ceil(this.plaintext.length / 69) + 1
         },
     },
     methods: {
