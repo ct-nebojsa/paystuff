@@ -2,7 +2,7 @@
     <div class="qt-main-wrapper">
         <div class="card qt-wrapper">
             <h3 class="page-title">Quick testing</h3>
-            <h4 class="warning-text">One-click S2S tests via direct.aspx</h4>
+            <h4 class="warning-text">One-click S2S tests</h4>
             <div class="subsection">
                 <div class="field-row">
                     <strong class="field-label w-50! text-left!">Environment</strong>
@@ -54,7 +54,7 @@
                     </div>
                 </div>
                 <h4 class="section-title">Paygate response</h4>
-                <p v-if="isLoading" class="muted-text">Calling direct.aspx...</p>
+                <p v-if="isLoading" class="muted-text">Calling {{ aspxPage }}.aspx...</p>
                 <p v-else-if="responseError" class="validation-error">{{ responseError }}</p>
                 <div v-else-if="responseBody" class="subsection">
                     <DecryptedParams v-if="decryptedResponse.length" :params="decryptedResponse" />
@@ -114,7 +114,7 @@ function freshThreeDsData() {
 
 const QUICK_TESTS = [
     {
-        value: 'card', label: 'Card (VISA test card)',
+        value: 'card', label: 'Card (VISA test card)', aspx: 'direct',
         params: () => ({
             card: btoa(CARD),
             browserInfo: btoa(BROWSER_INFO),
@@ -122,7 +122,7 @@ const QUICK_TESTS = [
         }),
     },
     {
-        value: 'cb2a', label: 'CB2A',
+        value: 'cb2a', label: 'CB2A', aspx: 'direct',
         params: () => ({
             PayType: 'CB2A',
             card: btoa(CARD),
@@ -131,7 +131,7 @@ const QUICK_TESTS = [
         }),
     },
     {
-        value: 'googlepay', label: 'Google Pay (tokenized card)',
+        value: 'googlepay', label: 'Google Pay (tokenized card)', aspx: 'direct',
         params: () => ({
             PayType: 'GooglePay',
             GooglePayMethod: 'TOKENIZED_CARD',
@@ -145,6 +145,17 @@ const QUICK_TESTS = [
             RTF: 'C',
             CAVV: 'kAMACEJBakKSOSzNLnxNiZeBQnf+',
             CCBrand: 'VISA',
+        }),
+    },
+    {
+        value: 'paytweak', label: 'Paytweak PBL', aspx: 'paybylinkexternal',
+        omit: ['URLNotify'],
+        params: () => ({
+            email: '',
+            Service: 'link',
+            Language: 'en',
+            externalLanguage: 'US',
+            bdEmail: 'nebojsa.pesic@computop.com',
         }),
     },
 ]
@@ -177,8 +188,14 @@ export default {
         canRun() {
             return !!this.auth.merchantid && !!this.auth.bf_password
         },
+        activeTest() {
+            return QUICK_TESTS.find(t => t.value === this.testtype)
+        },
+        aspxPage() {
+            return this.activeTest ? this.activeTest.aspx : 'direct'
+        },
         requestUrl() {
-            return `https://${this.baseurl}/direct.aspx?MerchantID=${this.auth.merchantid}&Len=${this.plaintext.length}&Data=${this.encrypted_data}`
+            return `https://${this.baseurl}/${this.aspxPage}.aspx?MerchantID=${this.auth.merchantid}&Len=${this.plaintext.length}&Data=${this.encrypted_data}`
         },
         decryptedResponse() {
             return decryptResponseBody(this.responseBody, this.auth.bf_password)
@@ -206,6 +223,9 @@ export default {
                 MsgVer: '2.0',
                 ...test.params(),
             }
+            if (test.omit) {
+                test.omit.forEach(key => delete params[key])
+            }
             this.plaintext = Object.entries(params)
                 .map(([key, value]) => `${key}=${value}`)
                 .join('&')
@@ -218,6 +238,7 @@ export default {
                     partner: this.auth.partner,
                     environment: this.auth.environment,
                     merchantid: this.auth.merchantid,
+                    aspx: this.aspxPage,
                     len: String(this.plaintext.length),
                     data: this.encrypted_data,
                 })

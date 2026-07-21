@@ -1,15 +1,17 @@
 import { getBaseUrl } from '../src/utils/partners.js'
 
-// Server-side proxy for direct.aspx: browsers can't read a cross-origin
-// iframe's body, and Computop sends no CORS headers, so the response can't
-// be fetched from client-side JS either. This runs the call from Vercel
-// instead, where there's no CORS restriction.
+// Server-side proxy for Paygate S2S aspx endpoints: browsers can't read a
+// cross-origin iframe's body, and Computop sends no CORS headers, so the
+// response can't be fetched from client-side JS either. This runs the call
+// from Vercel instead, where there's no CORS restriction.
 //
 // The target host is always derived from getBaseUrl() (Computop domains
-// only) - a client-supplied target URL is never used - so this cannot be
-// abused as an open proxy to arbitrary hosts.
+// only) and the aspx page from a fixed allowlist - a client-supplied target
+// URL is never used - so this cannot be abused as an open proxy.
+const ALLOWED_ASPX = new Set(['direct', 'paybylinkexternal'])
+
 export default async function handler(req, res) {
-    const { partner, environment, merchantid, len, data } = req.query
+    const { partner, environment, merchantid, len, data, aspx } = req.query
 
     if (!merchantid || !len || !data) {
         res.status(400).json({ error: 'merchantid, len and data are required' })
@@ -24,8 +26,10 @@ export default async function handler(req, res) {
         return
     }
 
+    const aspxPage = ALLOWED_ASPX.has(aspx) ? aspx : 'direct'
+
     const baseurl = getBaseUrl(partner, environment)
-    const targetUrl = `https://${baseurl}/direct.aspx?MerchantID=${encodeURIComponent(merchantid)}&Len=${len}&Data=${data}`
+    const targetUrl = `https://${baseurl}/${aspxPage}.aspx?MerchantID=${encodeURIComponent(merchantid)}&Len=${len}&Data=${data}`
 
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 8000)
