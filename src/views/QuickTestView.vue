@@ -58,7 +58,10 @@
                     </div>
                 </div>
                 <h4 class="section-title">Paygate response</h4>
-                <p v-if="isLoading" class="muted-text">Calling {{ aspxPage }}.aspx...</p>
+                <div v-if="isLoading" class="flex items-center gap-2">
+                    <span class="spinner" aria-hidden="true"></span>
+                    <p class="muted-text">Calling {{ aspxPage }}.aspx...</p>
+                </div>
                 <p v-else-if="responseError" class="validation-error">{{ responseError }}</p>
                 <div v-else-if="responseBody" class="subsection">
                     <DecryptedParams v-if="decryptedResponse.length" :params="decryptedResponse" />
@@ -305,5 +308,27 @@ export default {
     margin-top: 4px;
     font-size: 11px;
     color: #d12f2f;
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #d4d4d4;
+    border-top-color: #1e5582;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation: none;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 </style>
