@@ -56,6 +56,8 @@
                             <option value="easycollect_mandate">Easy Collect MANDATE</option>
                             <option value="floa">Floa</option>
                             <option value="applepay_server">Apple Pay (Server)</option>
+                            <option value="mit_installment">MIT Installment</option>
+                            <option value="mit_delayed_shipment">MIT Delayed shipment</option>
                         </select>
                     </div>
                     <div class="field-row" v-if="isEasyCollectPreset">
@@ -953,6 +955,55 @@ export default {
 
                 this.isOtherParameters = true
                 this.otherparams = `TokenExt=${btoa(JSON.stringify(applePayToken))}`
+            } else if (this.preset === 'mit_installment') {
+                this.isOtherPaymentMethod = false
+                this.paytype = 'installment'
+
+                this.isThreeDsData = false
+                this.isBrowserInfo = false
+                this.isCard = false
+
+                this.includeURLSuccess = false
+                this.includeURLFailure = false
+                this.includeURLBack = false
+
+                this.includeTransID = true
+                this.generate_transid()
+                this.includeAmount = true
+                this.amount = '10000'
+                this.includeCurrency = true
+                this.currency = 'EUR'
+
+                this.isOtherParameters = true
+                this.otherparams = 'CCNr=4111111111111111&CCBrand=VISA&CCExpiry=202906&CCCVC=123&PayID=123123'
+                // credentialOnFile is set by the 'installment' paytype's onSelect (watch.paytype), which
+                // already matches the MIT Installment value and fires after this synchronous code runs.
+            } else if (this.preset === 'mit_delayed_shipment') {
+                this.isOtherPaymentMethod = false
+                this.paytype = 'direct'
+
+                this.includeURLSuccess = false
+                this.includeURLFailure = false
+                this.includeURLBack = false
+
+                this.includeTransID = true
+                this.generate_transid()
+                this.includeAmount = true
+                this.amount = '10000'
+                this.includeCurrency = true
+                this.currency = 'EUR'
+
+                // The 'direct' paytype's watch.paytype handler sets isMsgVer2=true and its onSelect forces
+                // isCard/isThreeDsData/isBrowserInfo true and resets otherparams; it fires asynchronously,
+                // so override it via nextTick.
+                this.$nextTick(() => {
+                    this.isMsgVer2 = false
+                    this.isCredentialOnFile = false
+                    this.isCard = false
+                    this.isThreeDsData = false
+                    this.isBrowserInfo = false
+                    this.otherparams = 'PayID=123123&industrySpecificTxType=Reauthorization'
+                })
             }
         },
         seEci07() {
