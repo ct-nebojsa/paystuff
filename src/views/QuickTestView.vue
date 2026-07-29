@@ -246,7 +246,7 @@ export default {
                 TransID: this.transid,
                 Amount: this.amount,
                 Currency: this.currency,
-                URLNotify: 'https://paygate-test.vercel.app/notify',
+                URLNotify: 'https://paygate-test.vercel.app/api/notify',
                 OrderDesc: `test:${randomOrderDescSuffix()}`,
                 MsgVer: '2.0',
                 ...test.params(),
