@@ -52,6 +52,10 @@ export const PAYTYPES = [
     },
     {
         value: 'payssl', label: 'payssl (payssl.aspx)', msgVer2: true,
+        onSelect(vm) {
+            vm.template = 'npesic_test'
+            vm.syncPaysslCustomField1()
+        },
     },
     {
         value: 'paybylink', label: 'paybylink (paybylink.aspx)', msgVer2: true,

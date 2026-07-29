@@ -697,6 +697,14 @@ export default {
         },
     },
     methods: {
+        // payssl sends the amount/currency in CustomField1, with the amount in
+        // major units: Amount=1000 & Currency=EUR -> "10.00 EUR"
+        syncPaysslCustomField1() {
+            if (this.paytype !== 'payssl') {
+                return
+            }
+            this.customfield1 = `${(Number(this.amount) / 100).toFixed(2)} ${this.currency}`
+        },
         buildParams() {
             const params = {
                 MerchantID: this.auth.merchantid,
@@ -1255,6 +1263,12 @@ export default {
             if (cfg.onSelect) {
                 cfg.onSelect(this)
             }
+        },
+        amount() {
+            this.syncPaysslCustomField1()
+        },
+        currency() {
+            this.syncPaysslCustomField1()
         },
         otherparams(newValue) {
             if (newValue.endsWith('&')) {
