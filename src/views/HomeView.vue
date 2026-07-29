@@ -342,6 +342,7 @@
                         </p>
                         <div class="order-desc-buttons">
                             <button type="button" class="btn-chip" @click="template = 'ct_cards_v2'">ct_cards_v2</button>
+                            <button type="button" class="btn-chip" @click="template = 'npesic_test'">npesic_test</button>
                             <button type="button" class="btn-chip" @click="template = 'ct_PaymentPageDropDown_v1'">ct_PaymentPageDropDown_v1</button>
                         </div>
                     </div>
