@@ -1,17 +1,25 @@
 <template>
-  <p class="field-row">
-    <strong class="field-label">{{ label }}:</strong>
-    <input
-      :type="type"
-      :class="inputClass"
-      :placeholder="placeholder"
-      :value="modelValue"
-      :disabled="!includeValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-    >
-    <input type="checkbox" :checked="includeValue" @change="$emit('update:includeValue', $event.target.checked)">
-    <slot />
-  </p>
+  <div class="field-stack parameter-field">
+    <div class="field-heading-row">
+      <strong class="field-label-top">{{ label }}</strong>
+      <label class="checkbox-label">
+        <input type="checkbox" :checked="includeValue"
+          @change="$emit('update:includeValue', $event.target.checked)">
+        Include
+      </label>
+    </div>
+    <div class="input-action-row">
+      <input
+        :type="type"
+        :class="inputClass"
+        :placeholder="placeholder"
+        :value="modelValue"
+        :disabled="!includeValue"
+        @input="$emit('update:modelValue', $event.target.value)"
+      >
+      <slot />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -46,9 +54,3 @@ export default {
   emits: ['update:modelValue', 'update:includeValue'],
 }
 </script>
-
-<style scoped>
-.narrow {
-  width: 190px;
-}
-</style>

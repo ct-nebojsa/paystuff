@@ -4,140 +4,174 @@
             <div class="title-row">
                 <div>
                     <h3 class="page-title">Paygate Encryption Test Tool</h3>
-                    <h4 class="warning-text">Data is not stored on any server.</h4>
                 </div>
                 <button class="btn-secondary" @click="isLogOpen = true">Event log</button>
             </div>
             <div class="parameters" @keydown.enter="handleEnterKey">
                 <AccordionSection title="General" v-model="accordionGeneral">
-                    <div class="field-row">
-                        <strong class="field-label">Partner:</strong>
-                        <select name="partner" id="partner" class="field-select" v-model="auth.partner">
-                            <option v-for="p in partners" :key="p.value" :value="p.value">{{ p.label }}</option>
-                        </select>
-                    </div>
-                    <div class="field-row">
-                        <strong class="field-label">Environment:</strong>
-                        <select name="environment" id="environment" class="field-select" v-model="auth.environment">
-                            <option value="dev">DEV</option>
-                            <option value="test">TEST</option>
-                            <option value="prod">PRODUCTION</option>
-                        </select>
-                    </div>
-                    <p v-if="!isOtherPaymentMethod" class="field-row">
-                        <strong class="field-label">Pay type:</strong>
-                        <select name="paytype" id="paytype" v-model="paytype" class="field-select"
-                            @click="isOtherPaymentMethod = false">
-                            <option v-for="pt in paytypes" :key="pt.value" :value="pt.value" :disabled="pt.divider">
-                                {{ pt.divider ? '----------------' : pt.label }}</option>
-                        </select>
-                    </p>
-                    <div class="field-row">
-                        <strong class="field-label">Other pay type <strong
-                                title="Use this if payment method not listed in above dropdown"
-                                class="qm-tooltip">?</strong></strong>
-                        <input type="checkbox" v-model="isOtherPaymentMethod">
-                        <div v-if="isOtherPaymentMethod" class="other-wrapper">
-                            <input class="field-input w-68.75" type="text" v-model="otherpaymentmethod"
-                                placeholder="example (example.aspx)">
-                            <div class="flex gap-1.5 mt-1.5">
-                                <button class="btn-chip" @click="otherpaymentmethod = 'reverse'">reverse.aspx</button>
-                                <button class="btn-chip" @click="otherpaymentmethod = 'credit'">credit.aspx</button>
-                            </div>
+                    <div class="general-layout">
+                        <section class="form-group">
+                            <h4 class="form-group-title">Request setup</h4>
+                            <div class="field-grid">
+                                <label class="field-stack">
+                                    <strong class="field-label-top">Partner</strong>
+                                    <select name="partner" id="partner" class="field-select" v-model="auth.partner">
+                                        <option v-for="p in partners" :key="p.value" :value="p.value">{{ p.label }}</option>
+                                    </select>
+                                </label>
+                                <label class="field-stack">
+                                    <strong class="field-label-top">Environment</strong>
+                                    <select name="environment" id="environment" class="field-select" v-model="auth.environment">
+                                        <option value="dev">DEV</option>
+                                        <option value="test">TEST</option>
+                                        <option value="prod">PRODUCTION</option>
+                                    </select>
+                                </label>
+                                <div class="field-stack sm:col-span-2">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Pay type</strong>
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" v-model="isOtherPaymentMethod">
+                                            Use custom pay type
+                                            <strong title="Use this if payment method is not listed below"
+                                                class="qm-tooltip">?</strong>
+                                        </label>
+                                    </div>
+                                    <select v-if="!isOtherPaymentMethod" name="paytype" id="paytype" v-model="paytype"
+                                        class="field-select field-control-wide">
+                                        <option v-for="pt in paytypes" :key="pt.value" :value="pt.value" :disabled="pt.divider">
+                                            {{ pt.divider ? '----------------' : pt.label }}</option>
+                                    </select>
+                                    <div v-else class="custom-paytype-row">
+                                        <input class="field-input field-control-wide" type="text"
+                                            v-model="otherpaymentmethod" placeholder="example (example.aspx)">
+                                        <button type="button" class="btn-chip"
+                                            @click="otherpaymentmethod = 'reverse'">reverse.aspx</button>
+                                        <button type="button" class="btn-chip"
+                                            @click="otherpaymentmethod = 'credit'">credit.aspx</button>
+                                    </div>
+                                </div>
+                                <label class="field-stack">
+                                    <strong class="field-label-top">Preset <strong
+                                            title="Quickly fill the form with a sample request for a specific flow"
+                                            class="qm-tooltip">?</strong></strong>
+                                    <select name="preset" id="preset" class="field-select" v-model="preset"
+                                        @change="applyPreset">
+                                        <option value="">-- none --</option>
+                                        <option value="easycollect_payment">Easy Collect PAYMENT</option>
+                                        <option value="easycollect_mandate">Easy Collect MANDATE</option>
+                                        <option value="floa">Floa</option>
+                                        <option value="applepay_server">Apple Pay (Server)</option>
+                                        <option value="mit_installment">MIT Installment</option>
+                                        <option value="mit_delayed_shipment">MIT Delayed shipment</option>
+                                    </select>
+                                </label>
+                        <div class="field-stack" v-if="isEasyCollectPreset">
+                            <strong class="field-label-top">Agreement Scheme <strong title="Required for Easy Collect"
+                                    class="qm-tooltip">?</strong></strong>
+                            <select name="agreementScheme" id="agreementScheme" class="field-select"
+                                v-model="agreementScheme">
+                                <option value="">-- select --</option>
+                                <option value="SMS">SMS</option>
+                                <option value="EMAIL">EMAIL</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="field-row">
-                        <strong class="field-label">Preset <strong
-                                title="Quickly fill the form with a sample request for a specific flow"
-                                class="qm-tooltip">?</strong></strong>
-                        <select name="preset" id="preset" class="field-select" v-model="preset" @change="applyPreset">
-                            <option value="">-- none --</option>
-                            <option value="easycollect_payment">Easy Collect PAYMENT</option>
-                            <option value="easycollect_mandate">Easy Collect MANDATE</option>
-                            <option value="floa">Floa</option>
-                            <option value="applepay_server">Apple Pay (Server)</option>
-                            <option value="mit_installment">MIT Installment</option>
-                            <option value="mit_delayed_shipment">MIT Delayed shipment</option>
-                        </select>
-                    </div>
-                    <div class="field-row" v-if="isEasyCollectPreset">
-                        <strong class="field-label">Agreement Scheme <strong title="Required for Easy Collect"
-                                class="qm-tooltip">?</strong></strong>
-                        <select name="agreementScheme" id="agreementScheme" class="field-select"
-                            v-model="agreementScheme">
-                            <option value="">-- select --</option>
-                            <option value="SMS">SMS</option>
-                            <option value="EMAIL">EMAIL</option>
-                        </select>
+                            </div>
+                        </section>
+
+                        <section class="form-group">
+                            <h4 class="form-group-title">Merchant credentials</h4>
+                            <div class="credential-grid">
+                                <label class="field-stack">
+                                    <strong class="field-label-top">Merchant ID</strong>
+                                    <input type="text" class="field-input field-control-wide"
+                                        v-model="this.auth.merchantid" placeholder="Required">
+                                </label>
+                                <div class="quick-values">
+                                    <span>Quick values</span>
+                                    <button type="button" class="btn-chip" @click="this.auth.merchantid = 'npesic_test'">npesic_test</button>
+                                    <button type="button" class="btn-chip" @click="this.auth.merchantid = 'ing_test_nebo'">ing_test_nebo</button>
+                                    <button type="button" class="btn-chip" @click="this.auth.merchantid = 'Nexi_test_merchant'">Nexi_test_merchant</button>
+                                </div>
+                                <label class="field-stack">
+                                    <strong class="field-label-top">Encryption password <strong
+                                            title="Received from Computop" class="qm-tooltip">?</strong></strong>
+                                    <div class="input-action-row">
+                                        <input type="text" class="field-input field-control-wide min-w-0"
+                                            v-model="this.auth.bf_password" placeholder="Required">
+                                        <button type="button" class="btn-secondary shrink-0"
+                                            @click="this.auth.bf_password = 'AaAaAaAaAaAaAaAa'">Use test password</button>
+                                    </div>
+                                </label>
+                                <label class="field-stack">
+                                    <strong class="field-label-top">HMAC password <span class="optional-label">Optional</span></strong>
+                                    <input type="text" class="field-input field-control-wide"
+                                        v-model="hmac_password" placeholder="Optional">
+                                </label>
+                            </div>
+                        </section>
                     </div>
                 </AccordionSection>
 
                 <AccordionSection title="Encrypted parameters" v-model="accordionEncrypted">
-                    <p class="field-row">
-                        <strong class="field-label">MsgVer=2.0 <strong
-                                title="This parameter is required to indicate that your implementation supports 3-D Secure processing"
-                                class="qm-tooltip">?</strong></strong>
-                        <input type="checkbox" v-model="isMsgVer2">
-                    </p>
-                    <p class="field-row">
-                        <strong class="field-label">Duplication check <strong
-                                title="Adds InvoiceId and OrderId parameters with random values"
-                                class="qm-tooltip">?</strong></strong>
-                        <input type="checkbox" v-model="isDuplicationCheck">
-                    </p>
-                    <div class="field-row">
-                        <strong class="field-label">Encryption
-                            password <strong title="Received from Computop" class="qm-tooltip">?</strong></strong>
-                        <div class="flex items-center gap-1.5 flex-wrap">
-                            <input type="text" class="field-input" v-model="this.auth.bf_password"
-                                placeholder="(mandatory)">
-                            <button class="btn-secondary" @click="this.auth.bf_password = 'AaAaAaAaAaAaAaAa'">AaAaAaAaAaAaAaAa</button>
-                        </div>
+                    <div class="encrypted-options">
+                        <label class="checkbox-card">
+                            <input type="checkbox" v-model="isMsgVer2">
+                            <span><strong>3-D Secure (MsgVer 2.0)</strong><small>Enable 3-D Secure processing</small></span>
+                        </label>
+                        <label class="checkbox-card">
+                            <input type="checkbox" v-model="isDuplicationCheck">
+                            <span><strong>Duplication check</strong><small>Add random InvoiceId and OrderId values</small></span>
+                        </label>
                     </div>
-                    <p class="field-row">
-                        <strong class="field-label">HMAC password:</strong>
-                        <input type="text" placeholder="(optional)" class="field-input" v-model="hmac_password">
-                    </p>
-                    <div class="mb-1.5">
-                        <p class="field-row">
-                            <strong class="field-label">Merchant ID:</strong>
-                            <input type="text" class="field-input" v-model="this.auth.merchantid"
-                                placeholder="(mandatory)">
-                        </p>
-                        <div class="order-desc-buttons">
-                            <button type="button" class="btn-chip" @click="this.auth.merchantid = 'npesic_test'">npesic_test</button>
-                        </div>
-                    </div>
-                    <ParamInputRow label="Transaction ID" v-model="transid" v-model:includeValue="includeTransID"
-                        input-class="field-input narrow">
-                        <button @click="generate_transid" class="btn-secondary custom-padding">Generate
-                            TransID</button>
-                    </ParamInputRow>
-                    <ParamInputRow label="RefNr" v-model="refnr" v-model:includeValue="includeRefNr" />
-                    <ParamInputRow label="Channel" v-model="channel" v-model:includeValue="includeChannel" />
-                    <ParamInputRow label="Customer ID" v-model="customerid" v-model:includeValue="includeCustomerID" />
-                    <ParamInputRow label="Amount" v-model="amount" v-model:includeValue="includeAmount"
-                        placeholder="(mandatory)" />
-                    <ParamInputRow label="Currency" v-model="currency" v-model:includeValue="includeCurrency"
-                        placeholder="(mandatory)" />
-                    <ParamInputRow label="URLSuccess" v-model="urlsuccess" v-model:includeValue="includeURLSuccess" />
-                    <ParamInputRow label="URLFailure" v-model="urlfailure" v-model:includeValue="includeURLFailure" />
-                    <ParamInputRow label="URLNotify" v-model="urlnotify" v-model:includeValue="includeURLNotify" />
-                    <ParamInputRow label="URLBack" v-model="urlback" v-model:includeValue="includeURLBack" />
-                    <div class="flex gap-2 mb-1.5 mt-1.5">
-                        <strong class="field-label">ArticleList:</strong>
-                        <div class="field-row mb-0!">
-                            <input type="text" class="field-input" v-model="articlelist" :disabled="!isArticleList">
-                            <input type="checkbox" v-model="isArticleList">
-                        </div>
-                    </div>
-                    <div class="flex gap-2 mb-1.5">
-                        <strong class="field-label">OrderItem:</strong>
-                        <div class="flex gap-1.5">
-                            <input type="text" class="field-input" v-model="orderitem" :disabled="!isOrderItem">
-                            <input type="checkbox" v-model="isOrderItem">
-                        </div>
-                    </div>
+
+                    <div class="parameter-layout">
+                        <section class="form-group">
+                            <h4 class="form-group-title">Transaction</h4>
+                            <div class="parameter-grid">
+                                <ParamInputRow label="Transaction ID" v-model="transid" v-model:includeValue="includeTransID">
+                                    <button type="button" @click="generate_transid" class="btn-secondary">Generate</button>
+                                </ParamInputRow>
+                                <ParamInputRow label="Reference number" v-model="refnr" v-model:includeValue="includeRefNr" />
+                                <ParamInputRow label="Channel" v-model="channel" v-model:includeValue="includeChannel" />
+                                <ParamInputRow label="Customer ID" v-model="customerid" v-model:includeValue="includeCustomerID" />
+                                <ParamInputRow label="Amount" v-model="amount" v-model:includeValue="includeAmount"
+                                    placeholder="Required" />
+                                <ParamInputRow label="Currency" v-model="currency" v-model:includeValue="includeCurrency"
+                                    placeholder="Required" />
+                            </div>
+                        </section>
+
+                        <section class="form-group">
+                            <h4 class="form-group-title">Redirect URLs</h4>
+                            <div class="parameter-grid">
+                                <ParamInputRow label="Success URL" v-model="urlsuccess" v-model:includeValue="includeURLSuccess" />
+                                <ParamInputRow label="Failure URL" v-model="urlfailure" v-model:includeValue="includeURLFailure" />
+                                <ParamInputRow label="Notify URL" v-model="urlnotify" v-model:includeValue="includeURLNotify" />
+                                <ParamInputRow label="Back URL" v-model="urlback" v-model:includeValue="includeURLBack" />
+                            </div>
+                        </section>
+
+                        <section class="form-group parameter-span">
+                            <h4 class="form-group-title">Order data</h4>
+                            <div class="parameter-grid">
+                                <div class="field-stack parameter-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Article list</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isArticleList"> Include</label>
+                                    </div>
+                                    <textarea class="field-textarea" v-model="articlelist" :rows="rows(articlelist)"
+                                        :disabled="!isArticleList"></textarea>
+                                </div>
+                                <div class="field-stack parameter-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Order item</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isOrderItem"> Include</label>
+                                    </div>
+                                    <textarea class="field-textarea" v-model="orderitem" :rows="rows(orderitem)"
+                                        :disabled="!isOrderItem"></textarea>
+                                </div>
+                            </div>
                     <p v-if="paytype === 'paytweak'" class="field-row">
                         <strong class="field-label">Service (Paytweak) <strong title="Values: link|email|sms"
                                 class="qm-tooltip">?</strong></strong>
@@ -171,6 +205,8 @@
                                 title="Use this for simulating successful payment">test:0000</button>
                             <button class="btn-chip" @click="this.orderdesc = 'test:0305'">test:0305</button>
                         </div>
+                    </div>
+                        </section>
                     </div>
                 </AccordionSection>
 
@@ -344,6 +380,7 @@
                             <button type="button" class="btn-chip" @click="template = 'ct_cards_v2'">ct_cards_v2</button>
                             <button type="button" class="btn-chip" @click="template = 'npesic_test'">npesic_test</button>
                             <button type="button" class="btn-chip" @click="template = 'ct_PaymentPageDropDown_v1'">ct_PaymentPageDropDown_v1</button>
+                            <button type="button" class="btn-chip" @click="template = 'ing_PaymentPageDropDown_v1'">ing_PaymentPageDropDown_v1</button>                            <button type="button" class="btn-chip" @click="template = 'ct_paymentpagelogos_v1'">ct_paymentpagelogos_v1</button>
                         </div>
                     </div>
                     <p class="field-row">
@@ -1308,7 +1345,7 @@ export default {
     margin-top: 20px;
     position: relative;
     width: 100%;
-    max-width: 800px;
+    max-width: 1200px;
     padding: 0 16px 90px;
 }
 

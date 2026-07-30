@@ -61,6 +61,113 @@
     @apply w-40 text-right select-none text-sm shrink-0;
   }
 
+  /* Two-column grid of stacked label-above-control fields */
+  .field-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-3 mb-1;
+  }
+
+  .field-stack {
+    @apply flex flex-col items-start gap-1;
+  }
+
+  .general-layout {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-4;
+  }
+
+  .form-group {
+    @apply bg-[#f7f9fb] border border-[#e1e8ee] rounded-lg p-4;
+  }
+
+  .form-group-title {
+    @apply text-[#1e5582] text-sm font-semibold mb-3 pb-2 border-b border-[#dfe7ed];
+  }
+
+  .field-heading-row {
+    @apply flex items-center justify-between gap-3 w-full;
+  }
+
+  .checkbox-label {
+    @apply flex items-center gap-1.5 text-xs font-normal text-[#496476] cursor-pointer;
+  }
+
+  .field-control-wide {
+    @apply max-w-none;
+  }
+
+  .custom-paytype-row,
+  .input-action-row {
+    @apply flex flex-wrap sm:flex-nowrap items-center gap-1.5 w-full;
+  }
+
+  .credential-grid {
+    @apply grid grid-cols-1 gap-3;
+  }
+
+  .quick-values {
+    @apply flex flex-wrap items-center gap-1 text-xs text-[#6a7e8c] -mt-1;
+  }
+
+  .optional-label {
+    @apply ml-1 text-[10px] uppercase tracking-wide font-normal text-[#728694];
+  }
+
+  .encrypted-options {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4;
+  }
+
+  .checkbox-card {
+    @apply flex items-start gap-2.5 rounded-lg border border-[#dfe7ed] bg-white px-3 py-2.5 cursor-pointer;
+  }
+
+  .checkbox-card input {
+    @apply mt-0.5;
+  }
+
+  .checkbox-card span {
+    @apply flex flex-col;
+  }
+
+  .checkbox-card strong {
+    @apply text-sm;
+  }
+
+  .checkbox-card small {
+    @apply text-xs text-[#6a7e8c];
+  }
+
+  .parameter-layout {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-4;
+  }
+
+  .parameter-span {
+    @apply lg:col-span-2;
+  }
+
+  .parameter-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-3;
+  }
+
+  .parameter-field {
+    @apply min-w-0;
+  }
+
+  .parameter-field .field-input {
+    @apply max-w-none min-w-0;
+  }
+
+  .field-label-top {
+    @apply select-none text-sm;
+  }
+
+  /* Checkbox layered over the right edge of the input it toggles */
+  .field-overlay-wrap {
+    @apply relative w-full max-w-75;
+  }
+
+  .field-overlay-check {
+    @apply absolute right-2 top-1/2 -translate-y-1/2 z-10 cursor-pointer;
+  }
+
   .field-input {
     @apply px-2 py-1 rounded-md border border-[#d4d4d4] outline-none w-full max-w-75 bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed;
   }
@@ -74,7 +181,7 @@
   }
 
   .field-textarea {
-    @apply rounded-lg outline-none p-2 border border-[#d4d4d4] w-full text-xs bg-white;
+    @apply rounded-lg outline-none p-2 border border-[#d4d4d4] w-full text-xs bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed;
   }
 
   /* Buttons */
