@@ -2,15 +2,17 @@
     <div class="main-wrapper">
         <div class="card mx-auto">
             <div class="title-row">
-                <div>
+                <div class="title-actions">
                     <h3 class="page-title">Paygate Encryption Test Tool</h3>
+                    <button type="button" class="btn-secondary tutorial-launch" @click="startTutorial">Show tutorial</button>
                 </div>
+                <div class="floating-params-dock" data-floating-params-dock></div>
                 <button class="btn-secondary" @click="isLogOpen = true">Event log</button>
             </div>
             <div class="parameters" @keydown.enter="handleEnterKey">
                 <AccordionSection title="General" v-model="accordionGeneral">
                     <div class="general-layout">
-                        <section class="form-group">
+                        <section class="form-group" data-tour="request-setup">
                             <h4 class="form-group-title">Request setup</h4>
                             <div class="field-grid">
                                 <label class="field-stack">
@@ -19,7 +21,7 @@
                                         <option v-for="p in partners" :key="p.value" :value="p.value">{{ p.label }}</option>
                                     </select>
                                 </label>
-                                <label class="field-stack">
+                                <label class="field-stack" data-tour="environment">
                                     <strong class="field-label-top">Environment</strong>
                                     <select name="environment" id="environment" class="field-select" v-model="auth.environment">
                                         <option value="dev">DEV</option>
@@ -27,7 +29,7 @@
                                         <option value="prod">PRODUCTION</option>
                                     </select>
                                 </label>
-                                <div class="field-stack sm:col-span-2">
+                                <div class="field-stack sm:col-span-2" data-tour="paytype">
                                     <div class="field-heading-row">
                                         <strong class="field-label-top">Pay type</strong>
                                         <label class="checkbox-label">
@@ -79,10 +81,10 @@
                             </div>
                         </section>
 
-                        <section class="form-group">
+                        <section class="form-group" data-tour="credentials">
                             <h4 class="form-group-title">Merchant credentials</h4>
                             <div class="credential-grid">
-                                <label class="field-stack">
+                                <label class="field-stack" data-tour="merchant-id">
                                     <strong class="field-label-top">Merchant ID</strong>
                                     <input type="text" class="field-input field-control-wide"
                                         v-model="this.auth.merchantid" placeholder="Required">
@@ -93,7 +95,7 @@
                                     <button type="button" class="btn-chip" @click="this.auth.merchantid = 'ing_test_nebo'">ing_test_nebo</button>
                                     <button type="button" class="btn-chip" @click="this.auth.merchantid = 'Nexi_test_merchant'">Nexi_test_merchant</button>
                                 </div>
-                                <label class="field-stack">
+                                <label class="field-stack" data-tour="encryption-password">
                                     <strong class="field-label-top">Encryption password <strong
                                             title="Received from Computop" class="qm-tooltip">?</strong></strong>
                                     <div class="input-action-row">
@@ -126,7 +128,7 @@
                     </div>
 
                     <div class="parameter-layout">
-                        <section class="form-group">
+                        <section class="form-group" data-tour="transaction">
                             <h4 class="form-group-title">Transaction</h4>
                             <div class="parameter-grid">
                                 <ParamInputRow label="Transaction ID" v-model="transid" v-model:includeValue="includeTransID">
@@ -135,14 +137,18 @@
                                 <ParamInputRow label="Reference number" v-model="refnr" v-model:includeValue="includeRefNr" />
                                 <ParamInputRow label="Channel" v-model="channel" v-model:includeValue="includeChannel" />
                                 <ParamInputRow label="Customer ID" v-model="customerid" v-model:includeValue="includeCustomerID" />
-                                <ParamInputRow label="Amount" v-model="amount" v-model:includeValue="includeAmount"
-                                    placeholder="Required" />
-                                <ParamInputRow label="Currency" v-model="currency" v-model:includeValue="includeCurrency"
-                                    placeholder="Required" />
+                                <div data-tour="amount">
+                                    <ParamInputRow label="Amount" v-model="amount" v-model:includeValue="includeAmount"
+                                        placeholder="Required" />
+                                </div>
+                                <div data-tour="currency">
+                                    <ParamInputRow label="Currency" v-model="currency" v-model:includeValue="includeCurrency"
+                                        placeholder="Required" />
+                                </div>
                             </div>
                         </section>
 
-                        <section class="form-group">
+                        <section class="form-group" data-tour="urls">
                             <h4 class="form-group-title">Redirect URLs</h4>
                             <div class="parameter-grid">
                                 <ParamInputRow label="Success URL" v-model="urlsuccess" v-model:includeValue="includeURLSuccess" />
@@ -189,21 +195,23 @@
                             placeholder="YYYY-MM-DD HH:MM:SS" :disabled="!includeExpirationDate">
                         <input type="checkbox" v-model="includeExpirationDate">
                     </p>
-                    <div class="mb-1.5">
-                        <ParamInputRow label="Email" v-model="email" v-model:includeValue="includeEmail" />
-                        <div class="order-desc-buttons only-margin">
-                            <button class="btn-chip" @click="this.email = this.email + '@computop.com'"
-                                title="Use this for simulating successful payment">@computop.com</button>
-                            <button class="btn-chip"
-                                @click="this.email = this.email + '@gmail.com'">@gmail.com</button>
+                    <div class="parameter-grid mt-4">
+                        <div class="parameter-field">
+                            <ParamInputRow label="Email" v-model="email" v-model:includeValue="includeEmail" />
+                            <div class="order-desc-buttons">
+                                <button class="btn-chip" @click="this.email = this.email + '@computop.com'"
+                                    title="Use this for simulating successful payment">@computop.com</button>
+                                <button class="btn-chip"
+                                    @click="this.email = this.email + '@gmail.com'">@gmail.com</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="mb-1.5">
-                        <ParamInputRow label="OrderDesc" v-model="orderdesc" v-model:includeValue="includeOrderDesc" />
-                        <div class="order-desc-buttons">
-                            <button class="btn-chip" @click="this.orderdesc = 'test:0000'"
-                                title="Use this for simulating successful payment">test:0000</button>
-                            <button class="btn-chip" @click="this.orderdesc = 'test:0305'">test:0305</button>
+                        <div class="parameter-field">
+                            <ParamInputRow label="OrderDesc" v-model="orderdesc" v-model:includeValue="includeOrderDesc" />
+                            <div class="order-desc-buttons">
+                                <button class="btn-chip" @click="this.orderdesc = 'test:0000'"
+                                    title="Use this for simulating successful payment">test:0000</button>
+                                <button class="btn-chip" @click="this.orderdesc = 'test:0305'">test:0305</button>
+                            </div>
                         </div>
                     </div>
                         </section>
@@ -211,137 +219,156 @@
                 </AccordionSection>
 
                 <AccordionSection title="Advanced / 3DS &amp; tokens" v-model="accordionAdvanced">
-                    <div class="flex flex-col gap-1.5 mb-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">Card:</strong>
-                            <input type="checkbox" v-model="isCard">
-                        </div>
-                        <div><textarea class="custom-height field-textarea" v-if="isCard" :rows="rows(card)" name="card" id="card"
-                                v-model="card"></textarea></div>
-                        <div v-if="isCard" class="card-buttons">
-                            <button class="btn-chip" @click="setCardVisa">VISA/CB</button>
-                            <button class="btn-chip" @click="setCardMastercard">MC/CB</button>
-                            <button class="btn-chip" @click="setCardVisaOnly">VISA</button>
-                            <button class="btn-chip" @click="setCardMastercardOnly">Mastercard</button>
-                        </div>
-                        <div v-if="isCard" class="card-buttons">
-                            <span class="muted-text text-xs">Brand only:</span>
-                            <button class="btn-chip" @click="setCardBrand('VISA')">VISA</button>
-                            <button class="btn-chip" @click="setCardBrand('MasterCard')">MasterCard</button>
-                            <button class="btn-chip" @click="setCardBrand('Cartes Bancaires')">Cartes Bancaires</button>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5 mb-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">credentialOnFile:</strong>
-                            <input type="checkbox" v-model="isCredentialOnFile">
-                        </div>
-                        <div><textarea class="custom-height field-textarea" v-if="isCredentialOnFile" name="cof" id="cof"
-                                v-model="credentialOnFile" :rows="rows(credentialOnFile)"></textarea>
-                        </div>
-                        <div v-if="isCredentialOnFile" class="cof-buttons">
-                            <button class="btn-chip" @click="setCit">CIT</button>
-                            <button class="btn-chip" @click="setCitC">CIT (RTF=C)</button>
-                            <button class="btn-chip" @click="setMitE">MIT (RTF=E)</button>
-                            <button class="btn-chip" @click="setMitM">MIT (RTF=M)</button>
-                            <button class="btn-chip" @click="setInstallments">Installments (RTF=I)</button>
-                            <button class="btn-chip" @click="setInstallmentsR">Installments (RTF=R)</button>
-                            <button class="btn-chip" @click="setRecurring">Recurring (RTF=I)</button>
-                            <button class="btn-chip" @click="setRecurringR">Recurring (RTF=R)</button>
-                            <button class="btn-chip" @click="setRecurringFixed">useCase=fixed (02)</button>
-                            <button class="btn-chip" @click="setRecurringFlexibleAmount">useCase=flexibleAmount
-                                (05)</button>
-                            <button class="btn-chip" @click="setRecurringFlexibleFrequency">useCase=flexibleFrequency
-                                (05)</button>
-                            <button class="btn-chip" @click="setCofInitialPayment(true)">initialPayment=true</button>
-                            <button class="btn-chip" @click="setCofInitialPayment(false)">initialPayment=false</button>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5 mb-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">billToCustomer:</strong>
-                            <input type="checkbox" v-model="isBillToCustomer">
-                        </div>
-                        <div><textarea class="h-37.5 field-textarea" v-if="isBillToCustomer" name="billToCustomer"
-                                id="billToCustomer" v-model="billToCustomer" :rows="rows(billToCustomer)"></textarea>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5 mb-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">shipToCustomer:</strong>
-                            <input type="checkbox" v-model="isShipToCustomer">
-                        </div>
-                        <div><textarea class="h-37.5 field-textarea" v-if="isShipToCustomer" name="shipToCustomer"
-                                id="shipToCustomer" v-model="shipToCustomer" :rows="rows(shipToCustomer)"></textarea>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5 mb-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">billingAddress:</strong>
-                            <input type="checkbox" v-model="isBillingAddress">
-                        </div>
-                        <div><textarea class="h-37.5 field-textarea" v-if="isBillingAddress" name="billToCustomer"
-                                id="billToCustomer" v-model="billingAddress" :rows="rows(billingAddress)"></textarea>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5 mb-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">shippingAddress:</strong>
-                            <input type="checkbox" v-model="isShippingAddress">
-                        </div>
-                        <div><textarea class="h-37.5 field-textarea" v-if="isShippingAddress" name="shippingAddress"
-                                id="shippingAddress" v-model="shippingAddress" :rows="rows(shippingAddress)"></textarea>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5 mb-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">threeDsData:</strong>
-                            <input type="checkbox" v-model="isThreeDsData">
-                        </div>
-                        <div v-if="isThreeDsData"><textarea class="custom-height field-textarea" name="threeDsData" id="threeDsData"
-                                v-model="threeDsData"></textarea>
-                            <div class="field-row">
-                                <button class="btn-chip" @click="seEci07()">ECI=07/04</button>
-                                <button class="btn-chip" @click="seEci05()">ECI=05/02</button>
+                    <div class="advanced-layout">
+                        <section class="form-group advanced-span">
+                            <h4 class="form-group-title">Payment instrument</h4>
+                            <div class="advanced-grid">
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Card</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isCard"> Include</label>
+                                    </div>
+                                    <template v-if="isCard">
+                                        <textarea class="custom-height field-textarea" :rows="rows(card)" name="card"
+                                            id="card" v-model="card"></textarea>
+                                        <div class="preset-row">
+                                            <span class="preset-label">Card + brand</span>
+                                            <button class="btn-chip" @click="setCardVisa">VISA/CB</button>
+                                            <button class="btn-chip" @click="setCardMastercard">MC/CB</button>
+                                            <button class="btn-chip" @click="setCardVisaOnly">VISA</button>
+                                            <button class="btn-chip" @click="setCardMastercardOnly">Mastercard</button>
+                                        </div>
+                                        <div class="preset-row">
+                                            <span class="preset-label">Brand only</span>
+                                            <button class="btn-chip" @click="setCardBrand('VISA')">VISA</button>
+                                            <button class="btn-chip" @click="setCardBrand('MasterCard')">MasterCard</button>
+                                            <button class="btn-chip" @click="setCardBrand('Cartes Bancaires')">Cartes Bancaires</button>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Credential on file</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isCredentialOnFile"> Include</label>
+                                    </div>
+                                    <template v-if="isCredentialOnFile">
+                                        <textarea class="custom-height field-textarea" name="cof" id="cof"
+                                            v-model="credentialOnFile" :rows="rows(credentialOnFile)"></textarea>
+                                        <div class="preset-row">
+                                            <button class="btn-chip" @click="setCit">CIT</button>
+                                            <button class="btn-chip" @click="setCitC">CIT (RTF=C)</button>
+                                            <button class="btn-chip" @click="setMitE">MIT (RTF=E)</button>
+                                            <button class="btn-chip" @click="setMitM">MIT (RTF=M)</button>
+                                            <button class="btn-chip" @click="setInstallments">Installments (RTF=I)</button>
+                                            <button class="btn-chip" @click="setInstallmentsR">Installments (RTF=R)</button>
+                                            <button class="btn-chip" @click="setRecurring">Recurring (RTF=I)</button>
+                                            <button class="btn-chip" @click="setRecurringR">Recurring (RTF=R)</button>
+                                            <button class="btn-chip" @click="setRecurringFixed">useCase=fixed (02)</button>
+                                            <button class="btn-chip" @click="setRecurringFlexibleAmount">useCase=flexibleAmount (05)</button>
+                                            <button class="btn-chip" @click="setRecurringFlexibleFrequency">useCase=flexibleFrequency (05)</button>
+                                            <button class="btn-chip" @click="setCofInitialPayment(true)">initialPayment=true</button>
+                                            <button class="btn-chip" @click="setCofInitialPayment(false)">initialPayment=false</button>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5 mb-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">threeDsPolicy:</strong>
-                            <input type="checkbox" v-model="isThreeDsPolicy">
-                        </div>
-                        <div><textarea class="custom-height field-textarea" v-if="isThreeDsPolicy" name="threeDsData" id="threeDsData"
-                                v-model="threeDsPolicy"></textarea>
-                            <div v-if="isThreeDsPolicy">
-                                <button class="btn-chip" @click="setSkipThreeDs">Skip 3DS</button>
-                                <button class="btn-chip" @click="mandateChallenge">Mandate challenge</button>
-                                <button class="btn-chip" @click="tra">TRA</button>
-                                <button class="btn-chip" @click="lowvalue">Low Value</button>
+                        </section>
+
+                        <section class="form-group">
+                            <h4 class="form-group-title">Customer &amp; addresses</h4>
+                            <div class="advanced-grid">
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Bill-to customer</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isBillToCustomer"> Include</label>
+                                    </div>
+                                    <textarea v-if="isBillToCustomer" class="field-textarea" name="billToCustomer"
+                                        id="billToCustomer" v-model="billToCustomer" :rows="rows(billToCustomer)"></textarea>
+                                </div>
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Ship-to customer</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isShipToCustomer"> Include</label>
+                                    </div>
+                                    <textarea v-if="isShipToCustomer" class="field-textarea" name="shipToCustomer"
+                                        id="shipToCustomer" v-model="shipToCustomer" :rows="rows(shipToCustomer)"></textarea>
+                                </div>
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Billing address</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isBillingAddress"> Include</label>
+                                    </div>
+                                    <textarea v-if="isBillingAddress" class="field-textarea" name="billingAddress"
+                                        id="billingAddress" v-model="billingAddress" :rows="rows(billingAddress)"></textarea>
+                                </div>
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Shipping address</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isShippingAddress"> Include</label>
+                                    </div>
+                                    <textarea v-if="isShippingAddress" class="field-textarea" name="shippingAddress"
+                                        id="shippingAddress" v-model="shippingAddress" :rows="rows(shippingAddress)"></textarea>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5 mb-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">browserInfo:</strong>
-                            <input type="checkbox" v-model="isBrowserInfo">
-                        </div>
-                        <div><textarea class="custom-height field-textarea" v-if="isBrowserInfo" name="browserIno" id="browserInfo"
-                                v-model="browserInfo"></textarea>
-                        </div>
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                        <div class="field-row">
-                            <strong class="field-label">tokenData:</strong>
-                            <input type="checkbox" v-model="isTokenData">
-                        </div>
-                        <div><textarea class="custom-height field-textarea" v-if="isTokenData" name="tokenData" id="tokenData"
-                                v-model="tokenData"></textarea>
-                        </div>
-                        <div v-if="isTokenData">
-                            <button class="btn-chip" @click="setTokenRequestor('applepay')">ApplePay</button>
-                            <button class="btn-chip" @click="setTokenRequestor('googlepay')">GooglePay</button>
-                        </div>
+                        </section>
+
+                        <section class="form-group">
+                            <h4 class="form-group-title">Authentication &amp; tokens</h4>
+                            <div class="advanced-stack">
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">3DS data</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isThreeDsData"> Include</label>
+                                    </div>
+                                    <template v-if="isThreeDsData">
+                                        <textarea class="field-textarea" name="threeDsData" id="threeDsData"
+                                            v-model="threeDsData" :rows="rows(threeDsData)"></textarea>
+                                        <div class="preset-row">
+                                            <button class="btn-chip" @click="seEci07()">ECI=07/04</button>
+                                            <button class="btn-chip" @click="seEci05()">ECI=05/02</button>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">3DS policy</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isThreeDsPolicy"> Include</label>
+                                    </div>
+                                    <template v-if="isThreeDsPolicy">
+                                        <textarea class="custom-height field-textarea" name="threeDsPolicy"
+                                            id="threeDsPolicy" v-model="threeDsPolicy"></textarea>
+                                        <div class="preset-row">
+                                            <button class="btn-chip" @click="setSkipThreeDs">Skip 3DS</button>
+                                            <button class="btn-chip" @click="mandateChallenge">Mandate challenge</button>
+                                            <button class="btn-chip" @click="tra">TRA</button>
+                                            <button class="btn-chip" @click="lowvalue">Low Value</button>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Browser info</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isBrowserInfo"> Include</label>
+                                    </div>
+                                    <textarea v-if="isBrowserInfo" class="custom-height field-textarea" name="browserInfo"
+                                        id="browserInfo" v-model="browserInfo"></textarea>
+                                </div>
+                                <div class="advanced-field">
+                                    <div class="field-heading-row">
+                                        <strong class="field-label-top">Token data</strong>
+                                        <label class="checkbox-label"><input type="checkbox" v-model="isTokenData"> Include</label>
+                                    </div>
+                                    <template v-if="isTokenData">
+                                        <textarea class="custom-height field-textarea" name="tokenData" id="tokenData"
+                                            v-model="tokenData"></textarea>
+                                        <div class="preset-row">
+                                            <button class="btn-chip" @click="setTokenRequestor('applepay')">ApplePay</button>
+                                            <button class="btn-chip" @click="setTokenRequestor('googlepay')">GooglePay</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </AccordionSection>
 
@@ -484,12 +511,18 @@
         </div>
     </div>
 
+    <aside class="suggestion-contact" aria-label="Product feedback contact">
+        <img :src="neboImage" alt="Nebo" class="suggestion-contact-image">
+        <div class="suggestion-contact-pill">Any suggestions? Write to your favorite PM!</div>
+    </aside>
+
     <div class="action-bar">
         <div class="action-bar-inner">
             <div class="action-buttons">
                 <button @click="resetForm" class="btn-secondary action-btn-lg">Reset</button>
                 <button @click="generate_transid" class="btn-secondary action-btn-lg">Generate TransID</button>
-                <button @click="encryptData(plaintext)" class="btn-primary" :disabled="!canEncrypt">Encrypt</button>
+                <button @click="encryptData(plaintext)" class="btn-primary" data-tour="encrypt"
+                    :disabled="!canEncrypt">Encrypt</button>
                 <p v-if="!canEncrypt" class="validation-error">{{ encryptDisabledReason }}</p>
             </div>
             <a class="payment-url-button" v-if="isDataEncrypted" :href="testurl" target="_blank">
@@ -505,6 +538,25 @@
     <FloatingResponsePanel v-if="replaceFrontEnd === 'direct' || replaceFrontEnd === 'paybylinkexternal'"
         :password="auth.bf_password" @response-decrypted="logResponse" />
     <EventLogPanel v-if="isLogOpen" @close="isLogOpen = false" />
+
+    <template v-if="tutorialActive">
+        <div class="tutorial-backdrop" aria-hidden="true"></div>
+        <aside class="tutorial-dialog" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+            <div class="tutorial-progress">Step {{ tutorialStep + 1 }} of {{ tutorialSteps.length }}</div>
+            <h4 id="tutorial-title">{{ currentTutorialStep.title }}</h4>
+            <p>{{ currentTutorialStep.text }}</p>
+            <div class="tutorial-controls">
+                <button type="button" class="tutorial-stop" @click="stopTutorial">Stop tutorial</button>
+                <div class="tutorial-navigation">
+                    <button v-if="tutorialStep > 0" type="button" class="btn-secondary"
+                        @click="previousTutorialStep">Back</button>
+                    <button type="button" class="btn-primary tutorial-next" @click="nextTutorialStep">
+                        {{ tutorialStep === tutorialSteps.length - 1 ? 'Finish' : 'Next' }}
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </template>
 </template>
 
 <script>
@@ -520,6 +572,7 @@ import EventLogPanel from "@/components/EventLogPanel.vue";
 import useEventLogStore from '@/stores/eventLog.js'
 import useAuthStore from '@/stores/auth.js'
 import QRCode from "qrcode";
+import neboImage from '@/assets/images/logo/nebo.png'
 import { PARTNERS, getBaseUrl } from '@/utils/partners.js'
 import { PAYTYPES, getPaytypeConfig } from '@/config/paytypes.js'
 export default {
@@ -527,7 +580,59 @@ export default {
         return {
             auth: useAuthStore(),
             eventLog: useEventLogStore(),
+            neboImage,
             isLogOpen: false,
+            tutorialActive: false,
+            tutorialStep: 0,
+            tutorialSteps: [
+                {
+                    target: 'paytype',
+                    title: 'Choose the pay type',
+                    text: 'Select the payment endpoint you want to test. The pay type determines which additional parameters may be needed for your use case.',
+                    accordion: 'accordionGeneral',
+                },
+                {
+                    target: 'environment',
+                    title: 'Choose the environment',
+                    text: 'Select DEV, TEST, or PRODUCTION. Make sure the environment matches the merchant credentials you will use.',
+                    accordion: 'accordionGeneral',
+                },
+                {
+                    target: 'merchant-id',
+                    title: 'Enter the merchant ID',
+                    text: 'Enter the merchant ID assigned for the selected environment.',
+                    accordion: 'accordionGeneral',
+                },
+                {
+                    target: 'encryption-password',
+                    title: 'Enter the encryption password',
+                    text: 'Enter the Blowfish encryption password associated with this merchant ID.',
+                    accordion: 'accordionGeneral',
+                },
+                {
+                    target: 'amount',
+                    title: 'Set the amount',
+                    text: 'Enter the payment amount in the smallest currency unit—for example, 1000 for EUR 10.00.',
+                    accordion: 'accordionEncrypted',
+                },
+                {
+                    target: 'currency',
+                    title: 'Set the currency',
+                    text: 'Enter the three-letter ISO currency code, such as EUR or USD.',
+                    accordion: 'accordionEncrypted',
+                },
+                {
+                    target: 'urls',
+                    title: 'Provide redirect URLs',
+                    text: 'Check the success, failure, notification, and back URLs used by the payment flow. Other parameters depend on the selected pay type and your use case.',
+                    accordion: 'accordionEncrypted',
+                },
+                {
+                    target: 'encrypt',
+                    title: 'Encrypt the request',
+                    text: 'Review the required values, then select Encrypt to prepare the request. You can add any use-case or pay-type-specific parameters before this step.',
+                },
+            ],
             partners: PARTNERS,
             paytypes: PAYTYPES,
             // merchantid: import.meta.env.VITE_ENVIRONMENT === 'development' ? import.meta.env.VITE_TEST_MERCHANTID : '',
@@ -610,8 +715,8 @@ export default {
             includeURLFailure: true,
             includeURLNotify: true,
             includeURLBack: true,
-            includeEmail: true,
-            includeOrderDesc: true,
+            includeEmail: false,
+            includeOrderDesc: false,
             includePaytweakService: true,
             includePaytweakReminderEmail: true,
             includeExpirationDate: true,
@@ -635,6 +740,9 @@ export default {
         EventLogPanel
     },
     computed: {
+        currentTutorialStep() {
+            return this.tutorialSteps[this.tutorialStep]
+        },
         hmac_data() {
             return `*${this.transid}*${this.auth.merchantid}*${this.amount}*${this.currency}`
         },
@@ -734,6 +842,56 @@ export default {
         },
     },
     methods: {
+        startTutorial() {
+            this.tutorialStep = 0
+            this.tutorialActive = true
+            document.addEventListener('keydown', this.handleTutorialKeydown)
+            this.showTutorialStep()
+        },
+        stopTutorial() {
+            this.tutorialActive = false
+            this.clearTutorialHighlight()
+            document.removeEventListener('keydown', this.handleTutorialKeydown)
+        },
+        nextTutorialStep() {
+            if (this.tutorialStep === this.tutorialSteps.length - 1) {
+                this.stopTutorial()
+                return
+            }
+            this.tutorialStep += 1
+            this.showTutorialStep()
+        },
+        previousTutorialStep() {
+            if (this.tutorialStep === 0) return
+            this.tutorialStep -= 1
+            this.showTutorialStep()
+        },
+        handleTutorialKeydown(event) {
+            if (event.key === 'Escape') this.stopTutorial()
+            if (event.key === 'ArrowRight') this.nextTutorialStep()
+            if (event.key === 'ArrowLeft') this.previousTutorialStep()
+        },
+        clearTutorialHighlight() {
+            document.querySelectorAll('.tutorial-highlight').forEach((element) => {
+                element.classList.remove('tutorial-highlight')
+            })
+            document.querySelectorAll('.tutorial-layer').forEach((element) => {
+                element.classList.remove('tutorial-layer')
+            })
+        },
+        showTutorialStep() {
+            this.clearTutorialHighlight()
+            const step = this.currentTutorialStep
+            if (step.accordion) this[step.accordion] = true
+
+            this.$nextTick(() => {
+                const target = document.querySelector(`[data-tour="${step.target}"]`)
+                if (!target) return
+                target.classList.add('tutorial-highlight')
+                target.closest('.action-bar')?.classList.add('tutorial-layer')
+                target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
+            })
+        },
         // payssl sends the amount/currency in CustomField1, with the amount in
         // major units: Amount=1000 & Currency=EUR -> "10.00 EUR"
         syncPaysslCustomField1() {
@@ -1286,6 +1444,8 @@ export default {
     },
     beforeUnmount() {
         document.removeEventListener('mousedown', this.handleParentClick)
+        document.removeEventListener('keydown', this.handleTutorialKeydown)
+        this.clearTutorialHighlight()
     },
     watch: {
         paytype(newVal) {
@@ -1355,9 +1515,121 @@ export default {
 
 .title-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
+}
+
+.title-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.floating-params-dock {
+    margin-left: auto;
+}
+
+.tutorial-launch {
+    padding: 4px 9px;
+}
+
+.tutorial-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(7, 22, 34, 0.76);
+}
+
+.tutorial-dialog {
+    position: fixed;
+    top: 72px;
+    right: 24px;
+    z-index: 104;
+    width: min(380px, calc(100vw - 32px));
+    padding: 20px;
+    border: 1px solid #dce7ed;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+}
+
+.tutorial-dialog h4 {
+    margin: 3px 0 8px;
+    color: #1e5582;
+    font-size: 17px;
+}
+
+.tutorial-dialog p {
+    color: #405866;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.tutorial-progress {
+    color: #718691;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.tutorial-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.tutorial-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tutorial-stop {
+    border: 0;
+    background: transparent;
+    color: #637985;
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: underline;
+}
+
+.tutorial-next {
+    padding: 6px 15px;
+    font-size: 12px;
+}
+
+:global(.tutorial-highlight) {
+    position: relative;
+    z-index: 103;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 0 0 4px #a5f729, 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+:global(.btn-primary.tutorial-highlight),
+:global(.btn-primary.tutorial-highlight:disabled) {
+    background-color: #a5f729;
+    color: #1e5582;
+}
+
+:global(.action-bar.tutorial-layer) {
+    z-index: 102;
+}
+
+@media (max-width: 640px) {
+    .tutorial-dialog {
+        top: auto;
+        right: 16px;
+        bottom: 16px;
+        left: 16px;
+        width: auto;
+    }
 }
 
 .custom-height {
@@ -1416,10 +1688,6 @@ export default {
     margin-top: 6px;
 }
 
-.only-margin {
-    margin-left: 60px;
-}
-
 .simpler-button {
     border: none;
     background-color: #a5f729;
@@ -1430,6 +1698,54 @@ export default {
     color: #1e5582;
     font-weight: 600;
     outline: none;
+}
+
+.suggestion-contact {
+    position: fixed;
+    right: 18px;
+    bottom: 76px;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    width: 190px;
+}
+
+.suggestion-contact-image {
+    width: 92px;
+    height: 92px;
+    object-fit: cover;
+    border: 3px solid #1e5582;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 5px 16px rgba(0, 0, 0, 0.22);
+}
+
+.suggestion-contact-pill {
+    padding: 6px 11px;
+    border: 1px solid #d7e3e9;
+    border-radius: 999px;
+    background: white;
+    color: #1e5582;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.16);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+}
+
+@media (max-width: 760px) {
+    .suggestion-contact {
+        right: 10px;
+        bottom: 84px;
+        width: 150px;
+    }
+
+    .suggestion-contact-image {
+        width: 70px;
+        height: 70px;
+    }
 }
 
 .action-bar {

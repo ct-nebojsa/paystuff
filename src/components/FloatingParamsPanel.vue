@@ -1,13 +1,17 @@
 <template>
-  <div class="floating-panel" :style="{ top: position.top + 'px', left: position.left + 'px' }">
+  <Teleport to="[data-floating-params-dock]" :disabled="!docked">
+  <div ref="panel" class="floating-panel" :class="{ 'is-docked': docked }" :style="panelStyle">
     <div class="floating-panel-header" @mousedown="startDrag">
       <span>{{ title }}</span>
       <div class="floating-panel-controls">
-        <button type="button" class="floating-panel-toggle" title="Smaller text" @mousedown.stop
+        <button type="button" class="floating-panel-toggle floating-panel-dock" :title="docked ? 'Undock panel' : 'Dock left of Event log'"
+          @mousedown.stop @click="toggleDock">{{ docked ? 'Float' : 'Dock' }}</button>
+        <button v-if="!docked" type="button" class="floating-panel-toggle" title="Smaller text" @mousedown.stop
           @click="changeFontSize(-1)">A−</button>
-        <button type="button" class="floating-panel-toggle" title="Larger text" @mousedown.stop
+        <button v-if="!docked" type="button" class="floating-panel-toggle" title="Larger text" @mousedown.stop
           @click="changeFontSize(1)">A+</button>
-        <button type="button" class="floating-panel-toggle" @mousedown.stop @click="collapsed = !collapsed">{{ collapsed ? '▢' : '—' }}</button>
+        <button v-if="!docked" type="button" class="floating-panel-toggle" @mousedown.stop
+          @click="collapsed = !collapsed">{{ collapsed ? '▢' : '—' }}</button>
       </div>
     </div>
     <div v-show="!collapsed" class="floating-panel-body" :style="{ fontSize: fontSize + 'px' }">
@@ -33,6 +37,7 @@
       <pre>{{ hoverJson }}</pre>
     </div>
   </div>
+  </Teleport>
 </template>
 
 <script>
@@ -65,7 +70,8 @@ export default {
   emits: ['copy-url'],
   data() {
     return {
-      collapsed: false,
+      collapsed: true,
+      docked: true,
       fontSize: 11,
       decodedKeys: {},
       hoverJson: null,
@@ -78,9 +84,33 @@ export default {
       offset: { x: 0, y: 0 },
     }
   },
+  computed: {
+    panelStyle() {
+      if (this.docked) return {}
+      return {
+        top: this.position.top + 'px',
+        left: this.position.left + 'px',
+      }
+    },
+  },
   methods: {
     changeFontSize(delta) {
       this.fontSize = Math.min(16, Math.max(8, this.fontSize + delta))
+    },
+    toggleDock() {
+      if (!this.docked) {
+        this.docked = true
+        this.collapsed = true
+        return
+      }
+
+      const rect = this.$refs.panel.getBoundingClientRect()
+      this.position = {
+        top: Math.max(8, Math.min(rect.top, window.innerHeight - 48)),
+        left: Math.max(8, Math.min(rect.left, window.innerWidth - rect.width - 8)),
+      }
+      this.docked = false
+      this.collapsed = false
     },
     paramKey(param) {
       return splitParam(param)[0]
@@ -110,7 +140,7 @@ export default {
     showJson(param, event) {
       const json = this.jsonValue(param)
       if (json === null) return
-      const panelRect = this.$el.getBoundingClientRect()
+      const panelRect = this.$refs.panel.getBoundingClientRect()
       const rowRect = event.currentTarget.getBoundingClientRect()
       const width = 380
       let left = panelRect.left - width - 10
@@ -129,6 +159,7 @@ export default {
       this.decodedKeys[key] = !this.decodedKeys[key]
     },
     startDrag(event) {
+      if (this.docked) return
       this.dragging = true
       this.offset = {
         x: event.clientX - this.position.left,
@@ -173,6 +204,16 @@ export default {
   flex-direction: column;
 }
 
+.floating-panel.is-docked {
+  position: static;
+  width: 280px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+}
+
+.floating-panel.is-docked .floating-panel-header {
+  cursor: default;
+}
+
 .floating-panel-header {
   background: #a5f729;
   color: #1e5582;
@@ -182,6 +223,7 @@ export default {
   justify-content: space-between;
   gap: 8px;
   cursor: move;
+  touch-action: none;
   user-select: none;
   font-weight: 600;
   font-size: 13px;
@@ -204,6 +246,11 @@ export default {
   cursor: pointer;
   font-size: 11px;
   flex-shrink: 0;
+}
+
+.floating-panel-dock {
+  min-width: 38px;
+  padding: 0 5px;
 }
 
 .floating-panel-body {
