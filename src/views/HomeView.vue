@@ -648,7 +648,7 @@ export default {
             refnr: '',
             amount: '1000',
             currency: 'EUR',
-            orderdesc: 'test:payment',
+            orderdesc: 'test:paymentpage',
             urlsuccess: 'https://paygate-test.vercel.app/success',
             urlfailure: 'https://paygate-test.vercel.app/failure',
             urlnotify: 'https://paygate-test.vercel.app/api/notify',
@@ -1462,6 +1462,7 @@ export default {
     },
     watch: {
         paytype(newVal) {
+            this.orderdesc = `test:${newVal}`
             const cfg = getPaytypeConfig(newVal)
             if (!cfg) {
                 this.isDataEncrypted = false
