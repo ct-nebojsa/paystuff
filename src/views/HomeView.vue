@@ -537,8 +537,9 @@
 
     <ParametersModal v-show="isParametersModal" @close="isParametersModal = false" ref="menu"
         @setparameter="handleReceivedParameter" />
-    <FloatingParamsPanel title="Request parameters" :params="plaintextParams" :payment-url="testurl"
-        :show-payment-url="isDataEncrypted" :copied="copiedField === 'url'" @copy-url="copyText(testurl, 'url')" />
+    <FloatingParamsPanel title="Request parameters" :params="plaintextParams" :endpoint="requestEndpoint"
+        :payment-url="testurl" :show-payment-url="isDataEncrypted" :copied="copiedField === 'url'"
+        @copy-url="copyText(testurl, 'url')" />
     <FloatingResponsePanel v-if="replaceFrontEnd === 'direct' || replaceFrontEnd === 'paybylinkexternal'"
         :password="auth.bf_password" @response-decrypted="logResponse" />
     <EventLogPanel v-if="isLogOpen" @close="isLogOpen = false" />
@@ -822,8 +823,11 @@ export default {
             const cfg = getPaytypeConfig(this.paytype)
             return cfg ? (cfg.aspx || cfg.value) : '...'
         },
+        requestEndpoint() {
+            return `https://${this.baseurl}/${this.replaceFrontEnd}.aspx`
+        },
         testurl_ohne_data() {
-            return `https://${this.baseurl}/${this.replaceFrontEnd}.aspx?MerchantID=${this.auth.merchantid}&Len=${this.len}&Data=[EncryptedData]`
+            return `${this.requestEndpoint}?MerchantID=${this.auth.merchantid}&Len=${this.len}&Data=[EncryptedData]`
         },
         testurl() {
             let base_url = `https://${this.baseurl}/${this.replaceFrontEnd}.aspx?MerchantID=${this.auth.merchantid}&Len=${this.len}&Data=${this.encrypted_data}`

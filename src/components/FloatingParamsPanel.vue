@@ -15,14 +15,20 @@
       </div>
     </div>
     <div v-show="!collapsed" class="floating-panel-body" :style="{ fontSize: fontSize + 'px' }">
-      <div v-if="params.length === 0" class="floating-panel-empty">No parameters</div>
-      <div v-for="(param, idx) in params" :key="idx" class="floating-panel-row"
-        :class="{ 'has-json': jsonValue(param) !== null }" @mouseenter="showJson(param, $event)"
-        @mouseleave="hideJson">
-        {{ displayed(param) }}
-        <button v-if="base64Value(param) !== null" type="button" class="floating-panel-decode-btn"
-          @click="toggleDecode(param)">{{ decodedKeys[paramKey(param)] ? 'Original' : 'Decode' }}</button>
+      <div v-if="endpoint" class="floating-panel-endpoint">
+        <span class="floating-panel-endpoint-label">Endpoint</span>
+        <span class="floating-panel-endpoint-value">{{ endpoint }}</span>
       </div>
+      <div v-if="params.length === 0" class="floating-panel-empty">No parameters</div>
+      <TransitionGroup name="parameter-row">
+        <div v-for="param in params" :key="paramKey(param)" class="floating-panel-row"
+          :class="{ 'has-json': jsonValue(param) !== null }" @mouseenter="showJson(param, $event)"
+          @mouseleave="hideJson">
+          {{ displayed(param) }}
+          <button v-if="base64Value(param) !== null" type="button" class="floating-panel-decode-btn"
+            @click="toggleDecode(param)">{{ decodedKeys[paramKey(param)] ? 'Original' : 'Decode' }}</button>
+        </div>
+      </TransitionGroup>
       <div v-if="showPaymentUrl" class="floating-panel-url-section">
         <div class="floating-panel-url-label">Payment URL</div>
         <div class="floating-panel-url-value">{{ paymentUrl }}</div>
@@ -36,6 +42,8 @@
       :style="{ top: hoverPos.top + 'px', left: hoverPos.left + 'px' }">
       <pre>{{ hoverJson }}</pre>
     </div>
+    <button v-if="!docked" type="button" class="floating-panel-resize-handle" title="Resize panel"
+      aria-label="Resize panel" @mousedown.stop.prevent="startResize"></button>
   </div>
   </Teleport>
 </template>
@@ -53,6 +61,10 @@ export default {
     params: {
       type: Array,
       default: () => [],
+    },
+    endpoint: {
+      type: String,
+      default: '',
     },
     paymentUrl: {
       type: String,
@@ -81,7 +93,10 @@ export default {
         left: Math.max(20, window.innerWidth - 340),
       },
       dragging: false,
+      resizing: false,
       offset: { x: 0, y: 0 },
+      size: { width: 320, height: null },
+      resizeStart: { x: 0, y: 0, width: 320, height: 0 },
     }
   },
   computed: {
@@ -90,6 +105,9 @@ export default {
       return {
         top: this.position.top + 'px',
         left: this.position.left + 'px',
+        width: this.size.width + 'px',
+        height: this.size.height === null ? undefined : this.size.height + 'px',
+        maxHeight: this.size.height === null ? undefined : 'none',
       }
     },
   },
@@ -158,6 +176,32 @@ export default {
       const key = this.paramKey(param)
       this.decodedKeys[key] = !this.decodedKeys[key]
     },
+    startResize(event) {
+      const rect = this.$refs.panel.getBoundingClientRect()
+      this.resizing = true
+      this.resizeStart = {
+        x: event.clientX,
+        y: event.clientY,
+        width: rect.width,
+        height: rect.height,
+      }
+      document.addEventListener('mousemove', this.onResize)
+      document.addEventListener('mouseup', this.stopResize)
+    },
+    onResize(event) {
+      if (!this.resizing) return
+      const maxWidth = Math.max(240, window.innerWidth - this.position.left - 8)
+      const maxHeight = Math.max(140, window.innerHeight - this.position.top - 8)
+      this.size = {
+        width: Math.min(maxWidth, Math.max(240, this.resizeStart.width + event.clientX - this.resizeStart.x)),
+        height: Math.min(maxHeight, Math.max(140, this.resizeStart.height + event.clientY - this.resizeStart.y)),
+      }
+    },
+    stopResize() {
+      this.resizing = false
+      document.removeEventListener('mousemove', this.onResize)
+      document.removeEventListener('mouseup', this.stopResize)
+    },
     startDrag(event) {
       if (this.docked) return
       this.dragging = true
@@ -186,6 +230,8 @@ export default {
   beforeUnmount() {
     document.removeEventListener('mousemove', this.onDrag)
     document.removeEventListener('mouseup', this.stopDrag)
+    document.removeEventListener('mousemove', this.onResize)
+    document.removeEventListener('mouseup', this.stopResize)
   },
 }
 </script>
@@ -202,6 +248,24 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.floating-panel-resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: linear-gradient(135deg, transparent 45%, #1e5582 46%, #1e5582 54%, transparent 55%);
+  cursor: nwse-resize;
+  opacity: 0.65;
+  z-index: 2;
+}
+
+.floating-panel-resize-handle:hover {
+  opacity: 1;
 }
 
 .floating-panel.is-docked {
@@ -260,10 +324,72 @@ export default {
   font-size: 11px;
 }
 
+.floating-panel-endpoint {
+  margin-bottom: 7px;
+  padding: 7px 8px;
+  border: 1px solid rgba(30, 85, 130, 0.2);
+  border-radius: 6px;
+  background: rgba(30, 85, 130, 0.06);
+}
+
+.floating-panel-endpoint-label {
+  display: block;
+  margin-bottom: 3px;
+  color: #1e5582;
+  font-weight: 700;
+}
+
+.floating-panel-endpoint-value {
+  display: block;
+  color: #333;
+  word-break: break-all;
+}
+
 .floating-panel-row {
   padding: 3px 0;
   border-bottom: 1px solid #f0f0f0;
   word-break: break-all;
+}
+
+.parameter-row-enter-active,
+.parameter-row-leave-active {
+  max-height: 100px;
+  overflow: hidden;
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease,
+    max-height 300ms ease,
+    padding 300ms ease,
+    background-color 900ms ease;
+}
+
+.parameter-row-enter-from {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  transform: translateX(12px);
+  background-color: rgba(165, 247, 41, 0.65);
+}
+
+.parameter-row-enter-to {
+  background-color: transparent;
+}
+
+.parameter-row-leave-to {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  transform: translateX(-12px);
+  background-color: rgba(255, 99, 99, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parameter-row-enter-active,
+  .parameter-row-leave-active {
+    transition: none;
+  }
 }
 
 .floating-panel-row:last-child {
