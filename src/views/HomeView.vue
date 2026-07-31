@@ -511,9 +511,13 @@
         </div>
     </div>
 
-    <aside class="suggestion-contact" aria-label="Product feedback contact">
-        <img :src="neboImage" alt="Nebo" class="suggestion-contact-image">
-        <div class="suggestion-contact-pill">Any suggestions? Write to your favorite PM!</div>
+    <aside v-if="isSuggestionContactVisible" class="suggestion-contact" aria-label="Product feedback contact">
+        <div class="suggestion-contact-image-wrapper">
+            <img :src="neboImage" alt="Nebo" class="suggestion-contact-image">
+            <button type="button" class="suggestion-contact-close" aria-label="Close product feedback contact"
+                @click="dismissSuggestionContact">Close</button>
+        </div>
+        <div class="suggestion-contact-pill">Any suggestions? Message your favorite PM! ⬆️⬆️⬆️</div>
     </aside>
 
     <div class="action-bar">
@@ -575,12 +579,16 @@ import QRCode from "qrcode";
 import neboImage from '@/assets/images/logo/nebo.png'
 import { PARTNERS, getBaseUrl } from '@/utils/partners.js'
 import { PAYTYPES, getPaytypeConfig } from '@/config/paytypes.js'
+
+const SUGGESTION_CONTACT_DISMISSED_KEY = 'suggestion-contact-dismissed'
+
 export default {
     data() {
         return {
             auth: useAuthStore(),
             eventLog: useEventLogStore(),
             neboImage,
+            isSuggestionContactVisible: true,
             isLogOpen: false,
             tutorialActive: false,
             tutorialStep: 0,
@@ -842,6 +850,10 @@ export default {
         },
     },
     methods: {
+        dismissSuggestionContact() {
+            this.isSuggestionContactVisible = false
+            sessionStorage.setItem(SUGGESTION_CONTACT_DISMISSED_KEY, 'true')
+        },
         startTutorial() {
             this.tutorialStep = 0
             this.tutorialActive = true
@@ -1437,6 +1449,7 @@ export default {
         },
     },
     mounted() {
+        this.isSuggestionContactVisible = sessionStorage.getItem(SUGGESTION_CONTACT_DISMISSED_KEY) !== 'true'
         this.generate_transid()
         this.duplicationOrderId = 'ORD' + this.random_digits(8)
         this.duplicationInvoiceId = 'INV' + this.random_digits(8)
@@ -1720,6 +1733,34 @@ export default {
     border-radius: 50%;
     background: white;
     box-shadow: 0 5px 16px rgba(0, 0, 0, 0.22);
+}
+
+.suggestion-contact-image-wrapper {
+    position: relative;
+}
+
+.suggestion-contact-close {
+    position: absolute;
+    top: -7px;
+    right: -25px;
+    padding: 3px 7px;
+    border: 1px solid #1e5582;
+    border-radius: 999px;
+    background: white;
+    color: #1e5582;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.suggestion-contact-close:hover {
+    background: #f2f7fa;
+}
+
+.suggestion-contact-close:focus-visible {
+    outline: 2px solid #1e5582;
+    outline-offset: 2px;
 }
 
 .suggestion-contact-pill {
