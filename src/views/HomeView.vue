@@ -529,6 +529,21 @@
                     :disabled="!canEncrypt">Encrypt</button>
                 <p v-if="!canEncrypt" class="validation-error">{{ encryptDisabledReason }}</p>
             </div>
+            <div v-if="isBulkAvailable" class="bulk-run">
+                <label class="bulk-run-field">
+                    <span class="bulk-run-label">Runs</span>
+                    <input type="number" class="field-input bulk-run-input" min="1" :max="BULK_RUN_MAX" step="1"
+                        v-model.number="bulkCount" :disabled="isBulkRunning">
+                </label>
+                <button type="button" class="btn-secondary action-btn-lg bulk-run-button" @click="runBulk"
+                    :disabled="!canRunBulk">
+                    <span v-if="isBulkRunning" class="spinner" aria-hidden="true"></span>
+                    {{ isBulkRunning ? `Running ${bulkCompleted} of ${bulkTotal}` : 'Run bulk' }}
+                </button>
+                <button v-if="isBulkRunning" type="button" class="btn-secondary" @click="stopBulk">Stop</button>
+                <p v-if="bulkStatus" class="bulk-run-status" :class="{ 'bulk-run-status-error': bulkFailed > 0 }"
+                    role="status" aria-live="polite">{{ bulkStatus }}</p>
+            </div>
             <a class="payment-url-button" v-if="isDataEncrypted" :href="testurl" target="_blank">
                 <span>Open</span> {{ this.paytype }}
             </a>
@@ -580,8 +595,11 @@ import QRCode from "qrcode";
 import neboImage from '@/assets/images/logo/nebo.png'
 import { PARTNERS, getBaseUrl } from '@/utils/partners.js'
 import { PAYTYPES, getPaytypeConfig } from '@/config/paytypes.js'
+import { decryptResponseBody } from '@/utils/blowfish.js'
 
 const SUGGESTION_CONTACT_DISMISSED_KEY = 'suggestion-contact-dismissed'
+const BULK_RUN_MAX = 100
+const PROXY_UNREACHABLE = 'Could not reach the proxy - this only works when deployed on Vercel (or via `vercel dev` locally).'
 
 export default {
     data() {
@@ -589,6 +607,15 @@ export default {
             auth: useAuthStore(),
             eventLog: useEventLogStore(),
             neboImage,
+            BULK_RUN_MAX,
+            bulkCount: 5,
+            isBulkRunning: false,
+            bulkStopRequested: false,
+            bulkTotal: 0,
+            bulkCompleted: 0,
+            bulkSucceeded: 0,
+            bulkFailed: 0,
+            bulkStatus: '',
             isSuggestionContactVisible: true,
             isLogOpen: false,
             tutorialActive: false,
@@ -806,6 +833,14 @@ export default {
         },
         canEncrypt() {
             return this.validationErrors.length === 0;
+        },
+        // bulk sending only makes sense for the S2S endpoint: direct.aspx answers
+        // in the response body, the redirect pay types answer in the browser
+        isBulkAvailable() {
+            return this.replaceFrontEnd === 'direct';
+        },
+        canRunBulk() {
+            return this.canEncrypt && !this.isBulkRunning && Number(this.bulkCount) >= 1;
         },
         encryptDisabledReason() {
             return this.validationErrors[0] || '';
@@ -1377,6 +1412,113 @@ export default {
                 params: data.split('&'),
             })
         },
+        // Sends the current form as N direct.aspx calls, one after the other.
+        // Every run is prepared the same way the Encrypt button prepares a single
+        // request: buildParams() -> plaintext -> Blowfish, only with a fresh
+        // TransID per run so Paygate does not reject the repeats as duplicates.
+        async runBulk() {
+            if (!this.canRunBulk) {
+                return;
+            }
+
+            const total = Math.min(Math.max(Math.floor(Number(this.bulkCount) || 0), 1), BULK_RUN_MAX);
+            this.bulkCount = total;
+            this.bulkTotal = total;
+            this.bulkCompleted = 0;
+            this.bulkSucceeded = 0;
+            this.bulkFailed = 0;
+            this.bulkStatus = '';
+            this.bulkStopRequested = false;
+            this.isBulkRunning = true;
+
+            let unreachable = false;
+
+            try {
+                for (let i = 0; i < total; i++) {
+                    if (this.includeTransID) {
+                        this.generate_transid();
+                    }
+                    if (this.isDuplicationCheck) {
+                        this.duplicationOrderId = 'ORD' + this.random_digits(8);
+                        this.duplicationInvoiceId = 'INV' + this.random_digits(8);
+                    }
+
+                    const plaintext = this.plaintext;
+                    this.encryptData(plaintext);
+
+                    const result = await this.sendDirectRequest(plaintext, this.encrypted_data);
+                    this.bulkCompleted += 1;
+
+                    if (result === 'ok') {
+                        this.bulkSucceeded += 1;
+                    } else {
+                        this.bulkFailed += 1;
+                    }
+
+                    // a dead proxy fails every remaining run the same way, so stop
+                    if (result === 'unreachable') {
+                        unreachable = true;
+                        break;
+                    }
+                    if (this.bulkStopRequested) {
+                        break;
+                    }
+                }
+            } finally {
+                this.isBulkRunning = false;
+            }
+
+            this.bulkStatus = this.bulkStatusText(total, unreachable);
+        },
+        bulkStatusText(total, unreachable) {
+            if (unreachable) {
+                return PROXY_UNREACHABLE;
+            }
+            const failed = this.bulkFailed > 0 ? `, ${this.bulkFailed} failed` : '';
+            if (this.bulkCompleted < total) {
+                return `Stopped after ${this.bulkCompleted} of ${total}: ${this.bulkSucceeded} sent${failed}. Open the event log for details.`;
+            }
+            return `${this.bulkSucceeded} of ${total} sent${failed}. Open the event log for details.`;
+        },
+        stopBulk() {
+            this.bulkStopRequested = true;
+        },
+        async sendDirectRequest(plaintext, data) {
+            const query = new URLSearchParams({
+                partner: this.auth.partner,
+                environment: this.auth.environment,
+                merchantid: this.auth.merchantid,
+                aspx: 'direct',
+                len: String(plaintext.length),
+                data,
+            });
+
+            try {
+                const res = await fetch(`/api/direct-proxy?${query.toString()}`);
+                const json = await res.json();
+
+                if (!res.ok) {
+                    this.eventLog.log({
+                        page: 'Encryption',
+                        kind: 'error',
+                        aspx: 'direct',
+                        message: json.error || 'Request failed.',
+                    });
+                    return 'failed';
+                }
+
+                this.logResponse({ params: decryptResponseBody(json.body, this.auth.bf_password), raw: json.body });
+                return 'ok';
+            } catch (e) {
+                this.eventLog.log({
+                    page: 'Encryption',
+                    kind: 'error',
+                    aspx: 'direct',
+                    message: PROXY_UNREACHABLE,
+                });
+                return 'unreachable';
+            }
+        },
         logResponse({ params, raw }) {
             this.eventLog.log({
                 page: 'Encryption',
@@ -1812,6 +1954,7 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
     gap: 16px;
 }
 
@@ -1824,5 +1967,82 @@ export default {
 .action-btn-lg {
     font-size: 14px;
     padding: 10px 16px;
+}
+
+.bulk-run {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-left: 16px;
+    border-left: 1px solid #d4d4d4;
+}
+
+.bulk-run-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bulk-run-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e5582;
+}
+
+.bulk-run-input {
+    width: 68px;
+    padding: 8px;
+    text-align: right;
+}
+
+.bulk-run-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bulk-run-button:disabled {
+    background-color: #8ba6bd;
+    cursor: not-allowed;
+}
+
+.bulk-run-status {
+    flex-basis: 100%;
+    font-size: 11px;
+    color: #4a4a4a;
+}
+
+.bulk-run-status-error {
+    color: #d12f2f;
+}
+
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation: none;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 640px) {
+    .bulk-run {
+        padding-left: 0;
+        border-left: none;
+    }
 }
 </style>
