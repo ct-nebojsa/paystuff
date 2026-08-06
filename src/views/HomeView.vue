@@ -532,7 +532,7 @@
             <div v-if="isBulkAvailable" class="bulk-run">
                 <label class="bulk-run-field">
                     <span class="bulk-run-label">Runs</span>
-                    <input type="number" class="field-input bulk-run-input" min="1" :max="BULK_RUN_MAX" step="1"
+                    <input type="number" class="field-input bulk-run-input" min="1" step="1"
                         v-model.number="bulkCount" :disabled="isBulkRunning">
                 </label>
                 <button type="button" class="btn-secondary action-btn-lg bulk-run-button" @click="runBulk"
@@ -598,7 +598,6 @@ import { PAYTYPES, getPaytypeConfig } from '@/config/paytypes.js'
 import { decryptResponseBody } from '@/utils/blowfish.js'
 
 const SUGGESTION_CONTACT_DISMISSED_KEY = 'suggestion-contact-dismissed'
-const BULK_RUN_MAX = 100
 const PROXY_UNREACHABLE = 'Could not reach the proxy - this only works when deployed on Vercel (or via `vercel dev` locally).'
 
 export default {
@@ -607,7 +606,6 @@ export default {
             auth: useAuthStore(),
             eventLog: useEventLogStore(),
             neboImage,
-            BULK_RUN_MAX,
             bulkCount: 5,
             isBulkRunning: false,
             bulkStopRequested: false,
@@ -1421,7 +1419,7 @@ export default {
                 return;
             }
 
-            const total = Math.min(Math.max(Math.floor(Number(this.bulkCount) || 0), 1), BULK_RUN_MAX);
+            const total = Math.max(Math.floor(Number(this.bulkCount) || 0), 1);
             this.bulkCount = total;
             this.bulkTotal = total;
             this.bulkCompleted = 0;
