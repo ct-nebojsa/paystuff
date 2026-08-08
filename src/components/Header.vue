@@ -9,6 +9,7 @@
                 <li><router-link to="/other">Other actions</router-link></li>
                 <li><router-link to="/quick-testing">Quick testing</router-link></li>
                 <li><router-link to="/cb2a-builder">CB2A</router-link></li>
+                <li><router-link to="/xml-parser">XML parser</router-link></li>
             </ul>
         </nav>
         <div class="header-spacer" aria-hidden="true"></div>

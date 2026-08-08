@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import DecryptView from '../views/DecryptView.vue'
 import OtherView from '../views/OtherView.vue'
 import Cb2aView from '@/views/Cb2aView.vue'
+import XmlParserView from '@/views/XmlParserView.vue'
 import NotificationView from '@/views/NotificationView.vue'
 import QuickTestView from '@/views/QuickTestView.vue'
 
@@ -18,6 +19,7 @@ const router = createRouter({
     {path: '/other', name: 'other', component: OtherView},
     {path: '/quick-testing', name: 'quicktest', component: QuickTestView},
     {path: '/cb2a-builder', name: 'cb2a', component: Cb2aView},
+    {path: '/xml-parser', name: 'xmlparser', component: XmlParserView},
     {path: '/success', name: 'success', component: NotificationView, props: { status: 'success' }},
     {path: '/failure', name: 'failure', component: NotificationView, props: { status: 'failure' }},
     {path: '/back', name: 'back', component: NotificationView, props: { status: 'back' }},
